@@ -135,8 +135,7 @@ class Locale
      * @param string $form Optional form parameter
      * @param string $type Single or multiple
      * @param array $additional Additional parameters to compare
-     * @return string
-     * @throws \ErrorException
+     * @return string|null
      */
     public function getTerms($name, $form = '', $type = 'single', array $additional = array())
     {
@@ -149,9 +148,10 @@ class Locale
 
                     if (count($additional) > 0) {
                         foreach ($additional as $option => $value) {
-                            if ($this->terms[$i][$option] !== $value) {
-                                $found  =   false;
-                                break;
+                            if (array_key_exists($option, $this->terms[$i]) == false
+                                || $this->terms[$i][$option] !== $value) {
+                                    $found  =   false;
+                                    break;
                             }
                         }
                     }
@@ -162,9 +162,7 @@ class Locale
             }
         }
 
-        throw new \ErrorException(
-                            'The locale option (name = ' . $name . ', form = ' . $form
-                            . ', type = ' . $type . 'is not set');
+        return null;
     }
 
     /**

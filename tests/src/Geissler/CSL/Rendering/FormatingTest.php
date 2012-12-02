@@ -21,6 +21,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formating::__construct
      */
     public function testRender()
     {
@@ -60,7 +61,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
      */
     public function testRender4()
     {
-        $this->initElement('<et-al vertical-align="super"/>');
+        $this->initElement('<et-al vertical-align="sup"/>');
         $this->assertEquals('<font style="vertical-align:super">Test</font>', $this->object->render('Test'));
     }
 

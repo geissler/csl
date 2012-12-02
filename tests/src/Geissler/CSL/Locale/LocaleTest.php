@@ -30,38 +30,26 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Locale\Locale::setDir
-     * @todo   Implement testSetDir().
      */
     public function testSetDir()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->setDir('locales'));
     }
 
     /**
      * @covers Geissler\CSL\Locale\Locale::setFile
-     * @todo   Implement testSetFile().
      */
     public function testSetFile()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->setFile('locales-LANGAUGE.xml'));
     }
 
     /**
      * @covers Geissler\CSL\Locale\Locale::setPrimaryDialect
-     * @todo   Implement testSetPrimaryDialect().
      */
     public function testSetPrimaryDialect()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->setPrimaryDialect('{"de" : "de-DE"}'));
     }
 
     /**

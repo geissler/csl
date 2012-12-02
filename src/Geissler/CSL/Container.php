@@ -3,6 +3,7 @@ namespace Geissler\CSL;
 
 use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Macro\Macro;
+use Geissler\CSL\Data\Data;
 
 /**
  * Description of Container
@@ -15,7 +16,15 @@ class Container
     private static $locale;
     /** @var array **/
     private static $macros;
+    /** @var Data **/
+    private static $data;
 
+    /**
+     * Set the actual locale object.
+     *
+     * @param \Geissler\CSL\Locale\Locale $locale
+     * @return void
+     */
     public static function setLocale(Locale $locale)
     {
         self::$locale   =   $locale;
@@ -23,7 +32,7 @@ class Container
 
     /**
      * Access the Locale object.
-     * 
+     *
      * @return Locale
      * @throws \ErrorException
      */
@@ -53,5 +62,26 @@ class Container
         }
 
         throw new \ErrorException('A macro with the name ' . $name . ' is not registered!');
+    }
+
+    /**
+     * Store the data object.
+     *
+     * @param \Geissler\CSL\Data\Data $data
+     * @return void
+     */
+    public static function setData(Data $data)
+    {
+        self::$data = $data;
+    }
+
+    /**
+     * Access the data object.
+     *
+     * @return Data
+     */
+    public static function getData()
+    {
+        return self::$data;
     }
 }

@@ -86,14 +86,14 @@ class TextCase implements Interfaces\Renderable
     }
 
     /**
-     * Capitalize first letter of first word.
+     * Capitalizes the first character of the first word, if the word is lowercase.
      *
      * @param string $data
      * @return string
      */
     private function capitalizeFirst($data)
     {
-       return $this->keepNoCaseSpan(mb_strtoupper(mb_substr($data, 0, 1)) . mb_substr($data, 1), $data);
+        return $this->keepNoCaseSpan(mb_strtoupper(mb_substr($data, 0, 1)) . mb_substr($data, 1), $data);
     }
 
     /**

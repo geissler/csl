@@ -89,9 +89,8 @@ class Formating implements Interfaces\Renderable
         if ($this->align == 'sub') {
             $style[] = 'vertical-align:sub';
         }
-        elseif ($this->align == 'sup'
-            || $this->align == 'super') {
-                $style[] = 'vertical-align:super';
+        elseif ($this->align == 'sup') {
+            $style[] = 'vertical-align:super';
         }
 
         if (count($style) > 0) {

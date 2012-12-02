@@ -21,6 +21,7 @@ class DisplayTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\Display::render
+     * @covers Geissler\CSL\Rendering\Display::__construct
      */
     public function testRender()
     {

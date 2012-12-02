@@ -21,6 +21,7 @@ class QuotesTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\Quotes::render
+     * @covers Geissler\CSL\Rendering\Quotes::__construct
      */
     public function testRender()
     {

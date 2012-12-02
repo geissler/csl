@@ -41,6 +41,15 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
      */
+    public function testRenderCapitalizeFirst1()
+    {
+        $this->initElement('<text variable="title" prefix="(" suffix=")" text-decoration="underline" text-case="capitalize-first"/>');
+        $this->assertEquals('His book', $this->object->render('his book'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\TextCase::render
+     */
     public function testRenderLowerCase()
     {
         $this->initElement('<text variable="title" text-case="lowercase"/>');

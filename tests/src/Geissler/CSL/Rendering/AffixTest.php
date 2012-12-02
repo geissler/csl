@@ -11,8 +11,6 @@ class AffixTest extends \PHPUnit_Framework_TestCase
      */
     protected $object;
 
-   
-
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
@@ -23,6 +21,7 @@ class AffixTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\Affix::render
+     * @covers Geissler\CSL\Rendering\Affix::__construct
      */
     public function testRender()
     {
