@@ -54,7 +54,6 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Locale\Locale::readFile
-     * @todo   Implement testReadFile().
      */
     public function testReadFile()
     {

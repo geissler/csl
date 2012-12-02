@@ -68,6 +68,15 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Rendering\Formating::render
      */
+    public function testRender5()
+    {
+        $this->initElement('<et-al vertical-align="sup" font-style="oblique"/>');
+        $this->assertEquals('<font style="font-style:oblique;vertical-align:super">Test</font>', $this->object->render('Test'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Formating::render
+     */
     public function testRenderNothing()
     {
         $this->initElement('<et-al/>');

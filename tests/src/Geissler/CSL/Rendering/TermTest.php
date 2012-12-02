@@ -109,6 +109,21 @@ class TermTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->object->render(''));
     }
 
+    /**
+     * @covers Geissler\CSL\Rendering\Term::render
+     * @covers Geissler\CSL\Rendering\Term::__construct
+     */
+    public function testRender6()
+    {
+        $locale = \Geissler\CSL\CSL::locale();
+        $locale->readFile('fr');
+        \Geissler\CSL\Container::setLocale($locale);
+
+        $layout = '<text term="paragraph" form="symbol" text-case="capitalize-first" strip-periods="true"/>';
+        $this->initElement($layout);
+        $this->assertEquals('§', $this->object->render(''));
+    }
+
     protected function initElement($layout)
     {
         $xml = new \SimpleXMLElement($layout);

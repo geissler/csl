@@ -31,6 +31,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::capitalizeFirst
      */
     public function testRenderCapitalizeFirst()
     {
@@ -40,6 +41,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::capitalizeFirst
      */
     public function testRenderCapitalizeFirst1()
     {
@@ -67,6 +69,8 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::renderSentence
+     * @covers Geissler\CSL\Rendering\TextCase::keepNoCaseSpan
      */
     public function testRenderSentence()
     {
@@ -76,6 +80,8 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::renderSentence
+     * @covers Geissler\CSL\Rendering\TextCase::keepNoCaseSpan
      */
     public function testRenderSentence1()
     {
@@ -85,6 +91,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::renderTitle
      */
     public function testRenderTitle()
     {
@@ -98,6 +105,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::renderTitle
      * @depends testRenderTitle
      */
     public function testRenderTitle1()
@@ -118,6 +126,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::renderTitle
      * @depends testRenderTitle
      */
     public function testRenderTitleNotEnglish()

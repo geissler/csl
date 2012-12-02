@@ -30,7 +30,6 @@ class CSLTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\CSL::locale
-     * @todo   Implement testLocale().
      */
     public function testLocale()
     {
