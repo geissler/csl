@@ -1,0 +1,20 @@
+{
+    "name": "geissler/csl",
+    "description": "A php processor for the citation style language (http://citationstyles.org)",
+    "keywords": ["csl", "citation"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Benjamin Geißlser",
+            "email": "benjamin.geissler@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"        
+    },
+    "autoload": {
+        "psr-0": {
+                "Geissler": "src/"
+        }
+    }
+}
