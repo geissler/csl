@@ -34,6 +34,6 @@ class CSLTest extends \PHPUnit_Framework_TestCase
      */
     public function testLocale()
     {
-        $this->assertInstanceOf('\Geissler\CSL\Locale', CSL::locale());
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', CSL::locale());
     }
 }
