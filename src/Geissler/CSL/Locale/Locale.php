@@ -1,5 +1,5 @@
 <?php
-namespace Geissler\CSL;
+namespace Geissler\CSL\Locale;
 
 /**
  * Parse and access locales propertys.
@@ -21,6 +21,8 @@ class Locale
     private $date;
     /** @var array **/
     private $terms;
+    /** @var string **/
+    private $language;
 
     /**
      * Specifies the path where the locales- files are located.
@@ -30,7 +32,7 @@ class Locale
      */
     public function setDir($dir)
     {
-        $this->dir = __DIR__ . '/../../../' . $dir;
+        $this->dir = __DIR__ . '/../../../../' . $dir;
         return $this;
     }
 
@@ -75,7 +77,9 @@ class Locale
         }
 
         $content    =   file_get_contents($file);
+        $this->init();
         $this->parseXml(new \SimpleXMLElement($content));
+        $this->setLanguage($language);
 
         return $this;
     }
@@ -86,7 +90,7 @@ class Locale
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Locale
      */
-    public function readXml(\SimpleXMLElement $xml)
+    public function addXml(\SimpleXMLElement $xml)
     {
         $this->parseXml($xml);
         return $this;
@@ -108,34 +112,85 @@ class Locale
         throw new \ErrorException('Option (' . $value . ') not set!');
     }
 
-    public function getDate($form, $part = '')
+    /**
+     * Retrieve the date format.
+     *
+     * @param string $form Format (numeric or text)
+     * @return array
+     * @throws \ErrorException
+     */
+    public function getDate($form)
     {
-        return $this->date;
+        if (isset($this->date[$form]) == true) {
+            return $this->date[$form];
+        }
+
+        throw new \ErrorException('Date format (' . $form . ') not set!');
     }
 
     /**
      * Retrieve a term value.
      *
      * @param string $name
-     * @param string $form optional form parameter
-     * @param string $type single or multiple
+     * @param string $form Optional form parameter
+     * @param string $type Single or multiple
+     * @param array $additional Additional parameters to compare
      * @return string
      * @throws \ErrorException
      */
-    public function getTerms($name, $form = '', $type = 'single')
+    public function getTerms($name, $form = '', $type = 'single', array $additional = array())
     {
         $length =   count($this->terms);
 
         for ($i = 0; $i < $length; $i++) {
             if ($this->terms[$i]['name'] == $name
                 && $this->terms[$i]['form'] == $form) {
-                    return $this->terms[$i][$type];
+                    $found = true;
+
+                    if (count($additional) > 0) {
+                        foreach ($additional as $option => $value) {
+                            if ($this->terms[$i][$option] !== $value) {
+                                $found  =   false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($found == true) {
+                        return $this->terms[$i][$type];
+                    }
             }
         }
 
         throw new \ErrorException(
                             'The locale option (name = ' . $name . ', form = ' . $form
                             . ', type = ' . $type . 'is not set');
+    }
+
+    /**
+     * Retrieve the language.
+     *
+     * @return string
+     */
+    public function getLanguage()
+    {
+        if (isset($this->language) == true) {
+            return $this->language;
+        }
+
+        return 'en';
+    }
+
+    /**
+     * Stores the language.
+     *
+     * @param string $language
+     * @return \Geissler\CSL\Locale\Locale
+     */
+    private function setLanguage($language)
+    {
+        $this->language = preg_replace('/(-[A-z]+)$/', '', $language);
+        return $this;
     }
 
     /**
@@ -157,16 +212,24 @@ class Locale
     }
 
     /**
+     * Inits the arrays.
+     *
+     * @return void
+     */
+    private function init()
+    {
+        $this->terms    =   array();
+        $this->options  =   array();
+        $this->date     =   array();
+    }
+
+    /**
      * Parses the content of the xml file into the internal propertys.
      *
      * @param \SimpleXMLElement $xml
      */
     private function parseXml(\SimpleXMLElement $xml)
     {
-        $this->terms    =   array();
-        $this->options  =   array();
-        $this->date     =   array();
-
         foreach ($xml as $node) {
             switch($node->getName()) {
                 case 'style-options':
@@ -202,14 +265,17 @@ class Locale
 
                 case 'date':
                     foreach ($node->attributes() as $form) {
-                        $date   =   array();
+                        $this->date[(string) $form] =   array();
+
                         foreach ($node->children() as $child) {
+                            $date   =   array();
+
                             foreach ($child->attributes() as $attribute => $value) {
                                 $date[$attribute]    =   (string) $value;
                             }
-                        }
 
-                        $this->date[(string) $form]  =   $date;
+                            $this->date[(string) $form][]  =   $date;
+                        }
                     }
                 break;
             }
