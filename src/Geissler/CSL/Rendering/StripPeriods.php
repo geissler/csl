@@ -1,13 +1,15 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
+
 /**
  * Strip-periods.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class StripPeriods implements Interfaces\Renderable
+class StripPeriods implements Renderable
 {
     /** @var boolean **/
     private $strip;

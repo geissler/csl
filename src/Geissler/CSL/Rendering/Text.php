@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
 use Geissler\CSL\Rendering\Formating;
@@ -17,7 +18,7 @@ use Geissler\CSL\Rendering\Value;
  *
  * @author Benjamin
  */
-class Text implements Interfaces\Renderable
+class Text implements Renderable
 {
     /** @var Affix **/
     private $affix;

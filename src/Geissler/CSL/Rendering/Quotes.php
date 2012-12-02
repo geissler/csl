@@ -1,13 +1,15 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
+
 /**
  * Display quotes.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Quotes implements Interfaces\Renderable
+class Quotes implements Renderable
 {
     /** @var boolean **/
     private $quote;

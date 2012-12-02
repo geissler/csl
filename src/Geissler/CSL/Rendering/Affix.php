@@ -1,13 +1,15 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
+
 /**
  * Display affixs.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Affix implements Interfaces\Renderable
+class Affix implements Renderable
 {
     /** @var string **/
     private $prefix;

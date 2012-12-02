@@ -1,8 +1,7 @@
 <?php
-
 namespace Geissler\CSL\Macro;
 
-use Geissler\CSL\Rendering\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Renderable;
 
 /**
  * Description of Macro
@@ -18,7 +17,7 @@ class Macro implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        
+
     }
 
     /**

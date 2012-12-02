@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Data\Data;
 
 /**
@@ -9,7 +10,7 @@ use Geissler\CSL\Data\Data;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Variable  implements Interfaces\Renderable
+class Variable  implements Renderable
 {
     /** @var string **/
     private $name;

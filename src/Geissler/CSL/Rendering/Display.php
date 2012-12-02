@@ -1,13 +1,15 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
+
 /**
  * Display display options.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Display implements Interfaces\Renderable
+class Display implements Renderable
 {
     /** @var string **/
     private $display;

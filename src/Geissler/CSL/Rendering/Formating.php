@@ -1,13 +1,15 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
+
 /**
  * Formats the given text.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Formating implements Interfaces\Renderable
+class Formating implements Renderable
 {
     /** @var string **/
     private $style;

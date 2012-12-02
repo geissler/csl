@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Formating;
 use Geissler\CSL\Rendering\Text;
@@ -11,7 +12,7 @@ use Geissler\CSL\Macro\Macro;
  *
  * @author Benjamin
  */
-class Layout implements Interfaces\Renderable
+class Layout implements Renderable
 {
     /** @var Affix **/
     private $affix;
@@ -56,6 +57,13 @@ class Layout implements Interfaces\Renderable
 
     public function render($data)
     {
+        foreach ($this->children as $child) {
+            $data   =   $child->render($data);
+        }
 
+        $data   =   $this->formating->render($data);
+        $data   =   $this->affix->render($data);
+
+        return $data;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Container;
 
 /**
@@ -9,7 +10,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class TextCase implements Interfaces\Renderable
+class TextCase implements Renderable
 {
     /** @var boolean **/
     private $textCase;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Geissler\CSL\Rendering\Interfaces;
+namespace Geissler\CSL\Interfaces;
 
 /**
  * Defines the methods classes must implement to be renderd.
