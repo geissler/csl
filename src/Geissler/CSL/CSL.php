@@ -1,42 +1,60 @@
 <?php
-
 namespace Geissler\CSL;
 
-use Geissler\CSL\Locale\Locale;
+use Geissler\CSL\Factory;
+use Geissler\CSL\Container;
+use Geissler\CSL\Data\Data;
 
 /**
- * Description of CSL
+ * Main class to create citations and/or bibliographys.
  *
- * @author Benjamin
+ * @author Benjamin Geißler <benjamin.geissler@gmail.com>
+ * @license MIT
  */
 class CSL
 {
-    private static $configuration;
-
     /**
-     * Creates a Locale Objekt and injects the configuration paramters.
-     * @return \Geissler\CSL\Locale\Locale
+     * Set a language different from the one configured in the style.
+     *
+     * @param string $language
+     * @return \Geissler\CSL\CSL
      */
-    public static function locale()
+    public function registerLocale($language = 'en')
     {
-        self::loadConfig();
-        $locale =   new Locale();
-        $locale->setDir(self::$configuration['locale']['dir'])
-               ->setFile(self::$configuration['locale']['file'])
-               ->setPrimaryDialect(self::$configuration['locale']['dialects']);
+        $locale = Factory::locale();
+        $locale->readFile($language);
+        Container::setLocale($locale);
 
-        return $locale;
+        return $this;
     }
 
-    private static function loadConfig()
+    public function registerStyle($style)
     {
-        if (isset(self::$configuration) == false) {
-            $file   =   __DIR__ . '/../../../configuration.ini';
-            if (file_exists($file) == false) {
-                throw new \ErrorException('configuration.ini is missing at ' . $file);
-            }
+        return $this;
+    }
 
-            self::$configuration    = parse_ini_file($file, true);
-        }
+    /**
+     * Set the data as JSON-Array to create the citation/bibliography from.
+     * 
+     * @param string $json JSON array
+     * @return \Geissler\CSL\CSL
+     */
+    public function registerData($json)
+    {
+        $data   =   new Data();
+        $data->set($json);
+        Container::setData($data);
+
+        return $this;
+    }
+
+    public function getCitation()
+    {
+
+    }
+
+    public function getBibligraphy()
+    {
+
     }
 }

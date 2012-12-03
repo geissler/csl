@@ -109,7 +109,7 @@ class Locale
             return $this->options[$value];
         }
 
-        throw new \ErrorException('Option (' . $value . ') not set!');
+        return null;
     }
 
     /**

@@ -1,12 +1,12 @@
 <?php
-namespace Geissler\CSL\Rendering;
+namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
 use Geissler\CSL\Rendering\Formating;
 use Geissler\CSL\Rendering\TextCase;
-use Geissler\CSL\Rendering\DateParts;
+use Geissler\CSL\Date\DatePart;
 
 /**
  * Renders dates.
@@ -75,7 +75,7 @@ class Date implements Renderable
                     $this->dateParts    =   array();
                 }
 
-                $this->dateParts[]  =   new DateParts($child);
+                $this->dateParts[]  =   new DatePart($child);
             }
         }
     }
@@ -90,6 +90,6 @@ class Date implements Renderable
      */
     public function render($data)
     {
-        
+
     }
 }
