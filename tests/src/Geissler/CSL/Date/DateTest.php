@@ -214,6 +214,88 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('May 2008/June 2009', $this->object->render(''));
     }
 
+    /**
+     * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::renderSeason
+     */
+    public function testRenderSeason()
+    {
+        $layout =   '<date variable="issued" prefix="(" suffix=")">
+          <date-part name="month" />
+          <date-part name="day" prefix=" " />
+        </date>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    2000
+                ]
+            ],
+            "season": 3
+        },
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('(Autumn)', $this->object->render(''));
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::renderSeason
+     */
+    public function testRenderNoSeason()
+    {
+        $layout =   '<date variable="issued" prefix="(" suffix=")">
+          <date-part name="month" />
+          <date-part name="day" prefix=" " />
+        </date>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    2000
+                ]
+            ]
+        },
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('', $this->object->render(''));
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::renderSeason
+     */
+    public function testRenderNoSeason1()
+    {
+        $layout =   '<date variable="issued" prefix="(" suffix=")">
+          <date-part name="day" prefix=" " />
+        </date>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    2000
+                ]
+            ],
+            "season": 3
+        },
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('', $this->object->render(''));
+    }
+
     protected function initElement($layout, $json, $language = 'en-US')
     {
         $locale = Factory::locale();

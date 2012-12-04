@@ -4,6 +4,7 @@ namespace Geissler\CSL\Date;
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Container;
+use Geissler\CSL\Rendering\Ordinal;
 
 /**
  * Day.
@@ -65,26 +66,7 @@ class Day implements Renderable, Modifiable
                 return $data;
                 break;
             case 'ordinal':
-                // Some languages, such as French, only use the "ordinal" form for the first day of the month
-                if (Container::getLocale()->getOptions('limit-day-ordinals-to-day-1') === true
-                    && (int) $data > 1) {
-                        return $data;
-                }
-
-                $ordinal = 'ordinal-';
-                if ((int) $data < 10) {
-                    $ordinal .= '0' . (int) $data;
-                } else {
-                    $ordinal .= $data;
-                }
-
-                $locale = Container::getLocale()->getTerms($ordinal);
-
-                if ($locale !== null) {
-                    return (int) $data . $locale;
-                }
-
-                return (int) $data . Container::getLocale()->getTerms('ordinal');
+                return Ordinal::render($data, true);
                 break;
         }
     }

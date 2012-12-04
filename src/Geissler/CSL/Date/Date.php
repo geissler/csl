@@ -137,12 +137,10 @@ class Date implements Renderable
     }
 
     /**
-     * Adds the display options.
+     * Renders the date.
      *
      * @param string $data
      * @return string
-     * @todo Full support of left-margin and right-inline
-     * @link http://citationstyles.org/downloads/specification.html#display display
      */
     public function render($data)
     {
@@ -198,6 +196,10 @@ class Date implements Renderable
             }
 
             $value =   implode('', $return);
+        }
+
+        if ($value == '') {
+            $value  =   $this->renderSeason();
         }
 
         $value =   $this->affix->render($value);
@@ -267,5 +269,32 @@ class Date implements Renderable
         }
 
         return null;
+    }
+
+    /**
+     * Renders, if no previous data has been renderd and a month is required a given season instead.
+     *
+     * @return string
+     */
+    private function renderSeason()
+    {
+        $data   =   Container::getData()->getVariable($this->variable);
+
+        if (isset($data['season']) == true) {
+            $month  =   false;
+
+            foreach ($this->dateParts as $datePart) {
+                if ($datePart['name'] == 'month') {
+                    $month  =   true;
+                    break;
+                }
+            }
+
+            if ($month == true) {
+                return Container::getLocale()->getTerms('season-0' . (int) $data['season']);
+            }
+        }
+
+        return '';
     }
 }
