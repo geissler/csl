@@ -40,8 +40,7 @@ class Affix implements Renderable, Modifiable
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'prefix') {
                 $this->prefix   =   (string) $value;
-            }
-            elseif ($name == 'suffix') {
+            } elseif ($name == 'suffix') {
                 $this->suffix   =   (string) $value;
             }
         }

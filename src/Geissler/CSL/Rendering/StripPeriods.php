@@ -28,7 +28,7 @@ class StripPeriods implements Renderable, Modifiable
 
     /**
      * Modifys the configuration.
-     * 
+     *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Rendering\StripPeriods
      */

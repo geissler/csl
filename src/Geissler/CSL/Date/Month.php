@@ -71,15 +71,12 @@ class Month implements Renderable, Modifiable
                 case 'long':
                     return $this->getLocale($data);
                     break;
-
                 case 'short':
                     return $this->getLocale($data, 'short');
                     break;
-
                 case 'numeric':
                     return (int) $data;
                     break;
-
                 case 'numeric-leading-zeros':
                     $data = (int) $data;
 

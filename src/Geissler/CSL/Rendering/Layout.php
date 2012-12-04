@@ -41,7 +41,6 @@ class Layout implements Renderable
                 case 'text':
                     $this->children[]   =   new Text($child);
                     break;
-
                 case 'macro':
                     $this->children[]   =   new Macro($child);
                     break;

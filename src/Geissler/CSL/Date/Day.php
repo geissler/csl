@@ -57,7 +57,6 @@ class Day implements Renderable, Modifiable
             case 'numeric':
                 return (int) $data;
                 break;
-
             case 'numeric-leading-zeros':
                 if ((int) $data < 10) {
                     return '0' . (int) $data;
@@ -65,7 +64,6 @@ class Day implements Renderable, Modifiable
 
                 return $data;
                 break;
-
             case 'ordinal':
                 // Some languages, such as French, only use the "ordinal" form for the first day of the month
                 if (Container::getLocale()->getOptions('limit-day-ordinals-to-day-1') === true
@@ -76,8 +74,7 @@ class Day implements Renderable, Modifiable
                 $ordinal = 'ordinal-';
                 if ((int) $data < 10) {
                     $ordinal .= '0' . (int) $data;
-                }
-                else {
+                } else {
                     $ordinal .= $data;
                 }
 

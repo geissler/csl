@@ -54,15 +54,12 @@ class Text implements Renderable
                 case 'variable':
                     $this->render   =   new Variable($text);
                     break;
-
                 case 'macro':
                     $this->render   =   new Macro($text);
                     break;
-
                 case 'term':
                     $this->render   =   new Term($text);
                     break;
-
                 case 'value':
                     $this->render   =   new Value($text);
                     break;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Renderable;
@@ -10,11 +11,13 @@ use Geissler\CSL\Data\Data;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Variable  implements Renderable
+class Variable implements Renderable
 {
-    /** @var string **/
+
+    /** @var string * */
     private $name;
-    /** @var string **/
+
+    /** @var string * */
     private $form;
 
     /**
@@ -24,15 +27,14 @@ class Variable  implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->name =   '';
-        $this->form =   '';
+        $this->name = '';
+        $this->form = '';
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'variable') {
-                $this->name =   (string) $value;
-            }
-            elseif ($name == 'form') {
-                $this->form =   (string) $value;
+                $this->name = (string) $value;
+            } elseif ($name == 'form') {
+                $this->form = (string) $value;
             }
         }
     }
@@ -46,7 +48,7 @@ class Variable  implements Renderable
     public function render($data)
     {
         if ($this->form !== '') {
-            $return =   Data::getVariable($this->name . '-' . $this->form);
+            $return = Data::getVariable($this->name . '-' . $this->form);
 
             if ($return !== null) {
                 return $return;

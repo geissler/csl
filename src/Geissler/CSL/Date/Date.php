@@ -55,24 +55,23 @@ class Date implements Renderable
                 case 'variable':
                     $this->variable   =   (string) $value;
                     break;
-
                 case 'form':
                     $this->form =   (string) $value;
                     break;
-
                 case 'date-parts':
                     if ($this->form !== '') {
                         $dateParts      =   explode('-', (string) $value);
                         $localeDates    =   Container::getLocale()->getDate($this->form);
 
-                        foreach($localeDates as $localeDate) {
+                        foreach ($localeDates as $localeDate) {
                             if (in_array($localeDate['name'], $dateParts) == true) {
                                 $this->dateParts[]  =   array(
                                             'name'      =>  $localeDate['name'],
                                             'datepart'  =>  new DatePart(
-                                                                    new \SimpleXMLElement($localeDate['xml']),
-                                                                    array('form' => $this->form))
-                                );
+                                                new \SimpleXMLElement($localeDate['xml']),
+                                                array('form' => $this->form)
+                                            )
+                                    );
                             }
                         }
                     }
@@ -83,23 +82,25 @@ class Date implements Renderable
         // load date-part configuration
         if ($this->form !== ''
             && count($this->dateParts) == 0) {
-                foreach ($date->attributes() as $name => $value) {
-                    if ($name == 'date-parts') {
-                        $dateParts      =   explode('-', (string) $value);
-                        $localeDates    =   Container::getLocale()->getDate($this->form);
 
-                        foreach($localeDates as $localeDate) {
-                            if (in_array($localeDate['name'], $dateParts) == true) {
-                                $this->dateParts[]  =   array(
-                                            'name'      =>  $localeDate['name'],
-                                            'datepart'  =>  new DatePart(
-                                                                    new \SimpleXMLElement($localeDate['xml']),
-                                                                    array('form' => $this->form))
+            foreach ($date->attributes() as $name => $value) {
+                if ($name == 'date-parts') {
+                    $dateParts      =   explode('-', (string) $value);
+                    $localeDates    =   Container::getLocale()->getDate($this->form);
+
+                    foreach ($localeDates as $localeDate) {
+                        if (in_array($localeDate['name'], $dateParts) == true) {
+                            $this->dateParts[]  =   array(
+                                        'name'      =>  $localeDate['name'],
+                                        'datepart'  =>  new DatePart(
+                                            new \SimpleXMLElement($localeDate['xml']),
+                                            array('form' => $this->form)
+                                        )
                                 );
-                            }
                         }
                     }
                 }
+            }
         }
 
         // override locale date configurations with single date-part objects
@@ -120,8 +121,7 @@ class Date implements Renderable
                         $this->dateParts[]  =   array(
                                                     'name'      =>  $childName,
                                                     'datepart'  =>  new DatePart($child, $additional));
-                    }
-                    else {
+                    } else {
                         // override standard configuration by modifing the existing date-part configuration
                         for ($i = 0; $i < $length; $i++) {
                             if ($this->dateParts[$i]['name'] == $childName) {
@@ -165,7 +165,8 @@ class Date implements Renderable
                     // get special delimiter
                     if ($datePart['name'] == $delimiterFrom
                         && $object->getRangeDelimiter() !== '') {
-                            $delimiter  =   $object->getRangeDelimiter();
+
+                        $delimiter  =   $object->getRangeDelimiter();
                     }
                 }
 
@@ -189,8 +190,7 @@ class Date implements Renderable
             $result[1]  = implode('', $result[1]);
 
             $value  =   implode($delimiter, $result);
-        }
-        else {
+        } else {
             $return =   array();
             foreach ($this->dateParts as $datePart) {
                 $object     =   $datePart['datepart'];

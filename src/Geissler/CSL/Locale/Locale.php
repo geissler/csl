@@ -163,21 +163,22 @@ class Locale
         for ($i = 0; $i < $length; $i++) {
             if ($this->terms[$i]['name'] == $name
                 && $this->terms[$i]['form'] == $form) {
-                    $found = true;
 
-                    if (count($additional) > 0) {
-                        foreach ($additional as $option => $value) {
-                            if (array_key_exists($option, $this->terms[$i]) == false
-                                || $this->terms[$i][$option] !== $value) {
-                                    $found  =   false;
-                                    break;
-                            }
+                $found = true;
+                if (count($additional) > 0) {
+                    foreach ($additional as $option => $value) {
+                        if (array_key_exists($option, $this->terms[$i]) == false
+                            || $this->terms[$i][$option] !== $value) {
+
+                            $found  =   false;
+                            break;
                         }
                     }
+                }
 
-                    if ($found == true) {
-                        return $this->terms[$i][$type];
-                    }
+                if ($found == true) {
+                    return $this->terms[$i][$type];
+                }
             }
         }
 
@@ -220,8 +221,7 @@ class Locale
     {
         if (preg_match('/^[a-z]{2}\-[A-Z]{2}$/', $language) == 1) {
             return $language;
-        }
-        elseif (array_key_exists($language, $this->primaryDialect) == true) {
+        } elseif (array_key_exists($language, $this->primaryDialect) == true) {
             return $this->primaryDialect[$language];
         }
 
@@ -253,13 +253,11 @@ class Locale
                     foreach ($node->attributes() as $name => $value) {
                         if ((string) $value == 'true') {
                             $this->options[$name]   =   true;
-                        }
-                        else {
+                        } else {
                             $this->options[$name]   =   false;
                         }
                     }
-                break;
-
+                    break;
                 case 'terms':
                     foreach ($node->children() as $child) {
                         $term   =   array(
@@ -278,8 +276,7 @@ class Locale
 
                         $this->terms[]  =   $term;
                     }
-                break;
-
+                    break;
                 case 'date':
                     foreach ($node->attributes() as $form) {
                         $this->date[(string) $form] =   array();
@@ -295,7 +292,7 @@ class Locale
                             $this->date[(string) $form][]  =   $date;
                         }
                     }
-                break;
+                    break;
             }
         }
     }

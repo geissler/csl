@@ -43,21 +43,16 @@ class Display implements Renderable
         switch ($this->display) {
             case 'block':
                 return '<font style="display:block">' . $data . '</font>';
-
                 break;
-
             case 'left-margin':
                 return $data;
                 break;
-
             case 'right-inline':
                 return '<font style="display:inline">' . $data . '</font>';
                 break;
-
             case 'indent':
                 return '<font style="text-indent: 0px; padding-left: 45px;">' . $data . '</font>';
                 break;
-
             default:
                 return $data;
                 break;

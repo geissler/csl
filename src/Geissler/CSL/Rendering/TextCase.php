@@ -56,27 +56,21 @@ class TextCase implements Renderable, Modifiable
             case 'lowercase':
                 return $this->keepNoCaseSpan(mb_strtolower($data), $data);
                 break;
-
             case 'uppercase':
                 return $this->keepNoCaseSpan(mb_strtoupper($data), $data);
                 break;
-
             case 'capitalize-all':
                 return $this->keepNoCaseSpan(mb_convert_case($data, \MB_CASE_TITLE), $data);
                 break;
-
             case 'capitalize-first':
                 return $this->capitalizeFirst($data);
                 break;
-
             case 'sentence':
                 return $this->renderSentence($data);
                 break;
-
             case 'title':
                 return $this->renderTitle($data);
                 break;
-
             default:
                 return $data;
                 break;

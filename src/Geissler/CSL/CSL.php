@@ -35,7 +35,7 @@ class CSL
 
     /**
      * Set the data as JSON-Array to create the citation/bibliography from.
-     * 
+     *
      * @param string $json JSON array
      * @return \Geissler\CSL\CSL
      */

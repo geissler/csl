@@ -38,17 +38,14 @@ class Term implements Renderable
                 case 'term':
                     $this->name   =   (string) $value;
                     break;
-
                 case 'form':
                     $this->form   =   (string) $value;
                     break;
-
                 case 'plural':
                     if ((string) $value == 'true') {
                         $this->plural = 'multiple';
                     }
                     break;
-
                 case 'gender':
                 case 'match':
                     $this->additional[$name] =   (string) $value;
@@ -72,15 +69,12 @@ class Term implements Renderable
                 case 'verb-short':
                     $return = Container::getLocale()->getTerms($this->name, 'verb', $this->plural, $this->additional);
                     break;
-
                 case 'symbol':
                     $return = Container::getLocale()->getTerms($this->name, 'short', $this->plural, $this->additional);
                     break;
-
                 case 'verb':
                     $return = Container::getLocale()->getTerms($this->name, 'verb', $this->plural);
                     break;
-
                 case 'symbol':
                     $return = Container::getLocale()->getTerms($this->name, 'symbol', $this->plural);
                     break;

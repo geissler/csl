@@ -41,7 +41,7 @@ class Formating implements Renderable, Modifiable
 
     /**
      * Modifys the configuration.
-     * 
+     *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Rendering\Formating
      */
@@ -52,19 +52,15 @@ class Formating implements Renderable, Modifiable
                 case 'font-style':
                     $this->style    =   (string) $value;
                     break;
-
                 case 'font-variant':
                     $this->variant    =   (string) $value;
                     break;
-
                 case 'font-weight':
                     $this->weight    =   (string) $value;
                     break;
-
                 case 'text-decoration':
                     $this->decoration    =   (string) $value;
                     break;
-
                 case 'vertical-align':
                     $this->align    =   (string) $value;
                     break;
@@ -104,8 +100,7 @@ class Formating implements Renderable, Modifiable
 
         if ($this->align == 'sub') {
             $style[] = 'vertical-align:sub';
-        }
-        elseif ($this->align == 'sup') {
+        } elseif ($this->align == 'sup') {
             $style[] = 'vertical-align:super';
         }
 

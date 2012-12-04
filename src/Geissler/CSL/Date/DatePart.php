@@ -52,17 +52,14 @@ class DatePart implements Renderable, Modifiable
                         case 'day':
                             $this->render   =   Factory::day($additional['form'], $date);
                             break;
-
                         case 'month':
                             $this->render   =   Factory::month($additional['form'], $date);
                             break;
-
                         case 'year':
                             $this->render   =   Factory::year($additional['form'], $date);
                             break;
                     }
                     break;
-
                 case 'range-delimiter':
                     $this->delimiter   =   (string) $value;
                     break;
@@ -72,7 +69,7 @@ class DatePart implements Renderable, Modifiable
 
     /**
      * Modifys the configuration.
-     * 
+     *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Date\DatePart
      */
@@ -87,7 +84,6 @@ class DatePart implements Renderable, Modifiable
                 case 'name':
                     $this->render->modify($xml);
                     break;
-
                 case 'range-delimiter':
                     $this->delimiter   =   (string) $value;
                     break;

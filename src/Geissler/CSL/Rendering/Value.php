@@ -9,7 +9,7 @@ use Geissler\CSL\Interfaces\Renderable;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Value  implements Renderable
+class Value implements Renderable
 {
     /** @var string **/
     private $value;
