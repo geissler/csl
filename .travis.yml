@@ -4,7 +4,12 @@ php:
   - 5.3
 before_script:
   - composer install
-script: phpunit --coverage-text --bootstrap tests/bootstrap.php tests/
+script:
+  - phpunit --coverage-text --bootstrap tests/bootstrap.php tests/
+  - pyrus install http://phptal.org/latest.tar.gz
+  - pear install pear/PHP_CodeSniffer 
+  - phpenv rehash
+  - phpcs --standard=PSR2 src
 notifications:
   email:
     - benjamin.geissler@gmail.com
