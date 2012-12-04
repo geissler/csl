@@ -27,14 +27,12 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Rendering\DateParts::getRangeDelimiter
-     * @todo   Implement testGetRangeDelimiter().
      */
     public function testGetRangeDelimiter()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $layout =   '<date-part name="day" form="ordinal" prefix="[" suffix="]"/>';
+        $this->initElement($layout);
+        $this->assertEquals('–', $this->object->getRangeDelimiter());
     }
 
     /**
@@ -113,9 +111,23 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2', $this->object->render(array('day' => 2, 'month' => 12, 'year' => 1984)));
     }
 
-    protected function initElement($layout)
+    /**
+     * @covers Geissler\CSL\Date\DatePart::render
+     */
+    public function testRenderDayAsFrenchOrdinal2()
+    {
+        $locale = Factory::locale();
+        $locale->readFile('fr');
+        Container::setLocale($locale);
+
+        $layout =   '<date-part name="day" form="ordinal" prefix="[" suffix="]"/>';
+        $this->initElement($layout);
+        $this->assertEquals('[1ʳᵉ]', $this->object->render(array('day' => 1, 'month' => 12, 'year' => 1984)));
+    }
+
+    protected function initElement($layout, $form = 'text')
     {
         $xml = new \SimpleXMLElement($layout);
-        $this->object   =   new DatePart($xml);
+        $this->object   =   new DatePart($xml, array('form' => $form));
     }
 }

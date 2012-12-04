@@ -2,12 +2,11 @@
 namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
+use Geissler\CSL\Factory;
 use Geissler\CSL\Rendering\Formating;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Rendering\Affix;
-use Geissler\CSL\Date\Day;
-use Geissler\CSL\Date\Month;
-use Geissler\CSL\Date\Year;
 
 /**
  * Renders a part of a date.
@@ -15,7 +14,7 @@ use Geissler\CSL\Date\Year;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class DatePart implements Renderable
+class DatePart implements Renderable, Modifiable
 {
     /** @var string **/
     private $name;
@@ -34,8 +33,9 @@ class DatePart implements Renderable
      * Parses the affix configuration.
      *
      * @param \SimpleXMLElement $date
+     * @param array $additional Array with key form and value text or numeric
      */
-    public function __construct(\SimpleXMLElement $date)
+    public function __construct(\SimpleXMLElement $date, array $additional)
     {
         $this->name         =   '';
         $this->delimiter    =   '–';
@@ -50,15 +50,15 @@ class DatePart implements Renderable
                     $this->name   =   (string) $value;
                     switch ($this->name) {
                         case 'day':
-                            $this->render   =   new Day($date);
+                            $this->render   =   Factory::day($additional['form'], $date);
                             break;
 
                         case 'month':
-                            $this->render   =   new Month($date);
+                            $this->render   =   Factory::month($additional['form'], $date);
                             break;
 
                         case 'year':
-                            $this->render   =   new Year($date);
+                            $this->render   =   Factory::year($additional['form'], $date);
                             break;
                     }
                     break;
@@ -68,6 +68,33 @@ class DatePart implements Renderable
                     break;
             }
         }
+    }
+
+    /**
+     * Modifys the configuration.
+     * 
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Date\DatePart
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        $this->formating->modify($xml);
+        $this->textCase->modify($xml);
+        $this->affix->modify($xml);
+
+        foreach ($xml->attributes() as $name => $value) {
+            switch ($name) {
+                case 'name':
+                    $this->render->modify($xml);
+                    break;
+
+                case 'range-delimiter':
+                    $this->delimiter   =   (string) $value;
+                    break;
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -88,8 +115,9 @@ class DatePart implements Renderable
      */
     public function render($data)
     {
-        if (isset($data[$this->name]) == false) {
-            return '';
+        if (isset($data[$this->name]) == false
+            || $data[$this->name] == '') {
+                return '';
         }
 
         $value   =   $this->render->render($data[$this->name]);

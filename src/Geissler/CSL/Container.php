@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL;
 
+use Geissler\CSL\Factory;
 use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Macro\Macro;
 use Geissler\CSL\Data\Data;
@@ -31,18 +32,17 @@ class Container
     }
 
     /**
-     * Access the Locale object.
+     * Access the Locale object, if not set thestandard Locale is loaded.
      *
      * @return Locale
-     * @throws \ErrorException
      */
     public static function getLocale()
     {
-        if (isset(self::$locale) == true) {
-            return self::$locale;
+        if (isset(self::$locale) == false) {
+            self::setLocale(Factory::locale());
         }
 
-        throw new \ErrorException('No locale file set!');
+        return self::$locale;
     }
 
     public static function addMacro($name, Macro $macro)

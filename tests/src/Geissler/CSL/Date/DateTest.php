@@ -2,6 +2,7 @@
 
 namespace Geissler\CSL\Date;
 
+use Geissler\CSL\Factory;
 use Geissler\CSL\Data\Data;
 use Geissler\CSL\Container;
 
@@ -35,7 +36,6 @@ class DateTest extends \PHPUnit_Framework_TestCase
                         <date-part name="day" suffix=", " />
                         <date-part name="year" />
                       </date>';
-        $this->initElement($layout);
         $json   =   '[
     {
         "id": "ITEM-1",
@@ -50,9 +50,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $data   =   new Data();
-        $data->set($json);
-        Container::setData($data);
+        $this->initElement($layout, $json);
 
         $this->assertEquals('(499AD)', $this->object->render(''));
     }
@@ -67,7 +65,6 @@ class DateTest extends \PHPUnit_Framework_TestCase
         <date-part form="long" name="month" suffix=" "/>
         <date-part name="year" />
       </date>';
-        $this->initElement($layout);
         $json   =   '[
     {
         "id": "ITEM-1",
@@ -87,15 +84,146 @@ class DateTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $data   =   new Data();
-        $data->set($json);
-        Container::setData($data);
+
+        $this->initElement($layout, $json);
 
         $this->assertEquals('(August 1987–October 2003)', $this->object->render(''));
     }
 
-    protected function initElement($layout)
+    /**
+     * @covers Geissler\CSL\Rendering\Date::render
+     */
+    public function testRenderStandardText()
     {
+        $layout =   '<date variable="issued" form="text" date-parts="year-month-day"/>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    "1965",
+                    "1",
+                    "30"
+                ]
+            ]
+        },
+        "type": "book"
+    }
+]';
+
+        $this->initElement($layout, $json);
+
+        $this->assertEquals('January 30, 1965', $this->object->render(''));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Date::render
+     */
+    public function testRenderDateMonthShort()
+    {
+        $layout =   '<date date-parts="year-month" form="text" variable="issued">
+        <date-part form="short" name="month" />
+      </date>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    2005,
+                    12,
+                    15
+                ]
+            ]
+        },
+        "title": "Ignore me",
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('Dec. 2005', $this->object->render(''));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Date::render
+     * @covers Geissler\CSL\Rendering\Date::formatDate
+     */
+    public function testRenderCustomDelimiter()
+    {
+        $layout =   '<date variable="issued">
+                        <date-part name="day" suffix=" " range-delimiter="-"/>
+                        <date-part name="month" suffix=" "/>
+                        <date-part name="year" range-delimiter="/"/>
+                      </date>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    "2008",
+                    "5",
+                    "1"
+                ],
+                [
+                    "2008",
+                    "5",
+                    "4"
+                ]
+            ]
+        },
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('1-4 May 2008', $this->object->render(''));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Date::render
+     * @covers Geissler\CSL\Rendering\Date::formatDate
+     * @covers Geissler\CSL\Rendering\Date::partWithMaxDiff
+     */
+    public function testRenderCustomDelimiter1()
+    {
+        $layout =   '<date variable="issued">
+                        <date-part name="day" suffix=" " range-delimiter="-"/>
+                        <date-part name="month" suffix=" "/>
+                        <date-part name="year" range-delimiter="/"/>
+                      </date>';
+        $json   =   '[
+    {
+        "id": "ITEM-1",
+        "issued": {
+            "date-parts": [
+                [
+                    "2008",
+                    "5"
+                ],
+                [
+                    "2009",
+                    "6"
+                ]
+            ]
+        },
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('May 2008/June 2009', $this->object->render(''));
+    }
+
+    protected function initElement($layout, $json, $language = 'en-US')
+    {
+        $locale = Factory::locale();
+        $locale->readFile($language);
+        Container::setLocale($locale);
+
+        $data   =   new Data();
+        $data->set($json);
+        Container::setData($data);
+
         $xml = new \SimpleXMLElement($layout);
         $this->object   =   new Date($xml);
     }

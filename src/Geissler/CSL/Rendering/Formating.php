@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
 
 /**
  * Formats the given text.
@@ -9,7 +10,7 @@ use Geissler\CSL\Interfaces\Renderable;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Formating implements Renderable
+class Formating implements Renderable, Modifiable
 {
     /** @var string **/
     private $style;
@@ -35,6 +36,17 @@ class Formating implements Renderable
         $this->decoration   =   '';
         $this->align        =   '';
 
+        $this->modify($xml);
+    }
+
+    /**
+     * Modifys the configuration.
+     * 
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Rendering\Formating
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'font-style':
@@ -58,6 +70,8 @@ class Formating implements Renderable
                     break;
             }
         }
+
+        return $this;
     }
 
     /**

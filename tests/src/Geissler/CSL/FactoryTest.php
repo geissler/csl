@@ -36,4 +36,28 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', Factory::locale());
     }
+
+    /**
+     * @covers Geissler\CSL\Factory::day
+     */
+    public function testDay()
+    {
+        $this->assertInstanceOf('\Geissler\CSL\Date\Day', Factory::day('text', new \SimpleXMLElement('<date-parte />')));
+    }
+
+    /**
+     * @covers Geissler\CSL\Factory::month
+     */
+    public function testMonth()
+    {
+        $this->assertInstanceOf('\Geissler\CSL\Date\Month', Factory::month('text', new \SimpleXMLElement('<date-parte />')));
+    }
+
+    /**
+     * @covers Geissler\CSL\Factory::year
+     */
+    public function testYear()
+    {
+        $this->assertInstanceOf('\Geissler\CSL\Date\Year', Factory::year('text', new \SimpleXMLElement('<date-parte />')));
+    }
 }

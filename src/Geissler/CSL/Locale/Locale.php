@@ -116,8 +116,7 @@ class Locale
      * Retrieve the date format.
      *
      * @param string $form Format (numeric or text)
-     * @return array
-     * @throws \ErrorException
+     * @return array|null
      */
     public function getDate($form)
     {
@@ -125,7 +124,27 @@ class Locale
             return $this->date[$form];
         }
 
-        throw new \ErrorException('Date format (' . $form . ') not set!');
+        return null;
+    }
+
+    /**
+     * Retrieve the locale configuration for a date-parte element (day, month, year).
+     *
+     * @param string $form  text or numeric
+     * @param string $name  day, month, year
+     * @return string|null
+     */
+    public function getDateAsXml($form, $name)
+    {
+        if ($this->getDate($form) !== null) {
+            foreach ($this->date[$form] as $datePart) {
+                if ($datePart['name'] == $name) {
+                    return $datePart['xml'];
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -266,7 +285,8 @@ class Locale
                         $this->date[(string) $form] =   array();
 
                         foreach ($node->children() as $child) {
-                            $date   =   array();
+                            $date           =   array();
+                            $date['xml']    =   $child->asXML();
 
                             foreach ($child->attributes() as $attribute => $value) {
                                 $date[$attribute]    =   (string) $value;

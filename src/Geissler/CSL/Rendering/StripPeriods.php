@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
 
 /**
  * Strip-periods.
@@ -9,7 +10,7 @@ use Geissler\CSL\Interfaces\Renderable;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class StripPeriods implements Renderable
+class StripPeriods implements Renderable, Modifiable
 {
     /** @var boolean **/
     private $strip;
@@ -17,19 +18,31 @@ class StripPeriods implements Renderable
     /**
      * Parses the strip period configuration.
      *
-     * @param \SimpleXMLElement $affix
+     * @param \SimpleXMLElement $xml
      */
-    public function __construct(\SimpleXMLElement $affix)
+    public function __construct(\SimpleXMLElement $xml)
     {
         $this->strip    =   false;
+        $this->modify($xml);
+    }
 
-        foreach ($affix->attributes() as $name => $value) {
+    /**
+     * Modifys the configuration.
+     * 
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Rendering\StripPeriods
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        foreach ($xml->attributes() as $name => $value) {
             if ($name == 'strip-periods') {
                 if ((string) $value == 'true') {
                     $this->strip    =   true;
                 }
             }
         }
+
+        return $this;
     }
 
     /**

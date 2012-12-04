@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Rendering\StripPeriods;
 use Geissler\CSL\Container;
 
@@ -10,8 +11,9 @@ use Geissler\CSL\Container;
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
+ * @todo implement support for seasons http://citationstyles.org/downloads/specification.html#seasons
  */
-class Month implements Renderable
+class Month implements Renderable, Modifiable
 {
     /** @var string **/
     private $form;
@@ -27,6 +29,19 @@ class Month implements Renderable
     {
         $this->form         =   'long';
         $this->stripPeriods =   new StripPeriods($xml);
+        $this->modify($xml);
+    }
+
+    /**
+     * Modifys the actual month configuration.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Date\Month
+     * @todo Create new StripPeriods object is necessary
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        $this->stripPeriods->modify($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'form') {
@@ -34,6 +49,8 @@ class Month implements Renderable
                 break;
             }
         }
+
+        return $this;
     }
 
     /**
@@ -52,7 +69,6 @@ class Month implements Renderable
         if ($data !== '') {
             switch ($this->form) {
                 case 'long':
-                    var_dump($data);
                     return $this->getLocale($data);
                     break;
 

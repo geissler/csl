@@ -177,6 +177,23 @@ class DayTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1ʳᵉ', $this->object->render('1'));
     }
 
+    /**
+     * @covers Geissler\CSL\Date\Day::render
+     * @covers Geissler\CSL\Date\Day::modify
+     */
+    public function testModifyAndRender()
+    {
+        $locale = Factory::locale();
+        $locale->readFile('fr');
+        Container::setLocale($locale);
+
+        $layout =   '<date-part name="day" form="ordinal"/>';
+        $this->initElement($layout);
+        $xml    =   new \SimpleXMLElement('<date-part name="day" form="numeric"/>');
+        $this->assertInstanceOf('\Geissler\CSL\Date\Day', $this->object->modify($xml));
+        $this->assertEquals('1', $this->object->render('1'));
+    }
+
     protected function initElement($layout)
     {
         $xml = new \SimpleXMLElement($layout);

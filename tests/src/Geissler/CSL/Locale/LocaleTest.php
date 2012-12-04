@@ -63,15 +63,22 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Locale\Locale::readXml
-     * @todo   Implement testReadXml().
+     * @covers Geissler\CSL\Locale\Locale::addXml
+     * @covers Geissler\CSL\Locale\Locale::readFile
+     * @covers Geissler\CSL\Locale\Locale::getDateAsXml
      */
     public function testReadXml()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $xml    =   '<locale>
+                        <date form="text">
+                            <date-part name="day" suffix=" "/>
+                            <date-part name="month" suffix=" " text-case="uppercase"/>
+                            <date-part name="year"/>
+                        </date>
+                     </locale>';
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->readFile());
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->addXml(new \SimpleXMLElement($xml)));
+        $this->assertEquals('<date-part name="month" suffix=" " text-case="uppercase"/>', $this->object->getDateAsXml('text', 'month'));
     }
 
     /**

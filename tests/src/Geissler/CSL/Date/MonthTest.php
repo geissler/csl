@@ -201,6 +201,19 @@ class MonthTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('01', $this->object->render('1'));
     }
 
+    /**
+     * @covers Geissler\CSL\Date\Month::render
+     * @covers Geissler\CSL\Date\Month::modify
+     */
+    public function testModifyAndRender()
+    {
+        $layout =   '<date-part name="month" form="numeric"/>';
+        $this->initElement($layout);
+        $xml    =   new \SimpleXMLElement('<date-part name="month" form="numeric-leading-zeros"/>');
+        $this->assertInstanceOf('\Geissler\CSL\Date\Month', $this->object->modify($xml));
+        $this->assertEquals('01', $this->object->render('1'));
+    }
+
     protected function initElement($layout, $language = 'en-US')
     {
         $xml = new \SimpleXMLElement($layout);

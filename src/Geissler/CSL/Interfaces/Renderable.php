@@ -1,5 +1,4 @@
 <?php
-
 namespace Geissler\CSL\Interfaces;
 
 /**
@@ -10,13 +9,6 @@ namespace Geissler\CSL\Interfaces;
  */
 interface Renderable
 {
-    /**
-     * Parses the configuration.
-     *
-     * @param \SimpleXMLElement $xml
-     */
-    public function __construct(\SimpleXMLElement $xml);
-
     /**
      * Render the element.
      *

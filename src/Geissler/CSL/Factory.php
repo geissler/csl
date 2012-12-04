@@ -1,7 +1,11 @@
 <?php
 namespace Geissler\CSL;
 
+use Geissler\CSL\Container;
 use Geissler\CSL\Locale\Locale;
+use Geissler\CSL\Date\Day;
+use Geissler\CSL\Date\Month;
+use Geissler\CSL\Date\Year;
 
 /**
  * Factory, for creating objects which depend on configuration parameters.
@@ -27,6 +31,65 @@ class Factory
                ->setPrimaryDialect(self::$configuration['locale']['dialects']);
 
         return $locale;
+    }
+
+    /**
+     * Creates a Day object containing the locale day configuration and the given form the xml.
+     *
+     * @param string $form text or numeric
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Date\Day
+     */
+    public static function day($form, \SimpleXMLElement $xml)
+    {
+        $standard   = Container::getLocale()->getDateAsXml($form, 'day');
+
+        if ($standard !== null) {
+            $day    =   new Day(new \SimpleXMLElement($standard));
+            $day->modify($xml);
+
+            return $day;
+        }
+
+        return new Day($xml);
+    }
+
+    /**
+     * Creates a Month object containing the locale month configuration and the given form the xml.
+     *
+     * @param string $form text or numeric
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Date\Month
+     */
+    public static function month($form, \SimpleXMLElement $xml)
+    {
+        $standard   = Container::getLocale()->getDateAsXml($form, 'month');
+
+        if ($standard !== null) {
+            $month    =   new Month(new \SimpleXMLElement($standard));
+            return $month->modify($xml);
+        }
+
+        return new Month($xml);
+    }
+
+    /**
+     * Creates a Year object containing the locale year configuration and the given form the xml.
+     *
+     * @param string $form text or numeric
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Date\Year
+     */
+    public static function year($form, \SimpleXMLElement $xml)
+    {
+        $standard   = Container::getLocale()->getDateAsXml($form, 'year');
+
+        if ($standard !== null) {
+            $year    =   new Year(new \SimpleXMLElement($standard));
+            return $year->modify($xml);
+        }
+
+        return new Year($xml);
     }
 
     /**

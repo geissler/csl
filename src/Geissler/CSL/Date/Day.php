@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Container;
 
 /**
@@ -10,7 +11,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Day implements Renderable
+class Day implements Renderable, Modifiable
 {
     /** @var string **/
     private $form;
@@ -23,13 +24,25 @@ class Day implements Renderable
     public function __construct(\SimpleXMLElement $day)
     {
         $this->form =   'numeric';
+        $this->modify($day);
+    }
 
-        foreach ($day->attributes() as $name => $value) {
+    /**
+     * Modifys the actual day configuration.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Date\Day
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        foreach ($xml->attributes() as $name => $value) {
             if ($name == 'form') {
                 $this->form =   (string) $value;
                 break;
             }
         }
+
+        return $this;
     }
 
     /**

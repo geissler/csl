@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
 
 /**
  * Display affixs.
@@ -9,7 +10,7 @@ use Geissler\CSL\Interfaces\Renderable;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Affix implements Renderable
+class Affix implements Renderable, Modifiable
 {
     /** @var string **/
     private $prefix;
@@ -25,8 +26,18 @@ class Affix implements Renderable
     {
         $this->prefix   =   '';
         $this->suffix   =   '';
+        $this->modify($affix);
+    }
 
-        foreach ($affix->attributes() as $name => $value) {
+    /**
+     * Modifys the actual affix configuration.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Rendering\Affix
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        foreach ($xml->attributes() as $name => $value) {
             if ($name == 'prefix') {
                 $this->prefix   =   (string) $value;
             }
@@ -34,6 +45,8 @@ class Affix implements Renderable
                 $this->suffix   =   (string) $value;
             }
         }
+
+        return $this;
     }
 
     /**
