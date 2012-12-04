@@ -26,7 +26,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\DateParts::getRangeDelimiter
+     * @covers Geissler\CSL\Date\DatePart::getRangeDelimiter
      */
     public function testGetRangeDelimiter()
     {

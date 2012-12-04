@@ -27,7 +27,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Date::render
+     * @covers Geissler\CSL\Date\Date::render
      */
     public function testRender()
     {
@@ -56,7 +56,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Date::render
+     * @covers Geissler\CSL\Date\Date::render
      */
     public function testRender1()
     {
@@ -91,7 +91,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Date::render
+     * @covers Geissler\CSL\Date\Date::render
      */
     public function testRenderStandardText()
     {
@@ -118,7 +118,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Date::render
+     * @covers Geissler\CSL\Date\Date::render
      */
     public function testRenderDateMonthShort()
     {
@@ -146,8 +146,8 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Date::render
-     * @covers Geissler\CSL\Rendering\Date::formatDate
+     * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
      */
     public function testRenderCustomDelimiter()
     {
@@ -181,9 +181,9 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Date::render
-     * @covers Geissler\CSL\Rendering\Date::formatDate
-     * @covers Geissler\CSL\Rendering\Date::partWithMaxDiff
+     * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
+     * @covers Geissler\CSL\Date\Date::partWithMaxDiff
      */
     public function testRenderCustomDelimiter1()
     {
