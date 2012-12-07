@@ -82,8 +82,16 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Style\Style::readFile
+     */
+    public function testReadFileError()
+    {
+        $this->setExpectedException('ErrorException');
+        $this->object->readFile('not-there');
+    }
+
+    /**
      * @covers Geissler\CSL\Style\Style::readXml
-     * @todo   Implement testReadXml().
      */
     public function testReadXml()
     {
@@ -96,6 +104,39 @@ class StyleTest extends \PHPUnit_Framework_TestCase
                       <title />
                       <updated>2009-08-10T04:49:00+09:00</updated>
                     </info>
+                    <citation>
+                      <layout>
+                        <text value="Oops"/>
+                      </layout>
+                    </citation>
+                    <bibliography
+                        initialize-with=". ">
+                      <layout>
+                        <names variable="author">
+                          <name />
+                        </names>
+                      </layout>
+                    </bibliography>
+                  </style>';
+        $this->assertInstanceOf($this->class, $this->object->readXml(new \SimpleXMLElement($xml)));
+    }
+
+    /**
+     * @covers Geissler\CSL\Style\Style::readXml
+     */
+    public function testReadXml1()
+    {
+        $xml    =   '<style
+                        xmlns="http://purl.org/net/xbiblio/csl"
+                        class="note"
+                        version="1.0">
+                    <info>
+                      <id />
+                      <title />
+                      <updated>2009-08-10T04:49:00+09:00</updated>
+                    </info>
+                    <locale lang="fr">
+                    </locale>
                     <citation>
                       <layout>
                         <text value="Oops"/>

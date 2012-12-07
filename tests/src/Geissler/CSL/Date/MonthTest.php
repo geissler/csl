@@ -83,6 +83,8 @@ class MonthTest extends \PHPUnit_Framework_TestCase
      * @covers Geissler\CSL\Date\Month::__construct
      * @covers Geissler\CSL\Date\Month::render
      * @covers Geissler\CSL\Date\Month::getLocale
+     * @covers Geissler\CSL\Date\Month::getMonthNumber
+     * @covers Geissler\CSL\Date\Month::findMonth
      */
     public function testRenderShort()
     {
@@ -94,6 +96,9 @@ class MonthTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Date\Month::__construct
      * @covers Geissler\CSL\Date\Month::render
+     * @covers Geissler\CSL\Date\Month::getMonthNumber
+     * @covers Geissler\CSL\Date\Month::findMonth
+     * @covers Geissler\CSL\Date\Month::getLocale
      */
     public function testRenderShort1()
     {

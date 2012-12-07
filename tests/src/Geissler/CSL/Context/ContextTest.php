@@ -117,4 +117,14 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('ErrorException');
         $this->object->getOptions();
     }
+
+    /**
+     * @covers Geissler\CSL\Context\Context::getValue
+     */
+    public function testGetNoValue()
+    {
+        $this->assertEquals('', $this->object->getValue('test'));
+        $this->assertEquals('', $this->object->getValue('test', 'citation'));
+        $this->assertEquals('', $this->object->getValue('test', 'bibliography'));
+    }
 }

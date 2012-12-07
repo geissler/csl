@@ -23,6 +23,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderLong()
@@ -33,6 +35,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderAD()
@@ -43,6 +47,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderAD1()
@@ -53,6 +59,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderBC()
@@ -63,6 +71,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderBC1()
@@ -73,6 +83,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderBCGerman()
@@ -83,6 +95,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderShort()
@@ -93,6 +107,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderShort1()
@@ -103,6 +119,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderShort2()
@@ -113,6 +131,8 @@ class YearTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Year::__construct
+     * @covers Geissler\CSL\Date\Year::modify
      * @covers Geissler\CSL\Date\Year::render
      */
     public function testRenderEmpty()

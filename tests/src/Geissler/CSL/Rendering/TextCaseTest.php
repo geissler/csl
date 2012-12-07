@@ -23,6 +23,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\TextCase::__construct
      * @covers Geissler\CSL\Rendering\TextCase::render
      * @covers Geissler\CSL\Rendering\TextCase::keepNoCaseSpan
      */
@@ -142,6 +143,34 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Review of book by A.N. author', $this->object->render('Review of book by A.N. author'));
     }
 
+    /**
+     * @covers Geissler\CSL\Rendering\TextCase::render
+     */
+    public function testRenderNothing()
+    {
+        $locale = Factory::locale();
+        $locale->readFile('de');
+        Container::setLocale($locale);
+
+        $this->initElement('<text variable="title"/>');
+        $this->assertEquals('Review of book by A.N. author', $this->object->render('Review of book by A.N. author'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\TextCase::modify
+     * @covers Geissler\CSL\Rendering\TextCase::render
+     */
+    public function testRenderModified()
+    {
+        $locale = Factory::locale();
+        $locale->readFile('de');
+        Container::setLocale($locale);
+
+        $this->initElement('<text variable="title" text-case="sentence"/>');
+        $xml = '<text variable="title" text-case="uppercase"/>';
+        $this->assertInstanceOf('\Geissler\CSL\Rendering\TextCase', $this->object->modify(new \SimpleXMLElement($xml)));
+        $this->assertEquals('THIS IS A PEN THAT IS A SMITH PENCIL', $this->object->render('this is a Pen that is a Smith Pencil'));
+    }
 
     protected function initElement($layout)
     {

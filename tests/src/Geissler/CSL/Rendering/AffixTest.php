@@ -70,6 +70,19 @@ class AffixTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->object->render(''));
     }
 
+    /**
+     * @covers Geissler\CSL\Rendering\Affix::modify
+     * @covers Geissler\CSL\Rendering\Affix::render
+     */
+    public function testRenderModified()
+    {
+        $layout = '<layout suffix="--" delimiter=", "><text variable="citation-number"/></layout>';
+        $xml = '<layout suffix="]" prefix="["/>';
+        $this->initElement($layout);
+        $this->assertInstanceOf('\Geissler\CSL\Rendering\Affix', $this->object->modify(new \SimpleXMLElement($xml)));
+        $this->assertEquals('[test]', $this->object->render('test'));
+    }
+
     protected function initElement($layout)
     {
         $xml = new \SimpleXMLElement($layout);

@@ -26,6 +26,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::getRangeDelimiter
      */
     public function testGetRangeDelimiter()
@@ -36,6 +37,18 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
+     * @covers Geissler\CSL\Date\DatePart::getRangeDelimiter
+     */
+    public function testGetRangeDelimiter1()
+    {
+        $layout =   '<date-part name="day" range-delimiter="--"/>';
+        $this->initElement($layout);
+        $this->assertEquals('–-', $this->object->getRangeDelimiter());
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDay()
@@ -46,6 +59,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDay1()
@@ -56,6 +70,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDayAsOrdinal()
@@ -69,7 +84,8 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1st', $this->object->render(array('day' => 1, 'month' => 12, 'year' => 1984)));
     }
 
-     /**
+    /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDayAsOrdinal1()
@@ -84,6 +100,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDayAsFrenchOrdinal()
@@ -98,6 +115,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDayAsFrenchOrdinal1()
@@ -112,6 +130,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
      * @covers Geissler\CSL\Date\DatePart::render
      */
     public function testRenderDayAsFrenchOrdinal2()
@@ -123,6 +142,57 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
         $layout =   '<date-part name="day" form="ordinal" prefix="[" suffix="]"/>';
         $this->initElement($layout);
         $this->assertEquals('[1ʳᵉ]', $this->object->render(array('day' => 1, 'month' => 12, 'year' => 1984)));
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
+     * @covers Geissler\CSL\Date\DatePart::render
+     */
+    public function testRenderMonth()
+    {
+        $layout =   '<date-part name="month" suffix=". " form="numeric-leading-zeros"/>';
+        $this->initElement($layout);
+        $this->assertEquals('12. ', $this->object->render(array('day' => 3, 'month' => 12, 'year' => 1984)));
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
+     * @covers Geissler\CSL\Date\DatePart::render
+     */
+    public function testRenderYear()
+    {
+        $layout =   '<date-part name="year"/>';
+        $this->initElement($layout);
+        $this->assertEquals('1984', $this->object->render(array('day' => 3, 'month' => 12, 'year' => 1984)));
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
+     * @covers Geissler\CSL\Date\DatePart::modify
+     * @covers Geissler\CSL\Date\DatePart::render
+     */
+    public function testRenderModified()
+    {
+        $locale = Factory::locale();
+        $locale->readFile('fr');
+        Container::setLocale($locale);
+
+        $layout =   '<date-part name="day" form="ordinal"/>';
+        $this->initElement($layout);
+        $xml    =   '<date-part name="day" suffix=". " form="numeric-leading-zeros" range-delimiter="--"/>';
+        $this->assertInstanceOf('\Geissler\CSL\Date\DatePart', $this->object->modify(new \SimpleXMLElement($xml)));
+        $this->assertEquals('01. ', $this->object->render(array('day' => 1, 'month' => 12, 'year' => 1984)));
+    }
+
+    /**
+     * @covers Geissler\CSL\Date\DatePart::__construct
+     * @covers Geissler\CSL\Date\DatePart::render
+     */
+    public function testRenderNothing()
+    {
+        $layout =   '<date-part name="day" form="ordinal" prefix="[" suffix="]"/>';
+        $this->initElement($layout);
+        $this->assertEquals('', $this->object->render(array('month' => 12, 'year' => 1984)));
     }
 
     protected function initElement($layout, $form = 'text')

@@ -23,6 +23,7 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
      */
     public function testValidate()
@@ -42,6 +43,7 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
      */
     public function testValidate1()
