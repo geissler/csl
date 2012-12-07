@@ -6,6 +6,7 @@ use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Date\Day;
 use Geissler\CSL\Date\Month;
 use Geissler\CSL\Date\Year;
+use Geissler\CSL\Style\Style;
 
 /**
  * Factory, for creating objects which depend on configuration parameters.
@@ -31,6 +32,20 @@ class Factory
                ->setPrimaryDialect(self::$configuration['locale']['dialects']);
 
         return $locale;
+    }
+
+    /**
+     * Generats a Style object and injects the dir path.
+     * 
+     * @return \Geissler\CSL\Style\Style
+     */
+    public static function style()
+    {
+        self::loadConfig();
+
+        $style  =   new Style();
+        $style->setDir(self::$configuration['styles']['dir']);
+        return $style;
     }
 
     /**
