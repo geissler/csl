@@ -6,6 +6,9 @@ use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Formating;
 use Geissler\CSL\Rendering\Text;
 use Geissler\CSL\Macro\Macro;
+use Geissler\CSL\Date\Date;
+use Geissler\CSL\Rendering\Number;
+use Geissler\CSL\Names\Names;
 
 /**
  * Description of Layout
@@ -25,6 +28,11 @@ class Layout implements Renderable
     /** @var string **/
     private $type;
 
+    /**
+     * Parses the layout configuration.
+     *
+     * @param \SimpleXMLElement $xml
+     */
     public function __construct(\SimpleXMLElement $xml)
     {
         $this->affix        =   new Affix($xml);
@@ -43,6 +51,15 @@ class Layout implements Renderable
                     break;
                 case 'macro':
                     $this->children[]   =   new Macro($child);
+                    break;
+                case 'date':
+                    $this->children[]   =   new Date($child);
+                    break;
+                case 'number':
+                    $this->children[]   =   new Number($child);
+                    break;
+                case 'names':
+                    $this->children[]   =   new Names($child);
                     break;
             }
         }

@@ -36,7 +36,7 @@ class Options
             switch ($name) {
                 // global options
                 case 'initialize-with-hyphen':
-                    Container::getContext()->$method('initializeWithHyphen', (boolean) $value);
+                    Container::getContext()->$method('initializeWithHyphen', ($value === 'true' ? true : false));
                     break;
                 case 'page-range-format':
                     Container::getContext()->$method('pageRangeFormat', (string) $value);

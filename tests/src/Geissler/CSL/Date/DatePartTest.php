@@ -42,9 +42,9 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRangeDelimiter1()
     {
-        $layout =   '<date-part name="day" range-delimiter="--"/>';
+        $layout =   '<date-part name="day" range-delimiter="***"/>';
         $this->initElement($layout);
-        $this->assertEquals('–-', $this->object->getRangeDelimiter());
+        $this->assertEquals('***', $this->object->getRangeDelimiter());
     }
 
     /**

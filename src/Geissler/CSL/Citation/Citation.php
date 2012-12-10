@@ -30,16 +30,19 @@ class Citation implements Renderable
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'disambiguate-add-names':
-                    Container::getContext()->addCitation('disambiguateAddNames', (boolean) $value);
+                    Container::getContext()->addCitation('disambiguateAddNames', ($value == 'true' ? true : false));
                     break;
                 case 'disambiguate-add-givenname':
-                    Container::getContext()->addCitation('disambiguateAddGivenname', (boolean) $value);
+                    Container::getContext()->addCitation('disambiguateAddGivenname', ($value == 'true' ? true : false));
                     break;
                 case 'givenname-disambiguation-rule':
                     Container::getContext()->addCitation('givennameDisambiguationRule', (string) $value);
                     break;
                 case 'disambiguate-add-year-suffix':
-                    Container::getContext()->addCitation('disambiguateAddYearSuffix', (boolean) $value);
+                    Container::getContext()->addCitation(
+                        'disambiguateAddYearSuffix',
+                        ($value === 'true' ? true : false)
+                    );
                     break;
                 case 'cite-group-delimiter':
                     Container::getContext()->addCitation('citeGroupDelimiter', (string) $value);

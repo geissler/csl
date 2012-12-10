@@ -2,7 +2,6 @@
 namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Factory;
-use Geissler\CSL\Data\Data;
 use Geissler\CSL\Container;
 use Geissler\CSL\Citation\Citation;
 use Geissler\CSL\Bibliography\Bibliography;
@@ -28,6 +27,9 @@ class NameTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Name::__construct
      * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
      */
     public function testRender()
     {
@@ -49,6 +51,9 @@ class NameTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Name::__construct
      * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
      */
     public function testRenderDelimiterAndText()
     {
@@ -70,6 +75,9 @@ class NameTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Name::__construct
      * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
      */
     public function testRenderDelimiterAndTextInContext()
     {
@@ -83,8 +91,7 @@ class NameTest extends \PHPUnit_Framework_TestCase
                 "family" =>  "Roe",
                 "given" => "Jane")
         );
-
-        $this->initElement($layout);
+        $this->initElement($layout, $context);
 
         $this->assertEquals('John Doe, and Jane Roe', $this->object->render($data));
     }
@@ -92,6 +99,9 @@ class NameTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Name::__construct
      * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
      */
     public function testRenderDelimiterAlways()
     {
@@ -113,6 +123,9 @@ class NameTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Name::__construct
      * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
      */
     public function testRenderEtAl()
     {
@@ -133,10 +146,13 @@ class NameTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Name::__construct
      * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
      */
     public function testRenderEtAl1()
     {
-        $layout =   '<name delimiter=", " et-al-use-first="1" et-al-min="2" />';
+        $layout =   '<name delimiter=", " et-al-use-first="1" et-al-min="2" delimiter-precedes-et-al="always" />';
         $data   =   array(
             array(
                 "family" =>  "Doe",
@@ -150,8 +166,148 @@ class NameTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('John Doe, et al.', $this->object->render($data));
     }
 
+    /**
+     * @covers Geissler\CSL\Names\Name::__construct
+     * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
+     */
+    public function testRenderGreece()
+    {
+        $layout =   '<name and="text"/>';
+        $data   =   array(
+            array(
+                "family" =>  "Ράις",
+                "given" => "Μυρτώ")
+        );
+
+        $this->initElement($layout);
+
+        $this->assertEquals('Ράις Μυρτώ', $this->object->render($data));
+    }
+
+    /**
+     * @covers Geissler\CSL\Names\Name::__construct
+     * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
+     */
+    public function testRenderWithFormating()
+    {
+        $layout =   '<name>
+          <name-part name="family" text-case="uppercase"/>
+        </name>';
+        $data   =   array(
+            array(
+                "dropping-particle" => "van",
+                "family" => "Meer",
+                "given" => "Gerard",
+                "non-dropping-particle" => "der")
+        );
+
+        $this->initElement($layout);
+
+        $this->assertEquals('Gerard van DER MEER', $this->object->render($data));
+    }
+
+    /**
+     * @covers Geissler\CSL\Names\Name::__construct
+     * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
+     */
+    public function testRenderDelimiter()
+    {
+        $layout =   '<name and="symbol" delimiter=", " delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all" sort-separator=", " />';
+        $data   =   array(
+            array(
+                "family"=> "O’Malley",
+                "given" => "Charles D.",
+                "static-ordering" => false),
+            array(
+                "family"=> "Saunders",
+                "given" => "John Bertrand de Cusance Morant",
+                "static-ordering" => false
+            )
+        );
+
+        $this->initElement($layout);
+
+        $this->assertEquals('O’Malley, C.D., &#38; Saunders, J.B. de C.M.', $this->object->render($data));
+    }
+
+    /**
+     * @covers Geissler\CSL\Names\Name::__construct
+     * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
+     */
+    public function testRenderInitialize()
+    {
+        $layout =   '<name initialize="false" initialize-with="." />';
+        $data   =   array(
+            array(
+                "family"=> "Kirk",
+                "given" => "James T")
+        );
+
+        $this->initElement($layout);
+
+        $this->assertEquals('James T. Kirk', $this->object->render($data));
+    }
+
+    /**
+     * @covers Geissler\CSL\Names\Name::__construct
+     * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
+     */
+    public function testRenderInitialize1()
+    {
+        $layout =   '<name initialize="true" initialize-with=". " />';
+        $data   =   array(
+            array(
+                "family"=> "Kirk",
+                "given" => "James Tiberius")
+        );
+
+        $this->initElement($layout);
+
+        $this->assertEquals('J. T. Kirk', $this->object->render($data));
+    }
+
+    /**
+     * @covers Geissler\CSL\Names\Name::__construct
+     * @covers Geissler\CSL\Names\Name::render
+     * @covers Geissler\CSL\Names\Name::apply
+     * @covers Geissler\CSL\Names\Name::formatName
+     * @covers Geissler\CSL\Names\Name::getDisplayAndSortOrder
+     */
+    public function testRenderFormated()
+    {
+        $layout =   '<name name-as-sort-order="all" sort-separator=" ">
+                        <name-part name="family" font-variant="small-caps"/>
+                        <name-part name="given" prefix="(" suffix=")"/>
+                      </name>';
+        $data   =   array(
+            array(
+                "family" => "Fontaine",
+                "given" => "Jean de")
+        );
+
+        $this->initElement($layout);
+
+        $this->assertEquals('<font style="font-variant:small-caps">Fontaine</font> (Jean de)', $this->object->render($data));
+    }
+
     protected function initElement($layout, $context = '<citation />', $language = 'en-US')
     {
+        Container::clear();
         $locale = Factory::locale();
         $locale->readFile($language);
         Container::setLocale($locale);
@@ -161,7 +317,7 @@ class NameTest extends \PHPUnit_Framework_TestCase
             Container::setCitation(new Citation(new \SimpleXMLElement($context)));
         } else {
             Container::getContext()->setName('bibliography');
-            Container::setCitation(new Bibliography(new \SimpleXMLElement($context)));
+            Container::setBibliography(new Bibliography(new \SimpleXMLElement($context)));
         }
 
         $xml = new \SimpleXMLElement($layout);

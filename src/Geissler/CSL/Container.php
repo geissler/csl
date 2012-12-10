@@ -163,4 +163,15 @@ class Container
     {
         return self::$data;
     }
+
+    public static function clear()
+    {
+        if (isset(self::$context) == true) {
+            self::$context  =   new Context();
+        }
+
+        if (isset(self::$macros) == true) {
+            self::$macros   =   array();
+        }
+    }
 }

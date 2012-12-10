@@ -29,7 +29,7 @@ class Bibliography implements Renderable
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'hanging-indent':
-                    Container::getContext()->addBibliography('hangingIndent', (boolean) $value);
+                    Container::getContext()->addBibliography('hangingIndent', ($value == 'true' ? true : false));
                     break;
                 case 'second-field-align':
                     Container::getContext()->addBibliography('secondFieldAlign', (string) $value);
