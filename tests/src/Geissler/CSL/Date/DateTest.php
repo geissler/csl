@@ -27,7 +27,9 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
      */
     public function testRender()
     {
@@ -56,7 +58,10 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
+     * @covers Geissler\CSL\Date\Date::hasAccessEmptyVariable
      */
     public function testRender1()
     {
@@ -88,10 +93,13 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
 
         $this->assertEquals('(August 1987–October 2003)', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
      */
     public function testRenderStandardText()
     {
@@ -118,7 +126,9 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
      */
     public function testRenderDateMonthShort()
     {
@@ -146,6 +156,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
      * @covers Geissler\CSL\Date\Date::formatDate
      */
@@ -181,6 +192,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
      * @covers Geissler\CSL\Date\Date::formatDate
      * @covers Geissler\CSL\Date\Date::partWithMaxDiff
@@ -215,7 +227,9 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
+     * @covers Geissler\CSL\Date\Date::formatDate
      * @covers Geissler\CSL\Date\Date::renderSeason
      */
     public function testRenderSeason()
@@ -243,6 +257,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
      * @covers Geissler\CSL\Date\Date::renderSeason
      */
@@ -270,8 +285,10 @@ class DateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Date\Date::__construct
      * @covers Geissler\CSL\Date\Date::render
      * @covers Geissler\CSL\Date\Date::renderSeason
+     * @covers Geissler\CSL\Date\Date::hasAccessEmptyVariable
      */
     public function testRenderNoSeason1()
     {
@@ -294,6 +311,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
 ]';
         $this->initElement($layout, $json);
         $this->assertEquals('', $this->object->render(''));
+        $this->assertTrue($this->object->hasAccessEmptyVariable());
     }
 
     protected function initElement($layout, $json, $language = 'en-US')

@@ -45,6 +45,7 @@ class LabelTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Rendering\Label::__construct
      * @covers Geissler\CSL\Rendering\Label::render
+     * @covers Geissler\CSL\Rendering\Label::hasAccessEmptyVariable
      */
     public function testRender()
     {
@@ -59,6 +60,7 @@ class LabelTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
 
         $this->assertEquals('pages', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     /**
@@ -198,6 +200,34 @@ class LabelTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
         $this->setExpectedException('ErrorException');
         $this->object->render('');
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Label::__construct
+     * @covers Geissler\CSL\Rendering\Label::setVariable
+     * @covers Geissler\CSL\Rendering\Label::render
+     * @covers Geissler\CSL\Rendering\Label::hasAccessEmptyVariable
+     */
+    public function testRenderNot1()
+    {
+        $layout =   '<label plural="contextual" strip-periods="true" />';
+        $json   =   '[
+    {
+        "editor": [
+            {
+                "family": "Doe",
+                "given": "John",
+                "static-ordering": false
+            }
+        ],
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertInstanceOf($this->class, $this->object->setVariable('author'));
+        $this->assertEquals('', $this->object->render(''));
+        $this->assertTrue($this->object->hasAccessEmptyVariable());
     }
 
 

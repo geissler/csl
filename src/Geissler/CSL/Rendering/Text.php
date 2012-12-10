@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\RenderableElement;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
 use Geissler\CSL\Rendering\Formating;
@@ -18,7 +18,7 @@ use Geissler\CSL\Rendering\Value;
  *
  * @author Benjamin
  */
-class Text implements Renderable
+class Text implements RenderableElement
 {
     /** @var Affix **/
     private $affix;
@@ -67,6 +67,12 @@ class Text implements Renderable
         }
     }
 
+    /**
+     * Display text value.
+     *
+     * @param string|array $data
+     * @return string
+     */
     public function render($data)
     {
         $data   =   $this->render->render($data);
@@ -77,5 +83,20 @@ class Text implements Renderable
         $data   =   $this->formating->render($data);
 
         return $this->affix->render($data);
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean|null
+     */
+    public function hasAccessEmptyVariable()
+    {
+        if (($this->render instanceof RenderableElement) == true) {
+            return $this->render->hasAccessEmptyVariable();
+        }
+
+        return null;
     }
 }

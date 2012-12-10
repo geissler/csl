@@ -94,6 +94,7 @@ class SubstituteTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Substitute::__construct
      * @covers Geissler\CSL\Names\Substitute::render
+     * @covers Geissler\CSL\Names\Substitute::hasAccessEmptyVariable
      */
     public function testRenderNumber()
     {
@@ -118,23 +119,45 @@ class SubstituteTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
 
         $this->assertEquals('xlii', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     /**
      * @covers Geissler\CSL\Names\Substitute::__construct
      * @covers Geissler\CSL\Names\Substitute::render
+     * @covers Geissler\CSL\Names\Substitute::hasAccessEmptyVariable
      */
     public function testRenderNames()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $layout =   '<substitute>
+                        <names variable="editor"/>
+                        <text macro="title"/>
+                      </substitute>';
+        $json   =   '[
+            {
+                "id": "ITEM-1",
+                "editor" : [
+                    {
+                        "family": "Doe",
+                        "given": "John",
+                        "static-ordering": false
+                    }
+                ],
+                "volume": "42",
+                "title": "Ignore me",
+                "type": "book"
+            }
+        ]';
+        $this->initElement($layout, $json);
+        Container::getContext()->setName('citation');
+        $this->assertEquals('John Doe', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     /**
      * @covers Geissler\CSL\Names\Substitute::__construct
      * @covers Geissler\CSL\Names\Substitute::render
+     * @covers Geissler\CSL\Names\Substitute::hasAccessEmptyVariable
      */
     public function testRenderNothing()
     {
@@ -156,6 +179,7 @@ class SubstituteTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
 
         $this->assertEquals('', $this->object->render(''));
+        $this->assertTrue($this->object->hasAccessEmptyVariable());
     }
 
     protected function initElement($layout, $json, $language = 'en-US')

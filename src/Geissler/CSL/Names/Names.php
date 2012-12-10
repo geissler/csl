@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Names;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\RenderableElement;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -17,7 +17,7 @@ use Geissler\CSL\Rendering\Label;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Names implements Renderable
+class Names implements RenderableElement
 {
     /** @var array **/
     private $variables;
@@ -136,5 +136,26 @@ class Names implements Renderable
         $return =   $this->formating->render($return);
         $return =   $this->display->render($return);
         return $this->affix->render($return);
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        foreach ($this->variables as $variable) {
+            if (Container::getData()->getVariable($variable) !== null) {
+                return false;
+            }
+        }
+
+        if (isset($this->substitute) == true) {
+            return $this->substitute->hasAccessEmptyVariable();
+        }
+
+        return true;
     }
 }

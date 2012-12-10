@@ -24,7 +24,9 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
+     * @covers Geissler\CSL\Rendering\Number::hasAccessEmptyVariable
      */
     public function testRender()
     {
@@ -38,9 +40,11 @@ class NumberTest extends \PHPUnit_Framework_TestCase
 ]';
         $this->initElement($layout, $json);
         $this->assertEquals('2', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      */
     public function testRender1()
@@ -58,6 +62,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      * @covers Geissler\CSL\Rendering\Number::calcRoman
      * @covers Geissler\CSL\Rendering\Number::toRoman
@@ -79,6 +84,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      * @covers Geissler\CSL\Rendering\Number::calcRoman
      * @covers Geissler\CSL\Rendering\Number::toRoman
@@ -100,6 +106,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      */
     public function testRenderOrdinal()
@@ -118,6 +125,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      */
     public function testRenderOrdinal1()
@@ -136,6 +144,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      */
     public function testRenderLongOrdinal()
@@ -154,6 +163,7 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
      */
     public function testRenderLongOrdinal1()
@@ -172,7 +182,9 @@ class NumberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
      * @covers Geissler\CSL\Rendering\Number::render
+     * @covers Geissler\CSL\Rendering\Number::hasAccessEmptyVariable
      */
     public function testRenderNothing()
     {
@@ -186,6 +198,27 @@ class NumberTest extends \PHPUnit_Framework_TestCase
 ]';
         $this->initElement($layout, $json);
         $this->assertEquals('Special Edition', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Number::__construct
+     * @covers Geissler\CSL\Rendering\Number::render
+     * @covers Geissler\CSL\Rendering\Number::hasAccessEmptyVariable
+     */
+    public function testRenderNothing1()
+    {
+        $layout =   '<number variable="number"/>';
+        $json = '[
+    {
+        "id": "ITEM-1",
+        "edition": "Special Edition",
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('', $this->object->render(''));
+        $this->assertTrue($this->object->hasAccessEmptyVariable());
     }
 
     protected function initElement($layout, $json, $language = 'en-US')

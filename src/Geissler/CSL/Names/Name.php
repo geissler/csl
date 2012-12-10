@@ -261,19 +261,21 @@ class Name implements Renderable, Contextualize
         }
 
         // initialize given names
-        if ($this->initialize == true
-            && $this->initializeWith !== '') {
+        if (isset($names['given']) == true) {
+            if ($this->initialize == true
+                && $this->initializeWith !== '') {
 
-            $names['given']  =  preg_replace(
-                '/([A-Z])[a-z]+\b[ ]{0,1}/',
-                '$1' . $this->initializeWith,
-                $names['given']
-            );
-            $names['given'] =   preg_replace('/([a-z]+)/', ' $1 ', $names['given']);
-            $names['given'] =   trim(preg_replace('/[ ]+/', ' ', $names['given']));
+                $names['given']  =  preg_replace(
+                    '/([A-Z])[a-z]+\b[ ]{0,1}/',
+                    '$1' . $this->initializeWith,
+                    $names['given']
+                );
+                $names['given'] =   preg_replace('/([a-z]+)/', ' $1 ', $names['given']);
+                $names['given'] =   trim(preg_replace('/[ ]+/', ' ', $names['given']));
 
-        } else {
-            $names['given']  =  trim(preg_replace('/([A-Z]\b)/', '$1' . $this->initializeWith, $names['given']));
+            } else {
+                $names['given']  =  trim(preg_replace('/([A-Z]\b)/', '$1' . $this->initializeWith, $names['given']));
+            }
         }
 
         // format name-parts

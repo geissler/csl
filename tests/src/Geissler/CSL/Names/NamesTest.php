@@ -66,6 +66,46 @@ class NamesTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Names::__construct
      * @covers Geissler\CSL\Names\Names::render
+     * @covers Geissler\CSL\Names\Names::hasAccessEmptyVariable
+     */
+    public function testRender1()
+    {
+        $layout =   '<names variable="author">
+                    <name />
+                    <substitute>
+                      <names variable="editor author" />
+                    </substitute>
+                  </names>';
+        $json = '[
+    {
+        "editor": [
+            {
+                "family": "Doe",
+                "given": "John",
+                "static-ordering": false
+            }
+        ],
+        "id": "item-1",
+        "issued": {
+            "date-parts": [
+                [
+                    "2000"
+                ]
+            ]
+        },
+        "title": "His Anonymous Life",
+        "type": "book"
+    }
+]';
+        $this->initElement($layout, $json);
+
+        $this->assertEquals('John Doe', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
+    }
+
+    /**
+     * @covers Geissler\CSL\Names\Names::__construct
+     * @covers Geissler\CSL\Names\Names::render
      */
     public function testRenderEditorAndTranslator()
     {
@@ -101,6 +141,7 @@ class NamesTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Names\Names::__construct
      * @covers Geissler\CSL\Names\Names::render
+     * @covers Geissler\CSL\Names\Names::hasAccessEmptyVariable
      */
     public function testRenderEditorAndTranslator1()
     {
@@ -130,6 +171,7 @@ class NamesTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
 
         $this->assertEquals('John Doe (editor); John Johnson (translator)', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     protected function initElement($layout, $json, $context = '<citation />', $language = 'en-US')

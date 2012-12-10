@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\RenderableElement;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Formating;
@@ -14,7 +14,7 @@ use Geissler\CSL\Rendering\StripPeriods;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Label implements Renderable
+class Label implements RenderableElement
 {
     /** @var string **/
     private $variable;
@@ -119,5 +119,20 @@ class Label implements Renderable
         $return =   $this->textCase->render($return);
         $return =   $this->stripPeriods->render($return);
         return $this->affix->render($return);
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        if (Container::getData()->getVariable($this->variable) === null) {
+            return true;
+        }
+
+        return false;
     }
 }

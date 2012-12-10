@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\RenderableElement;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -16,7 +16,7 @@ use Geissler\CSL\Rendering\Ordinal;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Number implements Renderable
+class Number implements RenderableElement
 {
     /** @var string **/
     private $variable;
@@ -96,6 +96,21 @@ class Number implements Renderable
         }
 
         return $variable;
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        if (Container::getData()->getVariable($this->variable) === null) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

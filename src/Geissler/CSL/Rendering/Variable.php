@@ -1,9 +1,8 @@
 <?php
-
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\Renderable;
-use Geissler\CSL\Data\Data;
+use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Container;
 
 /**
  * Renders the text contents of a variable.
@@ -11,12 +10,10 @@ use Geissler\CSL\Data\Data;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Variable implements Renderable
+class Variable implements RenderableElement
 {
-
     /** @var string * */
     private $name;
-
     /** @var string * */
     private $form;
 
@@ -48,13 +45,28 @@ class Variable implements Renderable
     public function render($data)
     {
         if ($this->form !== '') {
-            $return = Data::getVariable($this->name . '-' . $this->form);
+            $return = Container::getData()->getVariable($this->name . '-' . $this->form);
 
             if ($return !== null) {
                 return $return;
             }
         }
 
-        return Data::getVariable($this->name);
+        return Container::getData()->getVariable($this->name);
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        if ($this->render('') === null) {
+            return true;
+        }
+
+        return false;
     }
 }

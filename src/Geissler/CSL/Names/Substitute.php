@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Names;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\RenderableElement;
 use Geissler\CSL\Rendering\Text;
 use Geissler\CSL\Date\Date;
 use Geissler\CSL\Rendering\Number;
@@ -13,7 +13,7 @@ use Geissler\CSL\Names\Names;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Substitute implements Renderable
+class Substitute implements RenderableElement
 {
     /** @var array **/
     private $renderingElements;
@@ -62,5 +62,22 @@ class Substitute implements Renderable
         }
 
         return '';
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        foreach ($this->renderingElements as $element) {
+            if ($element->hasAccessEmptyVariable() == false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Date;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\RenderableElement;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -15,7 +15,7 @@ use Geissler\CSL\Date\DatePart;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Date implements Renderable
+class Date implements RenderableElement
 {
     /** @var Affix **/
     private $affix;
@@ -206,6 +206,22 @@ class Date implements Renderable
         $value =   $this->display->render($value);
         $value =   $this->formating->render($value);
         return $this->textCase->render($value);
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        if ($this->formatDate() == false
+            || $this->render('') == '') {
+            return true;
+        }
+
+        return false;
     }
 
     /**

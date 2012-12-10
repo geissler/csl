@@ -1,19 +1,20 @@
 <?php
-namespace Geissler\CSL\Macro;
+namespace Geissler\CSL\Choose;
 
 use Geissler\CSL\Interfaces\RenderableElement;
 
 /**
- * Description of Macro
+ * .
  *
- * @author Benjamin
+ * @author Benjamin Geißler <benjamin.geissler@gmail.com>
+ * @license MIT
  */
-class Macro implements RenderableElement
+class Choose implements RenderableElement
 {
     /**
-     * Parses the configuration.
+     * Parses the Choose configuration.
      *
-     * @param \SimpleXMLElement $xml
+     * @param \SimpleXMLElement $date
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -21,10 +22,10 @@ class Macro implements RenderableElement
     }
 
     /**
-     * Render the element.
+     * .
      *
-     * @param string $data
-     * @return string
+     * @param string|array $data
+     * @return string|array
      */
     public function render($data)
     {
