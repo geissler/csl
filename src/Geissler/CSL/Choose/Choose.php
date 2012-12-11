@@ -1,7 +1,10 @@
 <?php
 namespace Geissler\CSL\Choose;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Choose\ChooseIf;
+use Geissler\CSL\Choose\ChooseElse;
 
 /**
  * .
@@ -9,8 +12,11 @@ use Geissler\CSL\Interfaces\RenderableElement;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Choose implements RenderableElement
+class Choose implements Renderable, Groupable
 {
+    /** @var array **/
+    private $children;
+
     /**
      * Parses the Choose configuration.
      *
@@ -18,7 +24,19 @@ class Choose implements RenderableElement
      */
     public function __construct(\SimpleXMLElement $xml)
     {
+        $this->children =   array();
 
+        foreach ($xml->children() as $child) {
+            switch ($child->getName()) {
+                case 'if':
+                case 'else-if':
+                    $this->children[]   =   new ChooseIf($child);
+                    break;
+                case 'else':
+                    $this->children[]   =   new ChooseElse($child);
+                    break;
+            }
+        }
     }
 
     /**
@@ -29,7 +47,13 @@ class Choose implements RenderableElement
      */
     public function render($data)
     {
+        foreach ($this->children as $child) {
+            if ($child->validate() == true) {
+                return $this->render($data);
+            }
+        }
 
+        return '';
     }
 
     /**
@@ -40,6 +64,12 @@ class Choose implements RenderableElement
      */
     public function hasAccessEmptyVariable()
     {
-        
+        foreach ($this->children as $child) {
+            if ($child->validate() == true) {
+                return $this->hasAccessEmptyVariable();
+            }
+        }
+
+        return false;
     }
 }

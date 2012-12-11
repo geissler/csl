@@ -39,10 +39,7 @@ class Citation implements Renderable
                     Container::getContext()->addCitation('givennameDisambiguationRule', (string) $value);
                     break;
                 case 'disambiguate-add-year-suffix':
-                    Container::getContext()->addCitation(
-                        'disambiguateAddYearSuffix',
-                        ($value === 'true' ? true : false)
-                    );
+                    Container::getContext()->addCitation('disambiguateAddYearSuffix', $value === 'true' ? true : false);
                     break;
                 case 'cite-group-delimiter':
                     Container::getContext()->addCitation('citeGroupDelimiter', (string) $value);

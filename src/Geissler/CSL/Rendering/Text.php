@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
 use Geissler\CSL\Rendering\Formating;
@@ -18,7 +18,7 @@ use Geissler\CSL\Rendering\Value;
  *
  * @author Benjamin
  */
-class Text implements RenderableElement
+class Text implements Groupable
 {
     /** @var Affix **/
     private $affix;
@@ -93,7 +93,7 @@ class Text implements RenderableElement
      */
     public function hasAccessEmptyVariable()
     {
-        if (($this->render instanceof RenderableElement) == true) {
+        if (($this->render instanceof Groupable) == true) {
             return $this->render->hasAccessEmptyVariable();
         }
 

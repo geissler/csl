@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Names;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -17,7 +17,7 @@ use Geissler\CSL\Rendering\Label;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Names implements RenderableElement
+class Names implements Groupable
 {
     /** @var array **/
     private $variables;

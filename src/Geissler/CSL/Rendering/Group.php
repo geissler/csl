@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
 use Geissler\CSL\Rendering\Formating;
@@ -13,12 +13,12 @@ use Geissler\CSL\Rendering\Label;
 use Geissler\CSL\Choose\Choose;
 
 /**
- * .
+ * Group Element.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Group implements RenderableElement
+class Group implements Groupable
 {
     /** @var string **/
     private $delimiter;

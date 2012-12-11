@@ -25,12 +25,11 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": 5,
@@ -38,19 +37,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
      * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate1()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "5",
@@ -58,18 +56,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate2()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "5th",
@@ -77,18 +75,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate3()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "D2",
@@ -96,18 +94,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate4()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "L2d",
@@ -115,18 +113,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate5()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "2, 3",
@@ -134,18 +132,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate6()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "2-4",
@@ -153,18 +151,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate7()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "2 & 4",
@@ -172,18 +170,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testValidate8()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "2nd",
@@ -191,18 +189,98 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertTrue($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
+     */
+    public function testValidateAny()
+    {
+        $variable =   'edition issued';
+        $json = '[
+    {
+        "issued" : 2,
+        "edition": "second",
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($variable, $json, 'any');
+        $this->assertTrue($this->object->validate());
+    }
+
+    /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
+     * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
+     */
+    public function testValidateNotAny()
+    {
+        $variable =   'edition issued';
+        $json = '[
+    {
+        "issued" : "first",
+        "edition": "second",
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($variable, $json, 'any');
+        $this->assertFalse($this->object->validate());
+    }
+
+    /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
+     * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
+     */
+    public function testValidateNone()
+    {
+        $variable =   'edition issued';
+        $json = '[
+    {
+        "issued" : "first",
+        "edition": "second",
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($variable, $json, 'none');
+        $this->assertTrue($this->object->validate());
+    }
+
+    /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
+     * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
+     */
+    public function testValidateNotNone()
+    {
+        $variable =   'edition issued';
+        $json = '[
+    {
+        "issued" : "1",
+        "edition": "second",
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($variable, $json, 'none');
+        $this->assertFalse($this->object->validate());
+    }
+
+    /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
+     * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testDoNotValidate()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "second",
@@ -210,18 +288,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertFalse($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testDoNotValidate1()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "2nd edition",
@@ -229,18 +307,18 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertFalse($this->object->validate());
     }
 
     /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
      * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
      */
     public function testDoNotValidate2()
     {
-        $layout =   '<if is-numeric="edition">
-                        <text value="TRUE"/>
-                      </if>';
+        $variable =   'edition';
         $json = '[
     {
         "edition": "second",
@@ -248,17 +326,56 @@ class IsNumericTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->initElement($layout, $json);
+        $this->initElement($variable, $json);
         $this->assertFalse($this->object->validate());
     }
 
-    protected function initElement($layout, $json)
+    /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
+     * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
+     */
+    public function testDoNotValidate3()
+    {
+        $variable =   'issued edition';
+        $json = '[
+    {
+        "issued" : 2,
+        "edition": "second",
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($variable, $json);
+        $this->assertFalse($this->object->validate());
+    }
+
+    /**
+     * @covers Geissler\CSL\Choose\IsNumeric::__construct
+     * @covers Geissler\CSL\Choose\IsNumeric::validate
+     * @covers Geissler\CSL\Choose\IsNumeric::validateVariable
+     */
+    public function testDoNotValidate4()
+    {
+        $variable =   'issued edition';
+        $json = '[
+    {
+        "issued" : 2,
+        "edition": "second",
+        "id": "ITEM-1",
+        "type": "book"
+    }
+]';
+        $this->initElement($variable, $json, '');
+        $this->assertFalse($this->object->validate());
+    }
+
+    protected function initElement($variable, $json, $match = 'all')
     {
         $data   =   new Data();
         $data->set($json);
         Container::setData($data);
 
-        $xml = new \SimpleXMLElement($layout);
-        $this->object   =   new IsNumeric($xml);
+        $this->object   =   new IsNumeric($variable, $match);
     }
 }

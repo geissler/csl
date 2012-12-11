@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -16,7 +16,7 @@ use Geissler\CSL\Rendering\Ordinal;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Number implements RenderableElement
+class Number implements Groupable
 {
     /** @var string **/
     private $variable;
@@ -66,7 +66,7 @@ class Number implements RenderableElement
     public function render($data)
     {
         $variable   =   Container::getData()->getVariable($this->variable);
-        $isNumeric  =   new IsNumeric(new \SimpleXMLElement('<if is-numeric="' . $this->variable . '"/>'));
+        $isNumeric  =   new IsNumeric($this->variable);
         if ($isNumeric->validate() == true) {
             $variable   =   $this->formatDelimiter($variable);
 

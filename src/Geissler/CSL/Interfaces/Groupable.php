@@ -1,6 +1,8 @@
 <?php
 namespace Geissler\CSL\Interfaces;
 
+use Geissler\CSL\Interfaces\Renderable;
+
 /**
  * Defines the addtitional methods for rendering elements, which could be direct or as children of a direct
  * part-element part of Group element.
@@ -8,7 +10,7 @@ namespace Geissler\CSL\Interfaces;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-interface RenderableElement extends Renderable
+interface Groupable extends Renderable
 {
     /**
      * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable

@@ -4,11 +4,7 @@ namespace Geissler\CSL\Rendering;
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Formating;
-use Geissler\CSL\Rendering\Text;
-use Geissler\CSL\Macro\Macro;
-use Geissler\CSL\Date\Date;
-use Geissler\CSL\Rendering\Number;
-use Geissler\CSL\Names\Names;
+use Geissler\CSL\Rendering\Children;
 
 /**
  * Description of Layout
@@ -25,8 +21,6 @@ class Layout implements Renderable
     private $delimiter;
     /** @var array **/
     private $children;
-    /** @var string **/
-    private $type;
 
     /**
      * Parses the layout configuration.
@@ -35,6 +29,8 @@ class Layout implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
+        $this->delimiter    =   '';
+
         $this->affix        =   new Affix($xml);
         $this->formating    =   new Formating($xml);
 
@@ -44,42 +40,22 @@ class Layout implements Renderable
             }
         }
 
-        foreach ($xml->children() as $child) {
-            switch ($child->getName()) {
-                case 'text':
-                    $this->children[]   =   new Text($child);
-                    break;
-                case 'macro':
-                    $this->children[]   =   new Macro($child);
-                    break;
-                case 'date':
-                    $this->children[]   =   new Date($child);
-                    break;
-                case 'number':
-                    $this->children[]   =   new Number($child);
-                    break;
-                case 'names':
-                    $this->children[]   =   new Names($child);
-                    break;
-            }
-        }
+        $children       =   new Children();
+        $this->children =   $children->create($xml);
     }
 
-    public function setType($type)
-    {
-        $this->type =   $type;
-        return $this;
-    }
 
     public function render($data)
     {
+        $result =   array();
         foreach ($this->children as $child) {
-            $data   =   $child->render($data);
+            $result[]   =   $child->render($data);
         }
 
-        $data   =   $this->formating->render($data);
-        $data   =   $this->affix->render($data);
+        $return =   implode($this->delimiter, $result);
+        $return =   $this->formating->render($return);
+        $return =   $this->affix->render($return);
 
-        return $data;
+        return $return;
     }
 }

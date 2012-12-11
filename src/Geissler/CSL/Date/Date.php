@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Date;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -15,7 +15,7 @@ use Geissler\CSL\Date\DatePart;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Date implements RenderableElement
+class Date implements Groupable
 {
     /** @var Affix **/
     private $affix;

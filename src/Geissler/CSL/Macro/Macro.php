@@ -1,14 +1,14 @@
 <?php
 namespace Geissler\CSL\Macro;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 
 /**
  * Description of Macro
  *
  * @author Benjamin
  */
-class Macro implements RenderableElement
+class Macro implements Groupable
 {
     /**
      * Parses the configuration.
@@ -39,6 +39,6 @@ class Macro implements RenderableElement
      */
     public function hasAccessEmptyVariable()
     {
-        
+
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Names;
 
-use Geissler\CSL\Interfaces\RenderableElement;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Rendering\Text;
 use Geissler\CSL\Date\Date;
 use Geissler\CSL\Rendering\Number;
@@ -13,7 +13,7 @@ use Geissler\CSL\Names\Names;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Substitute implements RenderableElement
+class Substitute implements Groupable
 {
     /** @var array **/
     private $renderingElements;
