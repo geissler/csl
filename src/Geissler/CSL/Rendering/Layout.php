@@ -31,7 +31,7 @@ class Layout implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->delimiter    =   '';
+        $this->delimiter    =   "\n";
 
         $this->affix        =   new Affix($xml);
         $this->formating    =   new Formating($xml);

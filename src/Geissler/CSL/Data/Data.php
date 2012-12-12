@@ -2,7 +2,7 @@
 namespace Geissler\CSL\Data;
 
 /**
- * Static storage for the data to parse.
+ * Storage for the data to parse.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -10,11 +10,11 @@ namespace Geissler\CSL\Data;
 class Data
 {
     /** @var array **/
-    private static $data;
+    private $data;
     /** @var integer **/
-    private static $length;
+    private $length;
     /** @var integer **/
-    private static $position;
+    private $position;
 
     /**
      * Set the data for citation and bibliography.
@@ -23,14 +23,14 @@ class Data
      * @return boolean
      * @throws \ErrorException
      */
-    public static function set($json)
+    public function set($json)
     {
         $data           =   json_decode($json, true);
-        self::$length   =   count($data);
+        $this->length   =   count($data);
 
-        if (self::$length > 0) {
-            self::$data     =   $data;
-            self::$position =   0;
+        if ($this->length > 0) {
+            $this->data     =   $data;
+            $this->position =   0;
 
             return true;
         }
@@ -43,10 +43,10 @@ class Data
      *
      * @return array|null
      */
-    public static function get()
+    public function get()
     {
-        if (isset(self::$data[self::$position]) == true) {
-            return self::$data[self::$position];
+        if (isset($this->data[$this->position]) == true) {
+            return $this->data[$this->position];
         }
 
         return null;
@@ -58,11 +58,11 @@ class Data
      * @param string $name
      * @return string|null
      */
-    public static function getVariable($name)
+    public function getVariable($name)
     {
-        if (isset(self::$data[self::$position]) == true
-            & array_key_exists($name, self::$data[self::$position]) == true) {
-                return self::$data[self::$position][$name];
+        if (isset($this->data[$this->position]) == true
+            & array_key_exists($name, $this->data[$this->position]) == true) {
+                return $this->data[$this->position][$name];
         }
 
         return null;
@@ -73,11 +73,11 @@ class Data
      *
      * @return boolean
      */
-    public static function next()
+    public function next()
     {
-        self::$position++;
+        $this->position++;
 
-        if (self::$position < self::$length) {
+        if ($this->position < $this->length) {
             return true;
         }
 

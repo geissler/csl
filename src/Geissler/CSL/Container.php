@@ -5,6 +5,7 @@ use Geissler\CSL\Factory;
 use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Macro\Macro;
 use Geissler\CSL\Data\Data;
+use Geissler\CSL\Data\Abbreviation;
 use Geissler\CSL\Context\Context;
 use Geissler\CSL\Style\Citation;
 use Geissler\CSL\Style\Bibliography;
@@ -29,6 +30,8 @@ class Container
     private static $bibliography;
     /** @var Data **/
     private static $data;
+    /** @var Abbreviation **/
+    private static $abbreviation;
 
     /**
      * Access the context object.
@@ -161,6 +164,20 @@ class Container
     public static function getData()
     {
         return self::$data;
+    }
+
+    public static function setAbbreviation(Abbreviation $abbreviation)
+    {
+        self::$abbreviation =   $abbreviation;
+    }
+
+    /**
+     *
+     * @return \Geissler\CSL\Data\Abbreviation
+     */
+    public static function getAbbreviation()
+    {
+        return self::$abbreviation;
     }
 
     public static function clear()

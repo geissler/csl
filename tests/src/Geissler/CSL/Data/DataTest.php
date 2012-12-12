@@ -34,7 +34,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
     public function testDoNotSet()
     {
         $this->setExpectedException('ErrorException');
-        Data::set('{');
+        $this->object->set('{');
     }
 
     /**
@@ -54,7 +54,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue(Data::set($json));
+        $this->assertTrue($this->object->set($json));
     }
 
     /**
@@ -63,8 +63,21 @@ class DataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet()
     {
-        $this->assertInternalType('array', Data::get());
-        $data = Data::get();
+        $json = '[
+    {
+        "title": "His Book",
+        "id": "ITEM-1",
+        "type": "book"
+    },
+    {
+        "volume": "101",
+        "id": "ITEM-2",
+        "type": "book"
+    }
+]';
+        $this->assertTrue($this->object->set($json));
+        $this->assertInternalType('array', $this->object->get());
+        $data = $this->object->get();
         $this->assertEquals('His Book', $data['title']);
         $this->assertEquals('ITEM-1', $data['id']);
     }
@@ -76,13 +89,26 @@ class DataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetNext()
     {
-        $this->assertTrue(Data::next());
-        $this->assertInternalType('array', Data::get());
-        $data = Data::get();
+        $json = '[
+    {
+        "title": "His Book",
+        "id": "ITEM-1",
+        "type": "book"
+    },
+    {
+        "volume": "101",
+        "id": "ITEM-2",
+        "type": "book"
+    }
+]';
+        $this->assertTrue($this->object->set($json));
+        $this->assertTrue($this->object->next());
+        $this->assertInternalType('array', $this->object->get());
+        $data = $this->object->get();
         $this->assertEquals('101', $data['volume']);
         $this->assertEquals('ITEM-2', $data['id']);
-        $this->assertFalse(Data::next());
-        $this->assertNull(Data::get());
+        $this->assertFalse($this->object->next());
+        $this->assertNull($this->object->get());
     }
 
     /**
@@ -98,10 +124,10 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "id": "ITEM-1",
         "type": "book"
     }]';
-        $this->assertTrue(Data::set($json));
-        $this->assertInternalType('array', Data::get());
-        $this->assertEquals('My Book', Data::getVariable('title'));
-        $this->assertNull(Data::getVariable('volume'));
+        $this->assertTrue($this->object->set($json));
+        $this->assertInternalType('array', $this->object->get());
+        $this->assertEquals('My Book', $this->object->getVariable('title'));
+        $this->assertNull($this->object->getVariable('volume'));
     }
 
     /**
@@ -122,8 +148,8 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue(Data::set($json));
-        $this->assertTrue(Data::next());
-        $this->assertFalse(Data::next());
+        $this->assertTrue($this->object->set($json));
+        $this->assertTrue($this->object->next());
+        $this->assertFalse($this->object->next());
     }
 }

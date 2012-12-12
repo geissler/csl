@@ -131,6 +131,16 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Rendering\TextCase::render
      * @covers Geissler\CSL\Rendering\TextCase::renderTitle
+     */
+    public function testRenderTitle3()
+    {
+        $this->initElement('<text variable="title" text-case="title"/>');
+        $this->assertEquals('This IS a Pen That Is a <span class=\"nocase\">smith</span> Pencil', $this->object->render('This IS a pen that is a <span class=\"nocase\">smith</span> pencil'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\TextCase::render
+     * @covers Geissler\CSL\Rendering\TextCase::renderTitle
      * @depends testRenderTitle
      */
     public function testRenderTitleNotEnglish()

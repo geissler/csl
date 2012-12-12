@@ -69,7 +69,7 @@ class TextCase implements Renderable, Modifiable
                 return $this->renderSentence($data);
                 break;
             case 'title':
-                return $this->renderTitle($data);
+                return $this->keepNoCaseSpan($this->renderTitle($data), $data);
                 break;
             default:
                 return $data;
@@ -86,8 +86,8 @@ class TextCase implements Renderable, Modifiable
      */
     private function keepNoCaseSpan($render, $original)
     {
-        if (preg_match('/(<span class=["|\']nocase["|\']>[A-z]+<\/span>)/i', $original, $matches) == 1) {
-            return preg_replace('/(<span class=["|\']nocase["|\']>[A-z]+<\/span>)/i', $matches[0], $render);
+        if (preg_match('/(<span class=("|\\"|\')nocase("|\\"|\')>[A-z]+<\/span>)/i', $original, $matches) == 1) {
+            return preg_replace('/(<span class=("|\\"|\')nocase("|\\"|\')>[A-z]+<\/span>)/i', $matches[0], $render);
         }
 
         return $render;

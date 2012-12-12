@@ -50,6 +50,14 @@ class Variable implements Groupable
             if ($return !== null) {
                 return $return;
             }
+
+            if (is_object(Container::getAbbreviation()) == true) {
+                $return = Container::getAbbreviation()->get($this->name, $this->form);
+            }
+
+            if ($return !== null) {
+                return $return;
+            }
         }
 
         return Container::getData()->getVariable($this->name);
