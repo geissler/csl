@@ -49,7 +49,7 @@ class Choose implements Renderable, Groupable
     {
         foreach ($this->children as $child) {
             if ($child->validate() == true) {
-                return $this->render($data);
+                return $child->render($data);
             }
         }
 
@@ -66,7 +66,7 @@ class Choose implements Renderable, Groupable
     {
         foreach ($this->children as $child) {
             if ($child->validate() == true) {
-                return $this->hasAccessEmptyVariable();
+                return $child->hasAccessEmptyVariable();
             }
         }
 

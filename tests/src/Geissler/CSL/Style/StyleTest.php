@@ -48,8 +48,8 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf($this->class, $this->object->setDir($this->dir));
         $this->assertInstanceOf($this->class, $this->object->readFile('chicago-annotated-bibliography'));
-        $this->assertInstanceOf('\Geissler\CSL\Citation\Citation', \Geissler\CSL\Container::getCitation());
-        $this->assertInstanceOf('\Geissler\CSL\Bibliography\Bibliography', \Geissler\CSL\Container::getBibliography());
+        $this->assertInstanceOf('\Geissler\CSL\Style\Citation', \Geissler\CSL\Container::getCitation());
+        $this->assertInstanceOf('\Geissler\CSL\Style\Bibliography', \Geissler\CSL\Container::getBibliography());
         $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', \Geissler\CSL\Container::getLocale());
     }
 
@@ -62,8 +62,8 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf($this->class, $this->object->setDir($this->dir));
         $this->assertInstanceOf($this->class, $this->object->readFile('revue-archeologique'));
-        $this->assertInstanceOf('\Geissler\CSL\Citation\Citation', \Geissler\CSL\Container::getCitation());
-        $this->assertInstanceOf('\Geissler\CSL\Bibliography\Bibliography', \Geissler\CSL\Container::getBibliography());
+        $this->assertInstanceOf('\Geissler\CSL\Style\Citation', \Geissler\CSL\Container::getCitation());
+        $this->assertInstanceOf('\Geissler\CSL\Style\Bibliography', \Geissler\CSL\Container::getBibliography());
         $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', \Geissler\CSL\Container::getLocale());
     }
 
@@ -76,8 +76,8 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf($this->class, $this->object->setDir($this->dir));
         $this->assertInstanceOf($this->class, $this->object->readFile('american-journal-of-archaeology'));
-        $this->assertInstanceOf('\Geissler\CSL\Citation\Citation', \Geissler\CSL\Container::getCitation());
-        $this->assertInstanceOf('\Geissler\CSL\Bibliography\Bibliography', \Geissler\CSL\Container::getBibliography());
+        $this->assertInstanceOf('\Geissler\CSL\Style\Citation', \Geissler\CSL\Container::getCitation());
+        $this->assertInstanceOf('\Geissler\CSL\Style\Bibliography', \Geissler\CSL\Container::getBibliography());
         $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', \Geissler\CSL\Container::getLocale());
     }
 

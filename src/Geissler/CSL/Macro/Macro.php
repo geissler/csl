@@ -1,15 +1,21 @@
 <?php
 namespace Geissler\CSL\Macro;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Rendering\Children;
 
 /**
- * Description of Macro
+ * Macro.
  *
- * @author Benjamin
+ * @author Benjamin Geißler <benjamin.geissler@gmail.com>
+ * @license MIT
  */
-class Macro implements Groupable
+class Macro implements Renderable, Groupable
 {
+    /** @var array **/
+    private $children;
+
     /**
      * Parses the configuration.
      *
@@ -17,18 +23,24 @@ class Macro implements Groupable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-
+        $children       =   new Children();
+        $this->children =   $children->create($xml);
     }
 
     /**
-     * Render the element.
+     * Render the macro.
      *
      * @param string $data
      * @return string
      */
     public function render($data)
     {
+        $result =   array();
+        foreach ($this->children as $child) {
+            $result[]   =   $child->render($data);
+        }
 
+        return implode('', $result);
     }
 
     /**
@@ -39,6 +51,12 @@ class Macro implements Groupable
      */
     public function hasAccessEmptyVariable()
     {
+        foreach ($this->children as $child) {
+            if ($child->hasAccessEmptyVariable() == true) {
+                return true;
+            }
+        }
 
+        return false;
     }
 }

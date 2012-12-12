@@ -1,5 +1,5 @@
 <?php
-namespace Geissler\CSL\Citation;
+namespace Geissler\CSL\Style;
 
 use Geissler\CSL\Container;
 
@@ -22,7 +22,7 @@ class CitationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Citation\Citation::__construct
+     * @covers Geissler\CSL\Style\Citation::__construct
      */
     public function testInit()
     {
@@ -35,7 +35,7 @@ class CitationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Citation\Citation::render
+     * @covers Geissler\CSL\Style\Citation::render
      * @todo   Implement testRender().
      */
     public function testRender()

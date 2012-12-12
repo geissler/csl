@@ -5,8 +5,8 @@ use Geissler\CSL\Container;
 use Geissler\CSL\Factory;
 use Geissler\CSL\Context\Options;
 use Geissler\CSL\Macro\Macro;
-use Geissler\CSL\Citation\Citation;
-use Geissler\CSL\Bibliography\Bibliography;
+use Geissler\CSL\Style\Citation;
+use Geissler\CSL\Style\Bibliography;
 
 /**
  * Reads the style configuration, creates the necessary objects and stores them in the Container.

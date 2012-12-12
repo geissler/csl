@@ -6,8 +6,8 @@ use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Macro\Macro;
 use Geissler\CSL\Data\Data;
 use Geissler\CSL\Context\Context;
-use Geissler\CSL\Citation\Citation;
-use Geissler\CSL\Bibliography\Bibliography;
+use Geissler\CSL\Style\Citation;
+use Geissler\CSL\Style\Bibliography;
 
 /**
  * Stores the diffrent objects created on base of a given Style.
@@ -22,7 +22,7 @@ class Container
     /** @var Locale **/
     private static $locale;
     /** @var array **/
-    private static $macros;
+    private static $macros = array();
     /** @var Citation **/
     private static $citation;
     /** @var Bibliography **/
@@ -90,7 +90,7 @@ class Container
      */
     public static function getMacro($name)
     {
-        if (isset(self::$macros[$name]) == false) {
+        if (isset(self::$macros[$name]) == true) {
             return self::$macros[$name];
         }
 
@@ -100,8 +100,7 @@ class Container
     /**
      * Sets the Citation object.
      *
-     * @param \Geissler\CSL\Citation\Citation $citation
-     * @return \Geissler\CSL\Container
+     * @param \Geissler\CSL\Style\Citation $citation
      */
     public static function setCitation(Citation $citation)
     {
@@ -111,7 +110,7 @@ class Container
     /**
      * Access the Citation object.
      *
-     * @return \Geissler\CSL\Citation\Citation
+     * @return \Geissler\CSL\Style\Citation
      * @throws \ErrorException If no object is injected
      */
     public static function getCitation()
@@ -131,7 +130,7 @@ class Container
     /**
      * Access the Bibliography object.
      *
-     * @return \Geissler\CSL\Bibliography\Bibliography
+     * @return \Geissler\CSL\Style\Bibliography
      * @throws \ErrorException If no object is injected
      */
     public static function getBibliography()

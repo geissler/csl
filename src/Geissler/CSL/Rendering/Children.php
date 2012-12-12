@@ -31,28 +31,28 @@ class Children
         foreach ($xml->children() as $child) {
             switch ($child->getName()) {
                 case 'text':
-                    $children   =   new Text($child);
+                    $children[] =   new Text($child);
                     break;
                 case 'macro':
-                    $children   =   new Macro($child);
+                    $children[] =   new Macro($child);
                     break;
                 case 'date':
-                    $children   =   new Date($child);
+                    $children[] =   new Date($child);
                     break;
                 case 'number':
-                    $children   =   new Number($child);
+                    $children[] =   new Number($child);
                     break;
                 case 'names':
-                    $children   =   new Names($child);
+                    $children[] =   new Names($child);
                     break;
                 case 'label':
-                    $children   =   new Label($child);
+                    $children[] =   new Label($child);
                     break;
                 case 'group':
-                    $children   =   new Group($child);
+                    $children[] =   new Group($child);
                     break;
                 case 'choose':
-                    $children   =   new Choose($child);
+                    $children[] =   new Choose($child);
                     break;
             }
         }

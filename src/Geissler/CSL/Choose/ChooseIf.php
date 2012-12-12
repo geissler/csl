@@ -7,6 +7,10 @@ use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Choose\Disambiguate;
 use Geissler\CSL\Choose\IsNumeric;
 use Geissler\CSL\Choose\IsUncertainDate;
+use Geissler\CSL\Choose\Locator;
+use Geissler\CSL\Choose\Position;
+use Geissler\CSL\Choose\Type;
+use Geissler\CSL\Choose\Variable;
 use Geissler\CSL\Rendering\Children;
 
 /**
@@ -53,6 +57,15 @@ class ChooseIf implements Renderable, Groupable, Chooseable
                 case 'locator':
                     $this->validation   =   new Locator((string) $value, $match);
                     break;
+                case 'position':
+                    $this->validation   =   new Position((string) $value, $match);
+                    break;
+                case 'type':
+                    $this->validation   =   new Type((string) $value, $match);
+                    break;
+                case 'variable':
+                    $this->validation   =   new Variable((string) $value, $match);
+                    break;
             }
         }
 
@@ -68,7 +81,12 @@ class ChooseIf implements Renderable, Groupable, Chooseable
      */
     public function render($data)
     {
+        $result =   array();
+        foreach ($this->children as $child) {
+            $result[]   =   $child->render($data);
+        }
 
+        return implode('', $result);
     }
 
     /**
@@ -79,7 +97,13 @@ class ChooseIf implements Renderable, Groupable, Chooseable
      */
     public function hasAccessEmptyVariable()
     {
+        foreach ($this->children as $child) {
+            if ($child->hasAccessEmptyVariable() == true) {
+                return true;
+            }
+        }
 
+        return false;
     }
 
     /**

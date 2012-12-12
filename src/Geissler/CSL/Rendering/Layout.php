@@ -5,11 +5,13 @@ use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Formating;
 use Geissler\CSL\Rendering\Children;
+use Geissler\CSL\Container;
 
 /**
- * Description of Layout
+ * Layout.
  *
- * @author Benjamin
+ * @author Benjamin Geißler <benjamin.geissler@gmail.com>
+ * @license MIT
  */
 class Layout implements Renderable
 {
@@ -44,18 +46,26 @@ class Layout implements Renderable
         $this->children =   $children->create($xml);
     }
 
-
+    /**
+     * Renders all child element with the data of all Data entrys.
+     *
+     * @param mixed $data
+     * @return string
+     */
     public function render($data)
     {
         $result =   array();
-        foreach ($this->children as $child) {
-            $result[]   =   $child->render($data);
-        }
+
+        do {
+            $entry   =   array();
+            foreach ($this->children as $child) {
+                $entry[]   =   $child->render($data);
+            }
+            $result[]   = implode('', $entry);
+        } while (Container::getData()->next() == true);
 
         $return =   implode($this->delimiter, $result);
         $return =   $this->formating->render($return);
-        $return =   $this->affix->render($return);
-
-        return $return;
+        return $this->affix->render($return);
     }
 }

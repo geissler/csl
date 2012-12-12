@@ -1,26 +1,29 @@
 <?php
-namespace Geissler\CSL\Bibliography;
+namespace Geissler\CSL\Style;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Style\DisplayAbstract;
 use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
 
 /**
- * .
+ * Bibliography.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Bibliography implements Renderable
+class Bibliography extends DisplayAbstract implements Renderable
 {
     /**
      * Parses the Bibliography configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-         // set Bibliography-specific Options
+        parent::__construct($xml);
+
+        // set Bibliography-specific Options
         Container::getContext()->addBibliography('hangingIndent', false);
         Container::getContext()->addBibliography('lineSpacing', 1);
         Container::getContext()->addBibliography('entrySpacing', 1);
@@ -52,16 +55,5 @@ class Bibliography implements Renderable
          // set global options and inheritable name options
         $options    =   new Options();
         $options->set('bibliography', $xml);
-    }
-
-    /**
-     * .
-     *
-     * @param string|array $data
-     * @return string|array
-     */
-    public function render($data)
-    {
-
     }
 }

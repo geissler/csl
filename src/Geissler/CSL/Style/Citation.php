@@ -1,7 +1,8 @@
 <?php
-namespace Geissler\CSL\Citation;
+namespace Geissler\CSL\Style;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Style\DisplayAbstract;
 use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
 
@@ -11,7 +12,7 @@ use Geissler\CSL\Context\Options;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Citation implements Renderable
+class Citation extends DisplayAbstract implements Renderable
 {
     /**
      * Parses the Citation configuration.
@@ -20,6 +21,8 @@ class Citation implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
+        parent::__construct($xml);
+
         // set Citation-specific Options
         Container::getContext()->addCitation('disambiguateAddNames', false);
         Container::getContext()->addCitation('disambiguateAddGivenname', false);
@@ -62,16 +65,5 @@ class Citation implements Renderable
         // set global options and inheritable name options
         $options    =   new Options();
         $options->set('citation', $xml);
-    }
-
-    /**
-     * .
-     *
-     * @param string|array $data
-     * @return string|array
-     */
-    public function render($data)
-    {
-
     }
 }

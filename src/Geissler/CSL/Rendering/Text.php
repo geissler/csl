@@ -9,7 +9,7 @@ use Geissler\CSL\Rendering\Quotes;
 use Geissler\CSL\Rendering\StripPeriods;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Rendering\Variable;
-use Geissler\CSL\Macro\Macro;
+use Geissler\CSL\Macro\Call;
 use Geissler\CSL\Rendering\Term;
 use Geissler\CSL\Rendering\Value;
 
@@ -55,7 +55,7 @@ class Text implements Groupable
                     $this->render   =   new Variable($text);
                     break;
                 case 'macro':
-                    $this->render   =   new Macro($text);
+                    $this->render   =   new Call((string) $value);
                     break;
                 case 'term':
                     $this->render   =   new Term($text);
