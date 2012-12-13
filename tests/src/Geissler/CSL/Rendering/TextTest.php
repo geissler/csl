@@ -115,7 +115,7 @@ class TextTest extends \PHPUnit_Framework_TestCase
         Container::setData($data);
 
         $this->initElement($layout);
-        $this->assertEquals('()', $this->object->render('blue'));
+        $this->assertEquals('', $this->object->render('blue'));
         $this->assertTrue($this->object->hasAccessEmptyVariable());
     }
 

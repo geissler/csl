@@ -102,6 +102,7 @@ class Group implements Groupable
         }
 
         $return =   implode($this->delimiter, $result);
+        $return =   preg_replace('/[' . $this->delimiter . '][' . $this->delimiter . ']+/', $this->delimiter, $return);
         $return =   $this->display->render($return);
         $return =   $this->formating->render($return);
         return $this->affix->render($return);

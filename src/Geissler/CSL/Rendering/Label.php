@@ -115,10 +115,15 @@ class Label implements Groupable
         }
 
         $return =   Container::getLocale()->getTerms($this->variable, $form, $plural);
-        $return =   $this->formating->render($return);
-        $return =   $this->textCase->render($return);
-        $return =   $this->stripPeriods->render($return);
-        return $this->affix->render($return);
+
+        if ($return !== '') {
+            $return =   $this->formating->render($return);
+            $return =   $this->textCase->render($return);
+            $return =   $this->stripPeriods->render($return);
+            $return =   $this->affix->render($return);
+        }
+
+        return $return;
     }
 
     /**

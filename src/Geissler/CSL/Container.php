@@ -6,6 +6,7 @@ use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Macro\Macro;
 use Geissler\CSL\Data\Data;
 use Geissler\CSL\Data\Abbreviation;
+use Geissler\CSL\Data\Citation as CitationItem;
 use Geissler\CSL\Context\Context;
 use Geissler\CSL\Style\Citation;
 use Geissler\CSL\Style\Bibliography;
@@ -32,6 +33,8 @@ class Container
     private static $data;
     /** @var Abbreviation **/
     private static $abbreviation;
+    /** @var CitationtItem **/
+    private static $citationItem;
 
     /**
      * Access the context object.
@@ -178,6 +181,30 @@ class Container
     public static function getAbbreviation()
     {
         return self::$abbreviation;
+    }
+
+    /**
+     * Sets the Citation items object.
+     *
+     * @param Geissler\CSL\Data\Citation $citationItem
+     */
+    public static function setCitationItem(CitationItem $citationItem)
+    {
+        self::$citationItem =   $citationItem;
+    }
+
+    /**
+     * Access the citation items.
+     *
+     * @return \Geissler\CSL\Data\Citation|boolean
+     */
+    public static function getCitationItem()
+    {
+        if (isset(self::$citationItem) == true) {
+            return self::$citationItem;
+        }
+
+        return false;
     }
 
     public static function clear()

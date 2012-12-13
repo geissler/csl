@@ -5,6 +5,7 @@ use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Formating;
 use Geissler\CSL\Rendering\Children;
+use Geissler\CSL\Rendering\ExpandFormating;
 use Geissler\CSL\Container;
 
 /**
@@ -21,6 +22,8 @@ class Layout implements Renderable
     private $formating;
     /** @var string **/
     private $delimiter;
+    /** @var ExpandFormating **/
+    private $expand;
     /** @var array **/
     private $children;
 
@@ -35,6 +38,7 @@ class Layout implements Renderable
 
         $this->affix        =   new Affix($xml);
         $this->formating    =   new Formating($xml);
+        $this->expand       =   new ExpandFormating();
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'delimiter') {
@@ -54,6 +58,52 @@ class Layout implements Renderable
      */
     public function render($data)
     {
+        if (Container::getContext()->getName() == 'citation'
+            && Container::getCitationItem() !== false) {
+            $result =   $this->citation($data);
+        } else {
+            $result =   $this->bibliography($data);
+        }
+
+        $return =   $this->format(implode($this->delimiter, $result));
+        return str_replace('  ', ' ', str_replace('..', '.', $return));
+    }
+
+    private function citation($data)
+    {
+        $result =   array();
+
+        do {
+            $group = array();
+            do {
+                Container::getData()->moveToId(Container::getCitationItem()->get('id'));
+
+                // prefix for citation item
+                if (Container::getCitationItem()->get('prefix') !== null) {
+                    $group[]    =   Container::getCitationItem()->get('prefix');
+                    $group[]    =   ' ';
+                }
+
+                foreach ($this->children as $child) {
+                    $group[]   =   $child->render($data);
+                }
+
+                // suffix for citation item
+                if (Container::getCitationItem()->get('suffix') !== null) {
+                    $group[]    =   ' ';
+                    $group[]    =   Container::getCitationItem()->get('suffix');
+                }
+
+            } while (Container::getCitationItem()->nextInGroup() == true);
+
+            $result[]   = implode('', $group);
+        } while (Container::getCitationItem()->next() == true);
+
+        return $result;
+    }
+
+    private function bibliography($data)
+    {
         $result =   array();
 
         do {
@@ -64,8 +114,13 @@ class Layout implements Renderable
             $result[]   = implode('', $entry);
         } while (Container::getData()->next() == true);
 
-        $return =   implode($this->delimiter, $result);
-        $return =   $this->formating->render($return);
-        return $this->affix->render($return);
+        return $result;
+    }
+
+    private function format($data)
+    {
+        $data =   $this->formating->render($data);
+        $data =   $this->expand->render($data);
+        return $this->affix->render($data);
     }
 }

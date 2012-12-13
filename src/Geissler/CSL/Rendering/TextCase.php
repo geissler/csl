@@ -86,8 +86,8 @@ class TextCase implements Renderable, Modifiable
      */
     private function keepNoCaseSpan($render, $original)
     {
-        if (preg_match('/(<span class=("|\\"|\')nocase("|\\"|\')>[A-z]+<\/span>)/i', $original, $matches) == 1) {
-            return preg_replace('/(<span class=("|\\"|\')nocase("|\\"|\')>[A-z]+<\/span>)/i', $matches[0], $render);
+        if (preg_match('/(<span class=(.){1,2}nocase(.){1,2}>[A-z]+<\/span>)/i', $original, $matches) == 1) {
+            return preg_replace('/(<span class=(.){1,2}nocase(.){1,2}>[A-z]+<\/span>)/i', $matches[0], $render);
         }
 
         return $render;

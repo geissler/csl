@@ -83,4 +83,23 @@ class Data
 
         return false;
     }
+
+    /**
+     * Changes the data position to the item with the given id.
+     *
+     * @param integer|string $id
+     * @return boolean
+     */
+    public function moveToId($id)
+    {
+        for ($i = 0; $i < $this->length; $i++) {
+            if (isset($this->data[$i]['id']) == true
+                && $this->data[$i]['id'] == $id) {
+                $this->position =   $i;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

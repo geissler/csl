@@ -233,7 +233,8 @@ class Date implements Groupable
     {
         $data   =   Container::getData()->getVariable($this->variable);
 
-        if (isset($data['date-parts']) == true) {
+        if (isset($data['date-parts']) == true
+            && count($data['date-parts']) > 0) {
             $this->data =   array();
 
             foreach ($data['date-parts'] as $values) {

@@ -152,4 +152,27 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->object->next());
         $this->assertFalse($this->object->next());
     }
+
+    /**
+     * @covers Geissler\CSL\Data\Data::moveToId
+     */
+    public function testMoveToId()
+    {
+        $json = '[
+    {
+        "title": "His Book",
+        "id": "ITEM-1",
+        "type": "book"
+    },
+    {
+        "volume": "101",
+        "id": "ITEM-2",
+        "type": "book"
+    }
+]';
+        $this->assertTrue($this->object->set($json));
+        $this->assertTrue($this->object->moveToId('ITEM-2'));
+        $this->assertEquals('book', $this->object->getVariable('type'));
+        $this->assertFalse($this->object->moveToId('ITEM-3'));
+    }
 }

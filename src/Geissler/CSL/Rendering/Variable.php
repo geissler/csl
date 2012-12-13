@@ -60,7 +60,13 @@ class Variable implements Groupable
             }
         }
 
-        return Container::getData()->getVariable($this->name);
+        $return =   Container::getData()->getVariable($this->name);
+
+        if ($return !== null) {
+            return $return;
+        }
+
+        return '';
     }
 
     /**
@@ -71,7 +77,7 @@ class Variable implements Groupable
      */
     public function hasAccessEmptyVariable()
     {
-        if ($this->render('') === null) {
+        if ($this->render('') === '') {
             return true;
         }
 

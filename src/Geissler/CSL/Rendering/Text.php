@@ -76,11 +76,14 @@ class Text implements Groupable
     public function render($data)
     {
         $data   =   $this->render->render($data);
-        $data   =   $this->textCase->render($data);
-        $data   =   $this->stripPeriods->render($data);
-        $data   =   $this->display->render($data);
-        $data   =   $this->quotes->render($data);
-        $data   =   $this->formating->render($data);
+
+        if ($data !== '') {
+            $data   =   $this->textCase->render($data);
+            $data   =   $this->stripPeriods->render($data);
+            $data   =   $this->display->render($data);
+            $data   =   $this->quotes->render($data);
+            $data   =   $this->formating->render($data);
+        }
 
         return $this->affix->render($data);
     }
