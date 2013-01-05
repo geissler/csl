@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010, 2011 and 2012 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009-2013 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010, 2011, and 2012 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009-2013 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -53,7 +53,21 @@ citation
 
 
 >>===== RESULT =====>>
-???
+..[0] Title 1: 1st-one
+..[1] Title 2: 2nd-two-end
+..[2] Title 3: 3rd-three-end
+..[3] Title 4: 4th
+..[4] Title 5: 5th-default
+..[5] Title 10: 10th-zero
+..[6] Title 11: 11th-default
+..[7] Title 12: 12th-twelve
+..[8] Title 13: 13th-thirteen-end
+..[9] Title 14: 14th
+..[10] Title 110: 110th-zero
+..[11] Title 111: 111th-default
+..[12] Title 112: 112nd-two-end
+..[13] Title 113: 113th-thirteen-end
+>>[14] Title 114: 114th
 <<===== RESULT =====<<
 
 >>===== CITATIONS =====>>

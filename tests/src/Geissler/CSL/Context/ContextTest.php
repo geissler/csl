@@ -127,4 +127,61 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->object->getValue('test', 'citation'));
         $this->assertEquals('', $this->object->getValue('test', 'bibliography'));
     }
+
+    /**
+     * @covers Geissler\CSL\Context\Context::enter
+     * @covers Geissler\CSL\Context\Context::in
+     */
+    public function testEnter()
+    {
+        $this->assertInstanceOf($this->class, $this->object->enter('citation'));
+        $this->assertTrue($this->object->in('citation'));
+        $this->assertFalse($this->object->in('sort'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Context\Context::enter
+     * @covers Geissler\CSL\Context\Context::in
+     * @covers Geissler\CSL\Context\Context::leave
+     * @depends testEnter
+     */
+    public function testEnterAndLeave()
+    {
+        $this->assertInstanceOf($this->class, $this->object->enter('citation'));
+        $this->assertTrue($this->object->in('citation'));
+        $this->assertFalse($this->object->in('sort'));
+        $this->assertInstanceOf($this->class, $this->object->leave());
+    }
+
+    /**
+     * @covers Geissler\CSL\Context\Context::enter
+     * @covers Geissler\CSL\Context\Context::in
+     * @covers Geissler\CSL\Context\Context::leave
+     * @depends testEnter
+     */
+    public function testEnterAndLeave1()
+    {
+        $this->assertInstanceOf($this->class, $this->object->enter('citation'));
+        $this->assertTrue($this->object->in('citation'));
+        $this->assertTrue($this->object->in('citation'));
+        $this->assertInstanceOf($this->class, $this->object->enter('sort'));
+        $this->assertTrue($this->object->in('sort'));
+        $this->assertInstanceOf($this->class, $this->object->leave());
+        $this->assertFalse($this->object->in('sort'));
+        $this->assertTrue($this->object->in('citation'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Context\Context::enter
+     * @covers Geissler\CSL\Context\Context::in
+     * @covers Geissler\CSL\Context\Context::get
+     * @depends testEnter
+     */
+    public function testGet()
+    {
+        $this->assertInstanceOf($this->class, $this->object->enter('citation', array('sort' => 'descending')));
+        $this->assertTrue($this->object->in('citation'));
+        $this->assertEquals('descending', $this->object->get('sort'));
+        $this->assertNull($this->object->get('cake'));
+    }
 }

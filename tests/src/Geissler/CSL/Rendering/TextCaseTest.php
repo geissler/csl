@@ -103,6 +103,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
         $locale = Factory::locale();
         $locale->readFile();
         Container::setLocale($locale);
+        Container::setData(new Data());
 
         $this->initElement('<text variable="title" text-case="title"/>');
         $this->assertEquals('This IS a Pen That Is a Smith Pencil', $this->object->render('This IS a pen that is a Smith pencil'));
@@ -115,6 +116,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderTitle1()
     {
+        Container::setData(new Data());
         $this->initElement('<text variable="title" text-case="title"/>');
         $this->assertEquals('Review of Book by A.N. Author', $this->object->render('Review of Book by A.N. Author'));
     }
@@ -125,6 +127,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderTitle2()
     {
+        Container::setData(new Data());
         $this->initElement('<text variable="title" text-case="title"/>');
         $this->assertEquals('Review of a Book by Me', $this->object->render('REVIEW OF A BOOK BY ME'));
     }
@@ -135,6 +138,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderTitle3()
     {
+        Container::setData(new Data());
         $this->initElement('<text variable="title" text-case="title"/>');
         $this->assertEquals('This IS a Pen That Is a <span class=\"nocase\">smith</span> Pencil', $this->object->render('This IS a pen that is a <span class=\"nocase\">smith</span> pencil'));
     }
@@ -149,6 +153,7 @@ class TextCaseTest extends \PHPUnit_Framework_TestCase
         $locale = Factory::locale();
         $locale->readFile('de');
         Container::setLocale($locale);
+        Container::setData(new Data());
 
         $this->initElement('<text variable="title" text-case="title"/>');
         $this->assertEquals('Review of book by A.N. author', $this->object->render('Review of book by A.N. author'));

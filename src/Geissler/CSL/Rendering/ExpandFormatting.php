@@ -4,27 +4,28 @@ namespace Geissler\CSL\Rendering;
 use Geissler\CSL\Interfaces\Renderable;
 
 /**
- * Short formating options. Only defined in citeproc-test.
+ * Short formatting options. Only defined in citeproc-test.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class ExpandFormating implements Renderable
+class ExpandFormatting implements Renderable
 {
-    private $formating = array(
-        '<sc>'  =>  '<span style="font-variant:small-caps;">',
-        '</sc>' =>  '</span>'
+    /** @var array */
+    private $formatting = array(
+        '<sc>'  =>  '<font style="font-variant:small-caps">',
+        '</sc>' =>  '</font>'
     );
 
     /**
-     * Expand short formatings to full CSS formating options.
+     * Expand short formatting to full CSS formatting options.
      *
      * @param string $data
      * @return string
      */
     public function render($data)
     {
-        foreach ($this->formating as $replace => $with) {
+        foreach ($this->formatting as $replace => $with) {
             $data   = str_replace($replace, $with, $data);
         }
 

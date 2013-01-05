@@ -3,12 +3,15 @@ namespace Geissler\CSL\Style;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Layout;
+use Geissler\CSL\Sorting\Sort;
+use Geissler\CSL\Container;
 
 /**
- * Combines the options for Citation and Bibiliography objects.
+ * Combines the options for CitationItems and Bibiliography objects.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
+ * @depracted
  */
 abstract class DisplayAbstract implements Renderable
 {
@@ -18,9 +21,9 @@ abstract class DisplayAbstract implements Renderable
     private $sort;
 
     /**
-     * Parses the Citation configuration.
+     * Parses the CitationItems configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -30,6 +33,7 @@ abstract class DisplayAbstract implements Renderable
                     $this->layout   =   new Layout($child);
                     break;
                 case 'sort':
+                    $this->sort =   new Sort($child);
                     break;
             }
         }
@@ -44,6 +48,10 @@ abstract class DisplayAbstract implements Renderable
     public function render($data)
     {
         // sort (?)
+        if (isset($this->sort) == true) {
+            $this->sort->sort(Container::getContext()->getName());
+        }
+
         return $this->layout->render($data);
     }
 }

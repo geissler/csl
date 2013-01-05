@@ -2,10 +2,11 @@
 namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Interfaces\Contextualize;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Names\NamePart;
 
 /**
@@ -14,7 +15,7 @@ use Geissler\CSL\Names\NamePart;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Name implements Renderable, Contextualize
+class Name implements Renderable, Modifiable, Contextualize
 {
     /** @var string **/
     private $and;
@@ -46,20 +47,23 @@ class Name implements Renderable, Contextualize
     private $sortSeparator;
     /** @var Affix **/
     private $affix;
-    /** @var Formating **/
-    private $formating;
+    /** @var Formatting **/
+    private $formatting;
     /** @var array **/
     private $nameParts;
+    /** @var array */
+    private $literals;
+    private $backup;
 
     /**
      * Parses the Name configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
         $this->and                      =   '';
-        $this->delimiter                =   ',';
+        $this->delimiter                =   ', ';
         $this->delimiterPrecedesEtAl    =   'contextual';
         $this->delimiterPrecedesLast    =   'contextual';
         $this->etAlMin                  =   0;
@@ -74,10 +78,31 @@ class Name implements Renderable, Contextualize
         $this->nameAsSortOrder  =   '';
         $this->sortSeparator    =   ', ';
         $this->nameParts        =   array();
+        $this->literals         =   array();
 
         $this->affix        =   new Affix($xml);
-        $this->formating    =   new Formating($xml);
+        $this->formatting    =   new Formatting($xml);
 
+        $this->modify($xml);
+
+        foreach ($xml->children() as $child) {
+            if ($child->getName() == 'name-part') {
+                $this->nameParts[]  =   new NamePart($child);
+            }
+        }
+
+        $backup         =   get_object_vars($this);
+        $this->backup   =   $backup;
+    }
+
+    /**
+     * Modifies the configuration of the name by parsing a new \SimpleXMLElement.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Names\Name
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'and':
@@ -96,7 +121,7 @@ class Name implements Renderable, Contextualize
                     $this->etAlMin  =   (int) $value;
                     break;
                 case 'et-al-use-first':
-                    $this->etAlUseFirst  =   (string) $value;
+                    $this->etAlUseFirst  =   (int) $value;
                     break;
                 case 'et-al-subsequent-min':
                     $this->etAlSubsequentMin  =   (int) $value;
@@ -105,13 +130,13 @@ class Name implements Renderable, Contextualize
                     $this->etAlSubsequentUseFirst  =   (string) $value;
                     break;
                 case 'et-al-use-last':
-                    $this->etAlUseLast  =   $value == 'true' ? true : false;
+                    $this->etAlUseLast  =   ((string) $value == 'true' ? true : false);
                     break;
                 case 'form':
                     $this->form  =   (string) $value;
                     break;
                 case 'initialize':
-                    $this->initialize  =   $value == 'true' ? true : false;
+                    $this->initialize  =   ((string) $value == 'true' ? true : false);
                     break;
                 case 'initialize-with':
                     $this->initializeWith  =   (string) $value;
@@ -125,26 +150,54 @@ class Name implements Renderable, Contextualize
             }
         }
 
-        foreach ($xml->children() as $child) {
-            if ($child->getName() == 'name-part') {
-                $this->nameParts[]  =   new NamePart($child);
-            }
-        }
+        return $this;
     }
 
     /**
-     * Applys the context configuration to the object.
+     * Applies the context configuration and the disambiguation options to the object.
      *
      * @return \Geissler\CSL\Interfaces\Contextualize
      */
     public function apply()
     {
+        // restore configuration parsed from csl file
+        foreach ($this->backup as $property => $value) {
+            if ($value !== null) {
+                $this->$property    =   $value;
+            }
+        }
+
         foreach (Container::getContext()->getOptions() as $name => $value) {
             if (property_exists($this, $name) == true) {
                 $this->$name    =   $value;
             }
         }
+
+        if (Container::getContext()->getDisambiguationOptions('Geissler\CSL\Names\Name') !== false) {
+            $options    =   Container::getContext()->getDisambiguationOptions('Geissler\CSL\Names\Name');
+            foreach ($options as $name => $value) {
+                if (property_exists($this, $name) == true) {
+                    $this->$name    =   $value;
+                }
+            }
+        }
+
         return $this;
+    }
+
+    /**
+     * Retrieve a configuration parameter from the originally parsed name element.
+     *
+     * @param string $property
+     * @return string|boolean|null
+     */
+    public function getPropertyValue($property)
+    {
+        if (isset($this->backup[$property]) == true) {
+            return $this->backup[$property];
+        }
+
+        return null;
     }
 
     /**
@@ -167,23 +220,40 @@ class Name implements Renderable, Contextualize
             $names[]    =   $this->formatName($data[$i], $i);
         }
 
-        $etAl   =   false;
-        if ($this->etAlMin > 0
+        $etAl           =   false;
+        $etAlUseFirst   =   $this->etAlUseFirst;
+        $etAlMin        =   $this->etAlMin;
+
+        // If used, the values of these attributes replace those of respectively et-al-min and et-al-use-first
+        // for subsequent cites (cites referencing earlier cited items)
+        if (Container::getRendered()->getById(Container::getActualId()) !== false) {
+            if ($this->etAlSubsequentMin > 0) {
+                $etAlMin    =   $this->etAlSubsequentMin;
+            }
+
+            if ($this->etAlSubsequentUseFirst !== '') {
+                $etAlUseFirst   =   $this->etAlSubsequentUseFirst;
+            }
+        }
+
+        if ($etAlMin > 0
             && $length > 1
-            && $this->etAlMin >= $length) {
+            && $etAlMin <= $length
+            && $etAlUseFirst < $length) {
             $etAl   =   true;
         }
 
         $namesAndSplitter   =   array();
+        $and                =   $this->getAndDelimiter();
         for ($i = 0; $i < $length; $i++) {
             $namesAndSplitter[] =   $names[$i];
 
             if ($etAl == true
-                && $i == $this->etAlUseFirst - 1) {
+                && $i == $etAlUseFirst - 1) {
 
                 switch ($this->delimiterPrecedesEtAl) {
                     case 'contextual':
-                        if ($this->etAlUseFirst > 2) {
+                        if ($etAlUseFirst >= 2) {
                             $namesAndSplitter[] =   $this->delimiter;
                         }
                         break;
@@ -204,7 +274,9 @@ class Name implements Renderable, Contextualize
             }
 
             // The delimiter between the second to last and last name of the names in a name variable
-            if ($i == $length - 2) {
+            if ($i == $length - 2
+                && $and !== ''
+                && in_array($names[$i], $this->literals) == false) {
                 switch ($this->delimiterPrecedesLast) {
                     case 'contextual':
                         if ($length >= 3) {
@@ -219,34 +291,39 @@ class Name implements Renderable, Contextualize
                     case 'always':
                         $namesAndSplitter[] =   $this->delimiter;
                         break;
+                    case 'never':
+                        break;
                 }
 
                 if ($this->and !== '') {
                     $namesAndSplitter[] =   ' ';
-                    if ($this->and == 'text') {
-                        $namesAndSplitter[] = Container::getLocale()->getTerms('and');
-                    } else {
-                        if (Container::getLocale()->getTerms('symbol') !== null) {
-                            $namesAndSplitter[] =   Container::getLocale()->getTerms('symbol');
-                        } else {
-                            $namesAndSplitter[] = '&#38;';
-                        }
-                    }
+                    $namesAndSplitter[] =   $and;
                     $namesAndSplitter[] =   ' ';
                 }
+            } elseif ($i < $length - 1) {
+                $namesAndSplitter[] =   $this->delimiter;
+            }
+
+        }
+        $return =   str_replace('  ', ' ', implode('', $namesAndSplitter));
+
+        // do not connect literals with an and
+        if (count($this->literals) > 0) {
+            $and    =   $and . ' ';
+            foreach ($this->literals as $literal) {
+                $return =   str_replace($and . $literal, $literal, $return);
             }
         }
 
-        $return =   str_replace('  ', ' ', implode('', $namesAndSplitter));
-        $return =   $this->formating->render($return);
+        $return =   $this->formatting->render($return);
         return $this->affix->render($return);
     }
 
     /**
-     * Formats the name at a postion.
+     * Formats the name at a position.
      *
      * @param array $data
-     * @param position $position
+     * @param integer $position
      * @return string
      */
     private function formatName($data, $position)
@@ -276,6 +353,11 @@ class Name implements Renderable, Contextualize
             } else {
                 $names['given']  =  trim(preg_replace('/([A-Z]\b)/', '$1' . $this->initializeWith, $names['given']));
             }
+
+            // Hyphenation of Initialized Names
+            if (Container::getContext()->get('initializeWithHyphen') == false) {
+                $names['given'] =   str_replace($this->initializeWith . '-', $this->initializeWith, $names['given']);
+            }
         }
 
         // format name-parts
@@ -287,11 +369,18 @@ class Name implements Renderable, Contextualize
             $names['suffix']  =   '';
             $names['non-dropping-particle']  =   '';
             $names['dropping-particle']  =   '';
+        } elseif (isset($data['literal']) == true) {
+            // institutions
+            $literal            =   $this->stripEnglishArticles($data['literal']);
+            $this->literals[]   =   $literal;
+            $names[]            =   $literal;
         }
 
         $return = implode(' ', $names);
 
-        if ($sort['switched'] == true) {
+        if ($sort['switched'] == true
+            && isset($names['family']) == true
+            && isset($names['given']) == true) {
             $return = str_replace(
                 $names['family'] . ' ' . $names['given'],
                 $names['family'] . $this->sortSeparator . $names['given'],
@@ -326,7 +415,7 @@ class Name implements Renderable, Contextualize
 
             if ($this->form ==  'long') {
                 if (($this->nameAsSortOrder == 'first'
-                        && $position == 1)
+                        && $position == 0)
                     || $this->nameAsSortOrder == 'all') {
 
                     $return['switched'] =   true;
@@ -395,5 +484,23 @@ class Name implements Renderable, Contextualize
         }
 
         return $nonPersonal;
+    }
+
+    /**
+     * Retrieve the and term delimiter.
+     *
+     * @return string
+     */
+    private function getAndDelimiter()
+    {
+        if ($this->and == 'text') {
+            return Container::getLocale()->getTerms('and');
+        } elseif (Container::getLocale()->getTerms('symbol') !== null) {
+            return Container::getLocale()->getTerms('symbol');
+        } elseif ($this->and == 'symbol') {
+            return '&#38;';
+        }
+
+        return '';
     }
 }

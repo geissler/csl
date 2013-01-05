@@ -6,7 +6,7 @@ use Geissler\CSL\Container;
 use Geissler\CSL\Data\Data;
 
 /**
- * Main class to create citations and/or bibliographys by doing all necessary configurations before.
+ * Main class to create citations and/or bibliographies by doing all necessary configurations before.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -23,7 +23,7 @@ class CSL
         return Container::getCitation()->render('');
     }
 
-    public function bibligraphy($style, $json, $language = false)
+    public function bibliography($style, $json, $language = false)
     {
         $this->registerContext('bibliography')
              ->registerStyle($style)

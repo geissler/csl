@@ -5,9 +5,10 @@ use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Date\DatePart;
+use Geissler\CSL\Date\Format;
 
 /**
  * Renders dates.
@@ -21,7 +22,7 @@ class Date implements Groupable
     private $affix;
     /** @var Display **/
     private $display;
-    /** @var Formating **/
+    /** @var Formatting **/
     private $formating;
     /** @var TextCase **/
     private $textCase;
@@ -47,7 +48,7 @@ class Date implements Groupable
 
         $this->affix        =   new Affix($date);
         $this->display      =   new Display($date);
-        $this->formating    =   new Formating($date);
+        $this->formating    =   new Formatting($date);
         $this->textCase     =   new TextCase($date);
 
         foreach ($date->attributes() as $name => $value) {
@@ -227,37 +228,12 @@ class Date implements Groupable
     /**
      * Parses the date-values.
      * @return boolean
-     * @todo raw field support
      */
     private function formatDate()
     {
-        $data   =   Container::getData()->getVariable($this->variable);
-
-        if (isset($data['date-parts']) == true
-            && count($data['date-parts']) > 0) {
-            $this->data =   array();
-
-            foreach ($data['date-parts'] as $values) {
-                $date   =   array(
-                    'year'  =>  '',
-                    'month' =>  '',
-                    'day'   =>  '');
-
-                if (isset($values[0]) == true) {
-                    $date['year']   =   $values[0];
-                }
-
-                if (isset($values[1]) == true) {
-                    $date['month']   =   $values[1];
-                }
-
-                if (isset($values[2]) == true) {
-                    $date['day']   =   $values[2];
-                }
-
-                $this->data[]   =   $date;
-            }
-
+        $format =   new Format();
+        if ($format->format($this->variable) == true) {
+            $this->data =   $format->getData();
             return true;
         }
 

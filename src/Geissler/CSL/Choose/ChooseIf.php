@@ -109,7 +109,7 @@ class ChooseIf implements Renderable, Groupable, Chooseable
     /**
      * Tests if the variable is numeric.
      *
-     * @return boolea
+     * @return boolean
      */
     public function validate()
     {

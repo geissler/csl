@@ -5,7 +5,7 @@ use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Choose\IsNumeric;
 use Geissler\CSL\Rendering\Ordinal;
@@ -26,7 +26,7 @@ class Number implements Groupable
     private $affix;
     /** @var Display **/
     private $display;
-    /** @var Formating **/
+    /** @var Formatting **/
     private $formating;
     /** @var TextCase **/
     private $textCase;
@@ -43,7 +43,7 @@ class Number implements Groupable
 
         $this->affix        =   new Affix($xml);
         $this->display      =   new Display($xml);
-        $this->formating    =   new Formating($xml);
+        $this->formating    =   new Formatting($xml);
         $this->textCase     =   new TextCase($xml);
 
         foreach ($xml->attributes() as $name => $value) {

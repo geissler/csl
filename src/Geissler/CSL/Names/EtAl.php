@@ -2,7 +2,7 @@
 namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Renderable;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 
 /**
  * Et-Al as children of a Names object.
@@ -14,7 +14,7 @@ class EtAl implements Renderable
 {
     /** @var term **/
     private $term;
-    /** @var Formating **/
+    /** @var Formatting **/
     private $formating;
 
     /**
@@ -26,7 +26,7 @@ class EtAl implements Renderable
     {
         $this->term =   'et-al';
 
-        $this->formating    =   new Formating($xml);
+        $this->formating    =   new Formatting($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'term') {

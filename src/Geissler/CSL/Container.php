@@ -6,13 +6,14 @@ use Geissler\CSL\Locale\Locale;
 use Geissler\CSL\Macro\Macro;
 use Geissler\CSL\Data\Data;
 use Geissler\CSL\Data\Abbreviation;
-use Geissler\CSL\Data\Citation as CitationItem;
+use Geissler\CSL\Data\CitationAbstract;
 use Geissler\CSL\Context\Context;
 use Geissler\CSL\Style\Citation;
 use Geissler\CSL\Style\Bibliography;
+use Geissler\CSL\Data\Rendered;
 
 /**
- * Stores the diffrent objects created on base of a given Style.
+ * Stores the different objects created on base of a given Style.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -33,8 +34,10 @@ class Container
     private static $data;
     /** @var Abbreviation **/
     private static $abbreviation;
-    /** @var CitationtItem **/
+    /** @var CitationAbstract **/
     private static $citationItem;
+    /** @var Rendered */
+    private static $rendered;
 
     /**
      * Access the context object.
@@ -62,7 +65,7 @@ class Container
     }
 
     /**
-     * Access the Locale object, if not set thestandard Locale is loaded.
+     * Access the Locale object, if not set the standard Locale is loaded.
      *
      * @return Locale
      */
@@ -70,6 +73,7 @@ class Container
     {
         if (isset(self::$locale) == false) {
             self::setLocale(Factory::locale());
+            self::$locale->readFile();
         }
 
         return self::$locale;
@@ -78,7 +82,7 @@ class Container
     /**
      * Store a Macro.
      *
-     * @param type $name
+     * @param string $name
      * @param \Geissler\CSL\Macro\Macro $macro
      * @return void
      */
@@ -104,7 +108,7 @@ class Container
     }
 
     /**
-     * Sets the Citation object.
+     * Sets the CitationItems object.
      *
      * @param \Geissler\CSL\Style\Citation $citation
      */
@@ -114,7 +118,7 @@ class Container
     }
 
     /**
-     * Access the Citation object.
+     * Access the CitationItems object.
      *
      * @return \Geissler\CSL\Style\Citation
      * @throws \ErrorException If no object is injected
@@ -184,11 +188,11 @@ class Container
     }
 
     /**
-     * Sets the Citation items object.
+     * Sets the citation data object.
      *
-     * @param Geissler\CSL\Data\Citation $citationItem
+     * @param \Geissler\CSL\Data\CitationAbstract $citationItem
      */
-    public static function setCitationItem(CitationItem $citationItem)
+    public static function setCitationItem(CitationAbstract $citationItem)
     {
         self::$citationItem =   $citationItem;
     }
@@ -196,7 +200,7 @@ class Container
     /**
      * Access the citation items.
      *
-     * @return \Geissler\CSL\Data\Citation|boolean
+     * @return \Geissler\CSL\Data\CitationAbstract|boolean
      */
     public static function getCitationItem()
     {
@@ -207,14 +211,41 @@ class Container
         return false;
     }
 
-    public static function clear()
+    /**
+     * Access the container with the rendered citations and bibliography entries.
+     *
+     * @return \Geissler\CSL\Data\Rendered
+     */
+    public static function getRendered()
     {
-        if (isset(self::$context) == true) {
-            self::$context  =   new Context();
+        if (isset(self::$rendered) == false) {
+            self::$rendered =   new Rendered();
         }
 
-        if (isset(self::$macros) == true) {
-            self::$macros   =   array();
+        return self::$rendered;
+    }
+
+    public static function getActualId()
+    {
+        if (self::$context->getName() == 'citation'
+            && self::getCitationItem()!== false) {
+                return self::getCitationItem()->get('id');
         }
+
+        return self::getData()->getVariable('id');
+    }
+
+    /**
+     * Reset all internal properties.
+     *
+     * @return void
+     */
+    public static function clear()
+    {
+        self::$context = new Context();
+        self::$macros = array();
+        self::$citationItem = false;
+        self::$context = new Context();
+        self::$rendered = new Rendered();
     }
 }

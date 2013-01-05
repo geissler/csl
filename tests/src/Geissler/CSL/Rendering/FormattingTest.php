@@ -7,7 +7,7 @@ namespace Geissler\CSL\Rendering;
 class FormatingTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Formating
+     * @var Formatting
      */
     protected $object;
 
@@ -20,8 +20,8 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
-     * @covers Geissler\CSL\Rendering\Formating::__construct
+     * @covers Geissler\CSL\Rendering\Formatting::render
+     * @covers Geissler\CSL\Rendering\Formatting::__construct
      */
     public function testRender()
     {
@@ -30,7 +30,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formatting::render
      */
     public function testRender1()
     {
@@ -39,7 +39,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formatting::render
      */
     public function testRender2()
     {
@@ -48,7 +48,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formatting::render
      */
     public function testRender3()
     {
@@ -57,7 +57,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formatting::render
      */
     public function testRender4()
     {
@@ -66,7 +66,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formatting::render
      */
     public function testRender5()
     {
@@ -75,7 +75,7 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Rendering\Formating::render
+     * @covers Geissler\CSL\Rendering\Formatting::render
      */
     public function testRenderNothing()
     {
@@ -86,6 +86,6 @@ class FormatingTest extends \PHPUnit_Framework_TestCase
     protected function initElement($layout)
     {
         $xml = new \SimpleXMLElement($layout);
-        $this->object   =   new Formating($xml);
+        $this->object   =   new Formatting($xml);
     }
 }

@@ -10,6 +10,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
      * @var Data
      */
     protected $object;
+    protected $class = 'Geissler\CSL\Data\Data';
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -54,7 +55,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue($this->object->set($json));
+        $this->assertInstanceOf($this->class, $this->object->set($json));
     }
 
     /**
@@ -75,7 +76,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue($this->object->set($json));
+        $this->assertInstanceOf($this->class, $this->object->set($json));
         $this->assertInternalType('array', $this->object->get());
         $data = $this->object->get();
         $this->assertEquals('His Book', $data['title']);
@@ -101,7 +102,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue($this->object->set($json));
+        $this->assertInstanceOf($this->class, $this->object->set($json));
         $this->assertTrue($this->object->next());
         $this->assertInternalType('array', $this->object->get());
         $data = $this->object->get();
@@ -124,7 +125,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "id": "ITEM-1",
         "type": "book"
     }]';
-        $this->assertTrue($this->object->set($json));
+        $this->assertInstanceOf($this->class, $this->object->set($json));
         $this->assertInternalType('array', $this->object->get());
         $this->assertEquals('My Book', $this->object->getVariable('title'));
         $this->assertNull($this->object->getVariable('volume'));
@@ -148,7 +149,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue($this->object->set($json));
+        $this->assertInstanceOf($this->class, $this->object->set($json));
         $this->assertTrue($this->object->next());
         $this->assertFalse($this->object->next());
     }
@@ -170,9 +171,53 @@ class DataTest extends \PHPUnit_Framework_TestCase
         "type": "book"
     }
 ]';
-        $this->assertTrue($this->object->set($json));
+        $this->assertInstanceOf($this->class, $this->object->set($json));
         $this->assertTrue($this->object->moveToId('ITEM-2'));
         $this->assertEquals('book', $this->object->getVariable('type'));
         $this->assertFalse($this->object->moveToId('ITEM-3'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Data\Data::setVariable
+     */
+    public function testSetVariable()
+    {
+        $json = '[
+    {
+        "title": "His Book",
+        "id": "ITEM-1",
+        "type": "book"
+    },
+    {
+        "volume": "101",
+        "id": "ITEM-2",
+        "type": "book"
+    }
+]';
+        $this->assertInstanceOf($this->class, $this->object->set($json));
+        $this->assertEquals('book', $this->object->getVariable('type'));
+        $this->assertInstanceOf($this->class, $this->object->setVariable('citation-number', 3));
+        $this->assertEquals(3, $this->object->getVariable('citation-number'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Data\Data::getLength
+     */
+    public function testGetLength()
+    {
+        $json = '[
+    {
+        "title": "His Book",
+        "id": "ITEM-1",
+        "type": "book"
+    },
+    {
+        "volume": "101",
+        "id": "ITEM-2",
+        "type": "book"
+    }
+]';
+        $this->assertInstanceOf($this->class, $this->object->set($json));
+        $this->assertEquals(2, $this->object->getLength());
     }
 }

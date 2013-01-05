@@ -37,6 +37,16 @@ class Variable implements Groupable
     }
 
     /**
+     * Retrieve the variable name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * Renders the variable.
      *
      * @param string $data
@@ -64,6 +74,25 @@ class Variable implements Groupable
 
         if ($return !== null) {
             return $return;
+        }
+
+        // special case
+        if ($this->name == 'title-short') {
+            $return = Container::getData()->getVariable('shortTitle');
+
+            if ($return !== null) {
+                return $return;
+            }
+        }
+
+        // retrieve variables form citations
+        if (Container::getContext()->getName() == 'citation'
+            && Container::getCitationItem() !== false) {
+            $return =   Container::getCitationItem()->get($this->name);
+
+            if ($return !== null) {
+                return $return;
+            }
         }
 
         return '';

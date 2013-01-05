@@ -130,7 +130,7 @@ class SubstituteTest extends \PHPUnit_Framework_TestCase
     public function testRenderNames()
     {
         $layout =   '<substitute>
-                        <names variable="editor"/>
+                        <names variable="editor" form="long"/>
                         <text macro="title"/>
                       </substitute>';
         $json   =   '[

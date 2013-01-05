@@ -3,6 +3,7 @@ namespace Geissler\CSL\Macro;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Parental;
 use Geissler\CSL\Rendering\Children;
 
 /**
@@ -11,7 +12,7 @@ use Geissler\CSL\Rendering\Children;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Macro implements Renderable, Groupable
+class Macro implements Renderable, Groupable, Parental
 {
     /** @var array **/
     private $children;
@@ -25,6 +26,50 @@ class Macro implements Renderable, Groupable
     {
         $children       =   new Children();
         $this->children =   $children->create($xml);
+    }
+
+    /**
+     * Retrieve the first child element matching the given class name.
+     *
+     * @param string $class full, namespace aware class name
+     * @return object
+     */
+    public function getChildElement($class)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof $class) == true) {
+                return $child;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+                $subChild   =   $child->getChildElement($class);
+
+                if ($subChild !== false) {
+                    return $subChild;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Tests if the element or an child element is accessing the variable with the given name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function isAccessingVariable($name)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof \Geissler\CSL\Rendering\Variable) == true
+                && $child->getName() == $name) {
+                return true;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true
+                && $child->isAccessingVariable($name) == true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -52,11 +97,11 @@ class Macro implements Renderable, Groupable
     public function hasAccessEmptyVariable()
     {
         foreach ($this->children as $child) {
-            if ($child->hasAccessEmptyVariable() == true) {
-                return true;
+            if ($child->hasAccessEmptyVariable() == false) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 }

@@ -127,7 +127,9 @@ class TextCase implements Renderable, Modifiable
      */
     private function renderTitle($data)
     {
-        if (Container::getLocale()->getLanguage() == 'en') {
+        if (Container::getLocale()->getLanguage() == 'en'
+            && (Container::getData()->getVariable('language') == null)
+                || Container::getData()->getVariable('language') == 'en') {
             // In both cases, stop words are lowercased, unless they are the first or last word in the string,
             // or follow a colon.
             $stopWords  =   array(
@@ -139,7 +141,7 @@ class TextCase implements Renderable, Modifiable
 
             if (preg_match('/^[A-Z| |\.|,]+$/', $data) == 1) {
                 // For uppercase strings, the first character of each word remains capitalized.
-                // All other letters are lowercased.
+                // All other letters are lowercase.
                 for ($i = 0; $i < $length; $i++) {
                     if ($i > 0
                         && $i < $length - 1

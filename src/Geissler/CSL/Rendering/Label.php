@@ -4,7 +4,7 @@ namespace Geissler\CSL\Rendering;
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Rendering\StripPeriods;
 
@@ -24,7 +24,7 @@ class Label implements Groupable
     private $plural;
     /** @var Affix **/
     private $affix;
-    /** @var Formating **/
+    /** @var Formatting **/
     private $formating;
     /** @var TextCase **/
     private $textCase;
@@ -34,7 +34,7 @@ class Label implements Groupable
     /**
      * Parses the Label configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -42,7 +42,7 @@ class Label implements Groupable
         $this->plural   =   'contextual';
 
         $this->affix        =   new Affix($xml);
-        $this->formating    =   new Formating($xml);
+        $this->formating    =   new Formatting($xml);
         $this->textCase     =   new TextCase($xml);
         $this->stripPeriods =   new StripPeriods($xml);
 
@@ -55,7 +55,7 @@ class Label implements Groupable
                     $this->form     =   (string) $value;
                     break;
                 case 'plural':
-                    $this->plural   =   (string) $value;
+                    $this->setPlural((string) $value);
                     break;
             }
         }
@@ -74,6 +74,18 @@ class Label implements Groupable
     }
 
     /**
+     * Change the plural value.
+     *
+     * @param string $plural
+     * @return \Geissler\CSL\Rendering\Label
+     */
+    public function setPlural($plural)
+    {
+        $this->plural = $plural;
+        return $this;
+    }
+
+    /**
      * Renders the label.
      *
      * @param string|array $data
@@ -86,7 +98,17 @@ class Label implements Groupable
             throw new \ErrorException('variable is not set!');
         }
 
-        $content    =   Container::getData()->getVariable($this->variable);
+        $variable   =   $this->variable;
+        if ($this->variable == 'locator') {
+            // Must be accompanied in the input data by a label indicating the locator type, which determines which
+            // term is rendered by cs:label when the "locator" variable is selected
+            $variable   =   'page';
+            if (Container::getCitationItem()->get('label') !== null) {
+                $variable   =   Container::getCitationItem()->get('label');
+            }
+        }
+
+        $content    =   Container::getData()->getVariable($variable);
         $plural     =   'single';
 
         switch ($this->plural) {
@@ -105,6 +127,7 @@ class Label implements Groupable
                 }
                 break;
             case 'always':
+            case 'multiple':
                 $plural =   'multiple';
                 break;
         }
@@ -114,7 +137,7 @@ class Label implements Groupable
             $form   =   $this->form;
         }
 
-        $return =   Container::getLocale()->getTerms($this->variable, $form, $plural);
+        $return =   Container::getLocale()->getTerms($variable, $form, $plural);
 
         if ($return !== '') {
             $return =   $this->formating->render($return);

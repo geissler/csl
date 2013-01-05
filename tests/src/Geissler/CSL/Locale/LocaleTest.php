@@ -92,7 +92,6 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Geissler\CSL\Locale\Locale::getDate
-     * @todo   Implement testGetDate().
      */
     public function testGetDate()
     {
@@ -195,5 +194,25 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->readFile('de-DE'));
         $this->assertEquals('Referenz', $this->object->getTerms('reference'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Locale\Locale::readFile
+     * @covers Geissler\CSL\Locale\Locale::addXml
+     * @covers Geissler\CSL\Locale\Locale::getTerms
+     */
+    public function testGetChangedTerms()
+    {
+        $locale =   '<locale xml:lang="en">
+    <terms>
+      <term form="short" name="editortranslator">
+        <single>ed. &#38; trans.</single>
+        <multiple>eds. &#38; trans.</multiple>
+      </term>
+    </terms>
+  </locale>';
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->readFile('en'));
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->addXml(new \SimpleXMLElement($locale)));
+        $this->assertEquals('ed. & trans.', $this->object->getTerms('editortranslator', 'short'));
     }
 }

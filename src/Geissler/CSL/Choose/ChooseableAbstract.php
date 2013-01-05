@@ -4,7 +4,7 @@ namespace Geissler\CSL\Choose;
 use Geissler\CSL\Interfaces\Chooseable;
 
 /**
- * Abtract class which implents the matching validation for Chooseable's.
+ * Abstract class which implements the matching validation for Chooseable's.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT

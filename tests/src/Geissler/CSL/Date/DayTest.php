@@ -174,7 +174,7 @@ class DayTest extends \PHPUnit_Framework_TestCase
 
         $layout =   '<date-part name="day" form="ordinal"/>';
         $this->initElement($layout);
-        $this->assertEquals('1ʳᵉ', $this->object->render('1'));
+        $this->assertEquals('1ᵉʳ', $this->object->render('1'));
     }
 
     /**

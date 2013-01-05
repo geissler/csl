@@ -20,7 +20,7 @@ class Choose implements Renderable, Groupable
     /**
      * Parses the Choose configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {

@@ -2,9 +2,10 @@
 namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Parental;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\Quotes;
 use Geissler\CSL\Rendering\StripPeriods;
 use Geissler\CSL\Rendering\TextCase;
@@ -16,16 +17,17 @@ use Geissler\CSL\Rendering\Value;
 /**
  * Description of Text
  *
- * @author Benjamin
+ * @author Benjamin Geißler <benjamin.geissler@gmail.com>
+ * @license MIT
  */
-class Text implements Groupable
+class Text implements Groupable, Parental
 {
     /** @var Affix **/
     private $affix;
     /** @var Display **/
     private $display;
-    /** @var Formating **/
-    private $formating;
+    /** @var Formatting **/
+    private $formatting;
     /** @var Quotes **/
     private $quotes;
     /** @var StripPeriods **/
@@ -44,7 +46,7 @@ class Text implements Groupable
     {
         $this->affix        =   new Affix($text);
         $this->display      =   new Display($text);
-        $this->formating    =   new Formating($text);
+        $this->formatting   =   new Formatting($text);
         $this->quotes       =   new Quotes($text);
         $this->stripPeriods =   new StripPeriods($text);
         $this->textCase     =   new TextCase($text);
@@ -68,6 +70,45 @@ class Text implements Groupable
     }
 
     /**
+     * Retrieve the first child element matching the given class name.
+     *
+     * @param string $class full, namespace aware class name
+     * @return object
+     */
+    public function getChildElement($class)
+    {
+        if (($this->render instanceof $class) == true) {
+            return $this->render;
+        } elseif (($this->render instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+            $subChild   =   $this->render->getChildElement($class);
+
+            if ($subChild !== false) {
+                return $subChild;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Tests if the element or an child element is accessing the variable with the given name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function isAccessingVariable($name)
+    {
+        if (($this->render instanceof \Geissler\CSL\Rendering\Variable) == true
+            && $this->render->getName() == $name) {
+            return true;
+        } elseif (($this->render instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+            return $this->render->isAccessingVariable($name);
+        }
+
+        return false;
+    }
+
+    /**
      * Display text value.
      *
      * @param string|array $data
@@ -82,7 +123,7 @@ class Text implements Groupable
             $data   =   $this->stripPeriods->render($data);
             $data   =   $this->display->render($data);
             $data   =   $this->quotes->render($data);
-            $data   =   $this->formating->render($data);
+            $data   =   $this->formatting->render($data);
         }
 
         return $this->affix->render($data);

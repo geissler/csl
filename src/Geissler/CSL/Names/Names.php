@@ -5,7 +5,7 @@ use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Names\Name;
 use Geissler\CSL\Names\EtAl;
 use Geissler\CSL\Names\Substitute;
@@ -27,8 +27,8 @@ class Names implements Groupable
     private $affix;
     /** @var Display **/
     private $display;
-    /** @var Formating **/
-    private $formating;
+    /** @var Formatting **/
+    private $formatting;
     /** @var Name **/
     private $name;
     /** @var EtAl **/
@@ -41,17 +41,17 @@ class Names implements Groupable
     /**
      * Parses the Names configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
         $this->variables    =   array();
         $this->delimiter    =   '';
-        $this->name         =   new Name(new \SimpleXMLElement('<name />'));
+        $this->name         =   new Name(new \SimpleXMLElement('<name form="short" />'));
 
         $this->affix        =   new Affix($xml);
         $this->display      =   new Display($xml);
-        $this->formating    =   new Formating($xml);
+        $this->formatting   =   new Formatting($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
@@ -83,7 +83,15 @@ class Names implements Groupable
     }
 
     /**
-     * .
+     * @return \Geissler\CSL\Names\Name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Render the names.
      *
      * @param string|array $data
      * @return string|array
@@ -125,7 +133,15 @@ class Names implements Groupable
 
             $editorTrans    =   $compare['translator'];
             if (isset($this->label) == true) {
-                $this->label->setVariable('editortranslator');
+                $plural =   'singular';
+                if (count($this->variables) > 1) {
+                    $plural = 'multiple';
+                }
+
+                $this->label
+                    ->setVariable('editortranslator')
+                    ->setPlural($plural);
+
                 $editorTrans    .=   $this->label->render('');
             }
 
@@ -133,9 +149,25 @@ class Names implements Groupable
         }
 
         $return =   implode($this->delimiter, $returns);
-        $return =   $this->formating->render($return);
+        $return =   $this->formatting->render($return);
         $return =   $this->display->render($return);
         return $this->affix->render($return);
+    }
+
+    public function renderAsArray($data)
+    {
+        $returns    =   array();
+
+        foreach ($this->variables as $variable) {
+            $data   =   Container::getData()->getVariable($variable);
+            $length =   count($data);
+
+            for ($i = 0; $i < $length; $i++) {
+                $returns[]  =   $this->name->render(array($data[$i]));
+            }
+        }
+
+        return $returns;
     }
 
     /**

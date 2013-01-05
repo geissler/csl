@@ -35,7 +35,7 @@ class CitationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Geissler\CSL\Style\Citation::render
+     * @covers Geissler\CSL\Style\CitationItems::render
      * @todo   Implement testRender().
      */
     public function testRender()

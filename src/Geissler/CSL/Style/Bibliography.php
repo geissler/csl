@@ -2,7 +2,8 @@
 namespace Geissler\CSL\Style;
 
 use Geissler\CSL\Interfaces\Renderable;
-use Geissler\CSL\Style\DisplayAbstract;
+use Geissler\CSL\Sorting\Sort;
+use Geissler\CSL\Rendering\Layout;
 use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
 
@@ -12,8 +13,13 @@ use Geissler\CSL\Context\Options;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Bibliography extends DisplayAbstract implements Renderable
+class Bibliography implements Renderable
 {
+    /** @var Layout **/
+    private $layout;
+    /** @var Sort **/
+    private $sort;
+
     /**
      * Parses the Bibliography configuration.
      *
@@ -21,7 +27,17 @@ class Bibliography extends DisplayAbstract implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        parent::__construct($xml);
+        // init child elements
+        foreach ($xml->children() as $child) {
+            switch ($child->getName()) {
+                case 'layout':
+                    $this->layout   =   new Layout($child);
+                    break;
+                case 'sort':
+                    $this->sort =   new Sort($child);
+                    break;
+            }
+        }
 
         // set Bibliography-specific Options
         Container::getContext()->addBibliography('hangingIndent', false);
@@ -32,7 +48,10 @@ class Bibliography extends DisplayAbstract implements Renderable
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'hanging-indent':
-                    Container::getContext()->addBibliography('hangingIndent', ($value == 'true' ? true : false));
+                    Container::getContext()->addBibliography(
+                        'hangingIndent',
+                        ((string) $value == 'true' ? true : false)
+                    );
                     break;
                 case 'second-field-align':
                     Container::getContext()->addBibliography('secondFieldAlign', (string) $value);
@@ -55,5 +74,41 @@ class Bibliography extends DisplayAbstract implements Renderable
          // set global options and inheritable name options
         $options    =   new Options();
         $options->set('bibliography', $xml);
+    }
+
+    public function render($data)
+    {
+        Container::getContext()->enter('bibliography');
+
+        if (isset($this->sort) == true) {
+            $this->sort->sort('bibliography');
+        }
+        $result =   $this->layout->render($data);
+        Container::getContext()->leave();
+
+        if (count($result) > 0) {
+            return '<div class="csl-bib-body"><div class="csl-entry">'
+                . implode('</div><div class="csl-entry">', $this->addOptions($result))
+                . '</div></div>';
+        }
+
+        return '';
+    }
+
+    private function addOptions($result)
+    {
+        $length =   count($result);
+
+        for ($i = 0; $i < $length; $i++) {
+            if (Container::getContext()->getValue('hangingIndent', 'bibliography') == true) {
+
+            } elseif (Container::getContext()->getValue('secondFieldAlign', 'bibliography') == 'flush') {
+                $result[$i] =   '<div class="csl-left-margin">'
+                    . preg_replace('/( )/', ' </div><div class="csl-right-inline">', $result[$i], 1)
+                    . '</div>';
+            }
+        }
+
+        return $result;
     }
 }

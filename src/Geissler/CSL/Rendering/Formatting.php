@@ -10,7 +10,7 @@ use Geissler\CSL\Interfaces\Modifiable;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Formating implements Renderable, Modifiable
+class Formatting implements Renderable, Modifiable
 {
     /** @var string **/
     private $style;
@@ -24,7 +24,7 @@ class Formating implements Renderable, Modifiable
     private $align;
 
     /**
-     * Parses the formating configuration.
+     * Parses the formatting configuration.
      *
      * @param \SimpleXMLElement $xml
      */
@@ -43,7 +43,7 @@ class Formating implements Renderable, Modifiable
      * Modifys the configuration.
      *
      * @param \SimpleXMLElement $xml
-     * @return \Geissler\CSL\Rendering\Formating
+     * @return \Geissler\CSL\Rendering\Formatting
      */
     public function modify(\SimpleXMLElement $xml)
     {
@@ -71,7 +71,7 @@ class Formating implements Renderable, Modifiable
     }
 
     /**
-     * Apply the formating.
+     * Apply the formatting.
      *
      * @param string $data
      * @return string

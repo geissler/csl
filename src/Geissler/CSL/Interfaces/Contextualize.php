@@ -12,7 +12,7 @@ use Geissler\CSL\Interfaces\Renderable;
 interface Contextualize extends Renderable
 {
     /**
-     * Applys the context configuration to the object.
+     * Applies the context configuration to the object.
      *
      * @return \Geissler\CSL\Interfaces\Contextualize
      */

@@ -12,7 +12,7 @@ use Geissler\CSL\Interfaces\Renderable;
 interface Modifiable extends Renderable
 {
     /**
-     * Modifys the configuration of the object by parsing a new \SimpleXMLElement.
+     * Modifies the configuration of the object by parsing a new \SimpleXMLElement.
      *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Interfaces\Modifiable

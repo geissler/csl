@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Macro;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 
 /**
@@ -10,7 +11,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Call implements Renderable
+class Call implements Renderable, Groupable
 {
     /** @var string **/
     private $name;
@@ -26,6 +27,16 @@ class Call implements Renderable
     }
 
     /**
+     * Access the macro.
+     *
+     * @return \Geissler\CSL\Macro\Macro
+     */
+    public function getMacro()
+    {
+        return Container::getMacro($this->name);
+    }
+
+    /**
      * Calls the macro and renders it.
      *
      * @param string|array $data
@@ -34,5 +45,16 @@ class Call implements Renderable
     public function render($data)
     {
         return Container::getMacro($this->name)->render($data);
+    }
+
+    /**
+     * If a Renderable object has tried to use a empty variable it returns true otherwise and when no variable
+     * is used false. Needed for the Group element.
+     *
+     * @return boolean
+     */
+    public function hasAccessEmptyVariable()
+    {
+        return Container::getMacro($this->name)->hasAccessEmptyVariable();
     }
 }

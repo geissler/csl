@@ -4,7 +4,7 @@ namespace Geissler\CSL\Date;
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Factory;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Rendering\Affix;
 
@@ -22,7 +22,7 @@ class DatePart implements Renderable, Modifiable
     private $render;
     /** @var Affix **/
     private $affix;
-    /** @var Formating **/
+    /** @var Formatting **/
     private $formating;
     /** @var TextCase **/
     private $textCase;
@@ -40,7 +40,7 @@ class DatePart implements Renderable, Modifiable
         $this->name         =   '';
         $this->delimiter    =   '–';
 
-        $this->formating    =   new Formating($date);
+        $this->formating    =   new Formatting($date);
         $this->textCase     =   new TextCase($date);
         $this->affix        =   new Affix($date);
 

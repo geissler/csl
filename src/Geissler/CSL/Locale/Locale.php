@@ -128,7 +128,7 @@ class Locale
     }
 
     /**
-     * Retrieve the locale configuration for a date-parte element (day, month, year).
+     * Retrieve the locale configuration for a date-part element (day, month, year).
      *
      * @param string $form  text or numeric
      * @param string $name  day, month, year
@@ -160,7 +160,7 @@ class Locale
     {
         $length =   count($this->terms);
 
-        for ($i = 0; $i < $length; $i++) {
+        for ($i = $length - 1; $i > 0; $i--) {
             if ($this->terms[$i]['name'] == $name
                 && $this->terms[$i]['form'] == $form) {
 
@@ -229,7 +229,7 @@ class Locale
     }
 
     /**
-     * Inits the arrays.
+     * Inuit's the arrays.
      *
      * @return void
      */
@@ -241,7 +241,7 @@ class Locale
     }
 
     /**
-     * Parses the content of the xml file into the internal propertys.
+     * Parses the content of the xml file into the internal property's.
      *
      * @param \SimpleXMLElement $xml
      */

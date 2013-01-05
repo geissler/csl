@@ -2,7 +2,7 @@
 namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Renderable;
-use Geissler\CSL\Rendering\Formating;
+use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Rendering\Affix;
 
@@ -16,7 +16,7 @@ class NamePart implements Renderable
 {
     /** @var string **/
     private $name;
-    /** @var Formating **/
+    /** @var Formatting **/
     private $formating;
     /** @var TextCase **/
     private $textCase;
@@ -26,11 +26,11 @@ class NamePart implements Renderable
     /**
      * Parses the NamePart configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->formating    =   new Formating($xml);
+        $this->formating    =   new Formatting($xml);
         $this->textCase     =   new TextCase($xml);
         $this->affix        =   new Affix($xml);
 

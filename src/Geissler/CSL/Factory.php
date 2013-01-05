@@ -20,7 +20,7 @@ class Factory
     private static $configuration;
 
     /**
-     * Creates a Locale Objekt and injects the configuration paramters.
+     * Creates a Locale object and injects the configuration parameters.
      * @return \Geissler\CSL\Locale\Locale
      */
     public static function locale()
@@ -28,14 +28,14 @@ class Factory
         self::loadConfig();
         $locale =   new Locale();
         $locale->setDir(self::$configuration['locale']['dir'])
-               ->setFile(self::$configuration['locale']['file'])
-               ->setPrimaryDialect(self::$configuration['locale']['dialects']);
+            ->setFile(self::$configuration['locale']['file'])
+            ->setPrimaryDialect(self::$configuration['locale']['dialects']);
 
         return $locale;
     }
 
     /**
-     * Generats a Style object and injects the dir path.
+     * Generates a Style object and injects the dir path.
      * 
      * @return \Geissler\CSL\Style\Style
      */

@@ -1,0 +1,3 @@
+[submodule "tests/citeproc-text"]
+	path = tests/citeproc-text
+	url = ssh://hg@bitbucket.org/bdarcus/citeproc-test

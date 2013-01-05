@@ -141,7 +141,7 @@ class DatePartTest extends \PHPUnit_Framework_TestCase
 
         $layout =   '<date-part name="day" form="ordinal" prefix="[" suffix="]"/>';
         $this->initElement($layout);
-        $this->assertEquals('[1ʳᵉ]', $this->object->render(array('day' => 1, 'month' => 12, 'year' => 1984)));
+        $this->assertEquals('[1ᵉʳ]', $this->object->render(array('day' => 1, 'month' => 12, 'year' => 1984)));
     }
 
     /**

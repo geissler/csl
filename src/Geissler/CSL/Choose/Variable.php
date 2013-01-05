@@ -3,7 +3,7 @@ namespace Geissler\CSL\Choose;
 
 use Geissler\CSL\Interfaces\Chooseable;
 use Geissler\CSL\Choose\ChooseableAbstract;
-use Geissler\CSL\Container;
+use Geissler\CSL\Rendering\Variable as GetVariable;
 
 /**
  * Variable.
@@ -21,7 +21,8 @@ class Variable extends ChooseableAbstract implements Chooseable
      */
     protected function validateVariable($variable)
     {
-        if (Container::getData()->getVariable($variable) !== null) {
+        $object =   new GetVariable(new \SimpleXMLElement('<variable variable="' . $variable . '"/>'));
+        if ($object->render('') !== '') {
             return true;
         }
 

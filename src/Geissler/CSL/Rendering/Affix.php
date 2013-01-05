@@ -58,6 +58,19 @@ class Affix implements Renderable, Modifiable
     {
         if ($data !== '') {
             $data   =   $this->prefix . $data . $this->suffix;
+
+            // remove duplicated pre- and suffixes
+            if ($this->prefix !== '') {
+                $prefix =   preg_replace('/([\.|\[|\]|\(|\)|\+|\/])/', '#$1', $this->prefix . $this->prefix);
+                $prefix =   str_replace('#', '\\', $prefix);
+                $data   =   preg_replace('/^' . $prefix . '/', $this->prefix, $data);
+            }
+
+            if ($this->suffix !== '') {
+                $suffix =   preg_replace('/([\.|\[|\]|\(|\)|\+|\/])/', '#$1', $this->suffix . $this->suffix);
+                $suffix =   str_replace('#', '\\', $suffix);
+                $data   =   preg_replace('/' . $suffix . '$/', $this->suffix, $data);
+            }
         }
 
         return $data;

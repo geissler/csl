@@ -2,7 +2,7 @@
 namespace Geissler\CSL\Context;
 
 /**
- * Stores all globaly changeable options to override local configurations.
+ * Stores all globally changeable options to override local configurations and the actual rendering context.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -17,15 +17,21 @@ class Context
     private $citation;
     /** @var array **/
     private $bibliography;
+    /** @var array */
+    private $context;
+    /** @var array */
+    private $diambiguation;
 
     /**
-     * Inits the arrays.
+     * Init's the arrays.
      */
     public function __construct()
     {
-        $this->style        =   array();
-        $this->citation     =   array();
-        $this->bibliography =   array();
+        $this->style            =   array();
+        $this->citation         =   array();
+        $this->bibliography     =   array();
+        $this->context          =   array();
+        $this->diambiguation    =   array();
     }
 
     /**
@@ -43,7 +49,7 @@ class Context
     /**
      * Returns the rendering context (citation or bibliography).
      *
-     * @return stirng
+     * @return string
      */
     public function getName()
     {
@@ -101,7 +107,8 @@ class Context
     /**
      * Returns the standard values for this context.
      *
-     * @return  array
+     * @return array
+     * @throws \ErrorException
      */
     public function getOptions()
     {
@@ -112,5 +119,114 @@ class Context
         }
 
         throw new \ErrorException('No rendering context defined!');
+    }
+
+    /**
+     * Enter a specific position in the "CSL rendering tree" like bibliography or sort.
+     *
+     * @param string $name
+     * @param array $options
+     * @return Context
+     */
+    public function enter($name, array $options = array())
+    {
+        array_push($this->context, array('name' => $name, 'option' => $options));
+        return $this;
+    }
+
+    /**
+     * Leave the actual context.
+     *
+     * @return Context
+     */
+    public function leave()
+    {
+        array_pop($this->context);
+        return $this;
+    }
+
+    /**
+     * Test if in an specific context.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function in($name)
+    {
+        $context =  end($this->context);
+
+        if ($context['name'] == $name) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieve a context option.
+     *
+     * @param string $option
+     * @return null|mixed
+     */
+    public function get($option)
+    {
+        $context =  end($this->context);
+
+        if (isset($context['option'][$option]) == true) {
+            if (is_object($context['option'][$option]) == true) {
+                return clone $context['option'][$option];
+            } else {
+                return $context['option'][$option];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Add additional options to disambiguate names.
+     *
+     * @param string $class
+     * @param array $options
+     * @return Context
+     */
+    public function setDisambiguationOptions($class, array $options)
+    {
+        if ($this->getDisambiguationOptions($class) == false) {
+            $this->diambiguation[$class]    =   $options;
+        } else {
+            $this->diambiguation[$class]    =   array_merge($this->getDisambiguationOptions($class), $options);
+        }
+        return $this;
+    }
+
+    /**
+     * Retrieve disambiguation options.
+     *
+     * @param string $class
+     * @return array|bool
+     */
+    public function getDisambiguationOptions($class)
+    {
+        if (array_key_exists($class, $this->diambiguation) == true) {
+            return $this->diambiguation[$class];
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the disambiguation options for a class.
+     *
+     * @param string $class
+     * @return Context
+     */
+    public function removeDisambiguationOptions($class)
+    {
+        if (array_key_exists($class, $this->diambiguation) == true) {
+            unset($this->diambiguation[$class]);
+        }
+
+        return $this;
     }
 }

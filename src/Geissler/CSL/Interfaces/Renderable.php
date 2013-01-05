@@ -2,7 +2,7 @@
 namespace Geissler\CSL\Interfaces;
 
 /**
- * Defines the methods classes must implement to be renderd.
+ * Defines the methods classes must implement to be rendered.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
