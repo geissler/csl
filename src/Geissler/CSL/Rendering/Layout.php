@@ -8,8 +8,8 @@ use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\Children;
 use Geissler\CSL\Rendering\ExpandFormatting;
 use Geissler\CSL\Container;
+use Geissler\CSL\Options\Disambiguation\Disambiguation;
 use Geissler\CSL\Options\CiteCollapsing;
-use Geissler\CSL\Options\Disambiguation;
 
 /**
  * Layout.
@@ -103,6 +103,7 @@ class Layout implements Renderable, Parental
     public function render($data)
     {
         Container::getContext()->enter('layout', array('layout' => $this));
+        Container::getData()->moveToFirst();
 
         if (Container::getContext()->getName() == 'citation') {
             if (Container::getCitationItem() !== false) {
@@ -114,13 +115,19 @@ class Layout implements Renderable, Parental
             $return =   $this->bibliography($data);
         }
 
+        /*
+        var_dump($return);
+        */
+
         Container::getContext()->leave();
         return $return;
     }
 
     public function renderJustActualEntry($data)
     {
+        Container::getData()->moveToId(Container::getActualId());
         $entry   =   array();
+
         if (Container::getCitationItem() !== false) {
             // prefix for citation item
             if (Container::getCitationItem()->get('prefix') !== null) {
@@ -153,12 +160,21 @@ class Layout implements Renderable, Parental
 
         if (Container::getData()->moveToId($id) == true) {
             $return =   $this->renderJustActualEntry($data);
-            Container::getData()->moveToId($actualId);
+
+            if ($actualId !== '') {
+                Container::getData()->moveToId($actualId);
+            }
         }
 
         return $return;
     }
 
+    /**
+     * Render citations with citations or citation-items data.
+     *
+     * @param string|array $data
+     * @return array
+     */
     private function citation($data)
     {
         Container::getCitationItem()->moveToFirst();
@@ -178,7 +194,8 @@ class Layout implements Renderable, Parental
             $result[]   =   $group;
         } while (Container::getCitationItem()->next() == true);
 
-        return $this->addCitationOptions($result);
+
+        return explode("\n", $this->disambiguateCites($result, "\n"));
     }
 
     /**
@@ -190,65 +207,102 @@ class Layout implements Renderable, Parental
     private function citationFromData($data)
     {
         Container::getData()->moveToFirst();
-        $result         =   array();
-        $disambiguation =   new Disambiguation();
+        $result =   array();
 
         do {
-            // disambiguate and store rendered citation
-            $id         =   Container::getData()->getVariable('id');
-            $entity     =   $disambiguation->solve($this->renderJustActualEntry($data), $id);
-            $result[]   =   $entity;
-            Container::getRendered()->addCitation($id, $entity);
+            // store rendered citation
+            $id =   Container::getData()->getVariable('id');
+            Container::getRendered()->addCitation($id, $this->renderJustActualEntry($data));
+            $result[]   =   $id;
         } while (Container::getData()->next() == true);
 
-        return array($this->format($this->addCitationOptions($result, $this->delimiter)));
+        return array($this->format($this->disambiguateCites($result, $this->delimiter)));
     }
 
-    private function addCitationOptions($data)
+    private function disambiguateCites($data, $delimiter)
     {
         // disambiguate cites
         if (Container::getContext()->getValue('disambiguateAddNames', 'citation') === true
             || Container::getContext()->getValue('disambiguateAddGivenname', 'citation') === true
-            || Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true) {
+            || Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
+            || Container::getContext()->getUseChooseDisambiguate() == true) {
             $disambiguation =   new Disambiguation();
             $disambiguation->solve();
         }
 
+        // move to starting position for citations and citations items
+        $citationData   =   false;
+        if (Container::getCitationItem() !== false) {
+            $citationData   =   true;
+            Container::getCitationItem()->moveToFirst();
+        }
         // replace item ids by disambiguate cite
         $length =   count($data);
         for ($i = 0; $i < $length; $i++) {
             if (is_array($data[$i]) == true) {
                 $innerLength    =   count($data[$i]);
                 for ($j = 0; $j < $innerLength; $j++) {
-                    $data[$i][$j]   =   Container::getRendered()->getCitationById($data[$i][$j]);
+                    // re-render citation if missing
+                    $actualCitation =   Container::getRendered()->getCitationById($data[$i][$j]);
+                    if ($actualCitation == false) {
+                        Container::getContext()->enter('disambiguation');
+                        $data[$i][$j]   =   $this->renderJustActualEntry('');
+                        Container::getContext()->leave();
+                    } else {
+                        $data[$i][$j]   =   $actualCitation;
+                    }
 
                     // Add delimiter at end if not ending with a dot
                     // (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
-                    if (preg_match('/\.$/', $data[$i][$j]) == 0) {
-                        $data[$i][$j] .=  $this->delimiter;
-                    } else {
-                        $data[$i][$j] .= ' ';
+                    if ($j < $innerLength - 1) {
+                        if (preg_match('/\.$/', $data[$i][$j]) == 0) {
+                            $data[$i][$j] .=  $this->delimiter;
+                        } else {
+                            $data[$i][$j] .= ' ';
+                        }
+                    }
+
+                    // move to next in group
+                    if ($citationData == true) {
+                        Container::getCitationItem()->nextInGroup();
                     }
                 }
+
+                $data[$i]   =   $this->addCitationOptions($data[$i], $this->delimiter);
             } else {
-                $data[$i]   =   Container::getRendered()->getCitationById($data[$i]);
+                // re-render citation if missing
+                $actualCitation =   Container::getRendered()->getCitationById($data[$i]);
+                if ($actualCitation == false) {
+                    Container::getContext()->enter('disambiguation');
+                    $data[$i]   =   $this->renderJustActualEntry('');
+                    Container::getContext()->leave();
+                } else {
+                    $data[$i]   =   $actualCitation;
+                }
+            }
+
+            if ($citationData == true) {
+                Container::getCitationItem()->next();
             }
         }
 
-        // $this->format($this->addCitationOptions($group, $this->delimiter));
-        // Disambiguate cites
+        return $this->addCitationOptions($data, $delimiter);
+    }
 
-
+    private function addCitationOptions($data, $delimiter)
+    {
         // Collapsing options
         if (Container::getContext()->getValue('collapse', 'citation') !== '') {
             $collapse   =   new CiteCollapsing();
-            return $collapse->collapse($data, $this->delimiter);
+            $return     =   $collapse->collapse($data, $delimiter);
+        } else {
+            // remove wrong or duplicated delimiters (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
+            $return =   implode($delimiter, $data);
+            $return =   str_replace('. ' . $this->delimiter, '. ', $return);
+            $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
         }
 
-        // remove wrong or duplicated delimiters (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
-        $return =   implode($this->delimiter, $data);
-        $return =   str_replace('. ' . $this->delimiter, '. ', $return);
-        return str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
+        return $this->format($return);
     }
 
     private function bibliography($data)

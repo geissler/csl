@@ -20,15 +20,9 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $style = '/styles';
     protected $testJustSelected = true;
     protected $selectedTests = array(
-        'disambiguate_AndreaEg3.txt',
-       // 'disambiguate_AndreaEg.',
-        'disambiguate_AllNamesBaseNameCountOnFailureIfYearSuffixAvailable.txt',
-        //'disambiguate_AddNamesFailure.txt'
-       // 'disambiguate_.'
-       // 'sort_VariousNameMacros1.txt'
-        //'bugreports_AccidentalAllCaps.txt',
-    //    'bibsection_Exclude.txt',
-    //    'textcase_Uppercase.txt'
+        //'disambiguate_YearSuffixAtTwoLevels.txt',
+        //'disambiguate_ByCiteGivennameExpandCrossNestedNames.txt',
+        'disambiguate_.'
     );
     protected $errors = array(
         // crashing why ever
@@ -50,7 +44,13 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'textcase_TitleCapitalization.txt' => 'This IS a Pen That Is a <span class="nocase">smith</span> Pencil',
         'affix_WithCommas.txt'  =>  'John Smith, <font style="font-style:italic">Book C</font>, 2000, and David Jones, <font style="font-style:italic">Book D</font>, 2000; John Smith, <font style="font-style:italic">Book C</font>, 2000 is one source, David Jones, <font style="font-style:italic">Book D</font>, 2000 is another; John Smith, <font style="font-style:italic">Book C</font>, 2000, 23 is one source, David Jones, <font style="font-style:italic">Book D</font>, 2000 is another.',
         'textcase_Uppercase.txt' => 'SMITH, John: THIS IS A PEN THAT IS A <span class="nocase">Smith</span> PENCIL',
-        'affix_WordProcessorAffixNoSpace.txt' => "..[0] <i>My Prefix</i> My Title My Suffix\n..[1] My Prefix. My Title, My Suffix\n>>[2] My Prefix My Title My Suffix"
+        'affix_WordProcessorAffixNoSpace.txt' => "..[0] <i>My Prefix</i> My Title My Suffix\n..[1] My Prefix. My Title, My Suffix\n>>[2] My Prefix My Title My Suffix",
+        'disambiguate_YearSuffixMacroSameYearImplicit.txt'  => "..[0] A Smith 2001\n>>[1] B Smith 2001",
+        'disambiguate_DisambiguateTrueAndYearSuffixOne.txt' =>  "..[0] Pollock, 1979\n>>[1] Pollock, 1980",
+        'disambiguate_YearSuffixMacroSameYearExplicit.txt'  =>  "..[0] A Smith 2001\n>>[1] B Smith 2001",
+        'disambiguate_DisambiguationHang.txt' => "..[0] (Caminiti, Johnson, Burnod, Galli, &#38; Ferraina 1990a)\n..[1] (Caminiti, Johnson, Burnod, Galli, &#38; Ferraina 1990b)\n>>[2] (Caminiti, Johnson, &#38; Urbano 1990)",
+        'disambiguate_FailWithYearSuffix.txt'   =>  "..[0] (Caritas Europa et al. 2004a)\n>>[1] (Caritas Europa et al. 2004b)",
+        'disambiguate_LastOnlyFailWithByCite.txt' => "..[0] Organisation 2010a\n>>[1] Organisation 2010b"
     );
 
     /**

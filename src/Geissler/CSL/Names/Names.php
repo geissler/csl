@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -17,7 +18,7 @@ use Geissler\CSL\Rendering\Label;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Names implements Groupable
+class Names implements Groupable, Modifiable
 {
     /** @var array **/
     private $variables;
@@ -47,7 +48,7 @@ class Names implements Groupable
     {
         $this->variables    =   array();
         $this->delimiter    =   '';
-        $this->name         =   new Name(new \SimpleXMLElement('<name form="short" />'));
+        $this->name         =   new Name(new \SimpleXMLElement('<name form="long" />'));
 
         $this->affix        =   new Affix($xml);
         $this->display      =   new Display($xml);
@@ -80,9 +81,40 @@ class Names implements Groupable
                     break;
             }
         }
+
+        // modify substitute child by passing all options
+        if (isset($this->name) == true
+            && isset($this->substitute) == true) {
+            $options    =   $this->name->getOptions();
+
+            if ($this->delimiter !== '') {
+                $options['delimiter']   =   $this->delimiter;
+            }
+
+            $xmlOptions =   array();
+            foreach ($options as $field => $value) {
+                $xmlOptions[]   =   $field . '="' . $value . '"';
+            }
+
+            $this->substitute->modify(new \SimpleXMLElement('<names ' . implode(' ', $xmlOptions) . '/>'));
+        }
     }
 
     /**
+     * Modifies the configuration of the object by parsing a new \SimpleXMLElement.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Interfaces\Modifiable
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        $this->name->modify($xml);
+        return $this;
+    }
+
+    /**
+     * Retrieve the name object.
+     *
      * @return \Geissler\CSL\Names\Name
      */
     public function getName()
@@ -94,7 +126,7 @@ class Names implements Groupable
      * Render the names.
      *
      * @param string|array $data
-     * @return string|array
+     * @return string
      */
     public function render($data)
     {
@@ -154,13 +186,29 @@ class Names implements Groupable
         return $this->affix->render($return);
     }
 
+    /**
+     * Render only the names and return them as an array.
+     *
+     * @param array $data
+     * @return array
+     */
     public function renderAsArray($data)
     {
         $returns    =   array();
 
         foreach ($this->variables as $variable) {
-            $data   =   Container::getData()->getVariable($variable);
-            $length =   count($data);
+            $data       =   Container::getData()->getVariable($variable);
+            $options    =   Container::getContext()->getDisambiguationOptions('Geissler\CSL\Names\Name');
+            $length     =   count($data);
+
+            if (isset($options['etAlUseFirst']) == true) {
+                if ($options['etAlUseFirst'] < $length) {
+                    $length =   $options['etAlUseFirst'];
+                }
+            } elseif (Container::getContext()->getValue('etAlUseFirst', 'citation') !== ''
+                && Container::getContext()->getValue('etAlUseFirst', 'citation') < $length) {
+                $length =   Container::getContext()->getValue('etAlUseFirst', 'citation');
+            }
 
             for ($i = 0; $i < $length; $i++) {
                 $returns[]  =   $this->name->render(array($data[$i]));
@@ -168,6 +216,23 @@ class Names implements Groupable
         }
 
         return $returns;
+    }
+
+    /**
+     * Retrieve the maximal number of renderable names.
+     *
+     * @return int
+     */
+    public function getMaxNumberOfNames()
+    {
+        $max    =   0;
+        foreach ($this->variables as $variable) {
+            if (count(Container::getData()->getVariable($variable)) > $max) {
+                $max    =   count(Container::getData()->getVariable($variable));
+            }
+        }
+
+        return $max;
     }
 
     /**

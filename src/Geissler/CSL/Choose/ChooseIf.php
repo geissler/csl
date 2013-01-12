@@ -4,6 +4,7 @@ namespace Geissler\CSL\Choose;
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Chooseable;
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Parental;
 use Geissler\CSL\Choose\Disambiguate;
 use Geissler\CSL\Choose\IsNumeric;
 use Geissler\CSL\Choose\IsUncertainDate;
@@ -14,12 +15,12 @@ use Geissler\CSL\Choose\Variable;
 use Geissler\CSL\Rendering\Children;
 
 /**
- * .
+ * Choose If selection.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class ChooseIf implements Renderable, Groupable, Chooseable
+class ChooseIf implements Renderable, Groupable, Chooseable, Parental
 {
     /** @var Chooseable **/
     private $validation;
@@ -29,7 +30,7 @@ class ChooseIf implements Renderable, Groupable, Chooseable
     /**
      * Parses the If configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -74,7 +75,7 @@ class ChooseIf implements Renderable, Groupable, Chooseable
     }
 
     /**
-     * .
+     * Render all child elements.
      *
      * @param string|array $data
      * @return string|array
@@ -114,5 +115,46 @@ class ChooseIf implements Renderable, Groupable, Chooseable
     public function validate()
     {
         return $this->validation->validate();
+    }
+
+    /**
+     * Retrieve the first child element matching the given class name.
+     *
+     * @param string $class full, namespace aware class name
+     * @return object
+     */
+    public function getChildElement($class)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof $class) == true) {
+                return $child;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+                $subChild   =   $child->getChildElement($class);
+
+                if ($subChild !== false) {
+                    return $subChild;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Tests if the element or an child element is accessing the variable with the given name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function isAccessingVariable($name)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof \Geissler\CSL\Interfaces\Parental) == true
+                && $child->isAccessingVariable($name) == true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -2,18 +2,19 @@
 namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Rendering\Text;
 use Geissler\CSL\Date\Date;
 use Geissler\CSL\Rendering\Number;
 use Geissler\CSL\Names\Names;
 
 /**
- * .
+ * Substitute.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Substitute implements Groupable
+class Substitute implements Groupable, Modifiable
 {
     /** @var array **/
     private $renderingElements;
@@ -21,7 +22,7 @@ class Substitute implements Groupable
     /**
      * Parses the Substitute configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -41,6 +42,22 @@ class Substitute implements Groupable
                 case 'names':
                     $this->renderingElements[]  =   new Names($child);
                     break;
+            }
+        }
+    }
+
+
+    /**
+     * Modifies the configuration of the object by parsing a new \SimpleXMLElement.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Interfaces\Modifiable
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        foreach ($this->renderingElements as $child) {
+            if (($child instanceof Modifiable) == true) {
+                $child->modify($xml);
             }
         }
     }

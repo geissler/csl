@@ -13,13 +13,23 @@ use Geissler\CSL\Container;
  */
 class Position extends ChooseableAbstract implements Chooseable
 {
+    /**
+     * Additionally activate different citation usage.
+     *
+     * @param string $variable
+     * @param string $match
+     */
+    public function __construct($variable, $match = 'all')
+    {
+        parent::__construct($variable, $match = 'all');
+        Container::getRendered()->setUseDifferentCitations(true);
+    }
 
     /**
      * Tests whether the cite position matches the given positions
      *
      * @param string $variable
      * @return boolean
-     * @todo implementation
      */
     protected function validateVariable($variable)
     {
@@ -42,9 +52,18 @@ class Position extends ChooseableAbstract implements Chooseable
 
                 return true;
                 break;
+            case 'subsequent':
+                $length =   Container::getCitationItem()->getPosition();
+                $actual =   Container::getCitationItem()->get('id');
+
+                for ($i = 0; $i < $length; $i++) {
+                    if (Container::getCitationItem()->getAtPosition('id', $i) == $actual) {
+                        return true;
+                    }
+                }
+                break;
             case 'ibid':
             case 'ibid-with-locator':
-            case 'subsequent':
                 $position       =   Container::getCitationItem()->getPosition();
                 $groupPosition  =   Container::getCitationItem()->getGroupPosition();
 

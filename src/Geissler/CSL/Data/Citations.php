@@ -39,9 +39,10 @@ class Citations extends CitationAbstract
                     }
                     break;
                 case 'noteIndex':
+                case 'index':
                     if (isset($this->data[$position][0]['properties']) == true
-                        && isset($this->data[$position][0]['properties']['noteIndex']) == true) {
-                        return $this->data[$position][0]['properties']['noteIndex'];
+                        && isset($this->data[$position][0]['properties'][$variable]) == true) {
+                        return $this->data[$position][0]['properties'][$variable];
                     }
                     break;
                 default:
@@ -59,7 +60,7 @@ class Citations extends CitationAbstract
      * Changes the order of the actual group.
      *
      * @param array $group
-     * @return Citations|Geissler\CSL\Data\CitationAbstract
+     * @return Citations
      */
     public function sortGroup(array $group)
     {
@@ -87,6 +88,4 @@ class Citations extends CitationAbstract
     {
         return count($this->data[$this->position][0]['citationItems']);
     }
-
-
 }

@@ -15,7 +15,7 @@ use Geissler\CSL\Rendering\Term;
 use Geissler\CSL\Rendering\Value;
 
 /**
- * Description of Text
+ * Text.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT

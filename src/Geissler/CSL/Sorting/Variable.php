@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Sorting;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Sortable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Date\Format;
 
@@ -11,7 +11,7 @@ use Geissler\CSL\Date\Format;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Variable implements Renderable
+class Variable implements Sortable
 {
     /** @var string */
     private $variable;

@@ -4,9 +4,10 @@ namespace Geissler\CSL\Sorting;
 use Geissler\CSL\Container;
 use Geissler\CSL\Sorting\Macro;
 use Geissler\CSL\Sorting\Variable;
+use Geissler\CSL\Interfaces\Sortable;
 
 /**
- * Description of Sort
+ * Sorting.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -42,40 +43,67 @@ class Sort
                 }
             }
 
-            $this->keys[]   =   $sortingKey;
+            if ($sortingKey['generate'] instanceof Sortable) {
+                $this->keys[]   =   $sortingKey;
+            }
         }
     }
 
+    /**
+     * Sort the data in the given context.
+     *
+     * @param string $context
+     * @return Sort
+     */
     public function sort($context)
     {
-        Container::getContext()->enter('sort', array('sort' => $this->keys[0]['sort']));
+        if (count($this->keys) == 0) {
+            return $this;
+        }
 
+        Container::getContext()->enter('sort', array('sort' => $this->keys[0]['sort']));
         if ($context == 'citation') {
             $this->citation();
         } else {
             $this->bibliography();
         }
-
         Container::getContext()->leave();
+
         return $this;
-        // citation or bibliography data durch laufen
-        // sortier gruppe erstellen
-        // sortieren der gruppe
-        // sortierung zurück in Container schreiben
     }
 
+    /**
+     * Sort the citation items or if missing the bibliography data with the citation sorting keys.
+     */
     private function citation()
     {
         if (Container::getCitationItem() !== false) {
-            $key    =   $this->keys[0]['generate'];
             do {
-                $sort   =   $this->sortCitation($key, $this->keys[0]['sort']);
+                $sort   =   $this->generateCitationSort($this->keys[0]['generate'], $this->keys[0]['sort']);
+                $iteration  =   0;
 
-                if (array_values($sort) !== array_unique(array_values($sort))
-                    && count($this->keys) > 1) {
-                    // use next sorting key
-                    Container::getCitationItem()->moveToFirstInGroup();
-                    $newSort    =   $this->sortCitation($this->keys[1]['generate'], $this->keys[1]['sort']);
+                while (isset($this->keys[$iteration + 1]) == true
+                    && ($this->keys[$iteration + 1]['generate'] instanceof Sortable) == true) {
+
+                    if ($this->keys[$iteration]['sort'] == 'ascending') {
+                        $firstDirection =   SORT_ASC;
+                    } else {
+                        $firstDirection =   SORT_DESC;
+                    }
+
+                    $iteration++;
+                    $nextSort    =   $this->generateCitationSort(
+                        $this->keys[$iteration]['generate'],
+                        $this->keys[$iteration]['sort']
+                    );
+
+                    if ($this->keys[$iteration]['sort'] == 'ascending') {
+                        $nextDirection  =   SORT_ASC;
+                    } else {
+                        $nextDirection =   SORT_DESC;
+                    }
+
+                    array_multisort($sort, $firstDirection, $nextSort, $nextDirection, $sort);
                 }
 
                 Container::getCitationItem()->sortGroup($sort);
@@ -85,12 +113,19 @@ class Sort
         }
     }
 
-    private function sortCitation($key, $direction)
+    /**
+     * Generate the actual sorting data based on the citation data with the given sorting key.
+     *
+     * @param \Geissler\CSL\Interfaces\Sortable $key
+     * @param string $direction
+     * @return array
+     */
+    private function generateCitationSort(Sortable $key, $direction)
     {
         $sort   =   array();
 
         do {
-            $id =   Container::getCitationItem()->get('id');
+            $id         =   Container::getCitationItem()->get('id');
             Container::getData()->moveToId($id);
             $sort[$id]  =   $key->render(Container::getData()->get());
         } while (Container::getCitationItem()->nextInGroup() == true);
@@ -105,25 +140,62 @@ class Sort
         return $sort;
     }
 
+    /**
+     * Sort the bibliography entries.
+     */
     private function bibliography()
     {
+        $sort       =   $this->generateBibliographySort($this->keys[0]['generate'], $this->keys[0]['sort']);
+        $iteration  =   0;
+
+        while ($iteration + 1 < count($this->keys)) {
+            if ($this->keys[$iteration]['sort'] == 'ascending') {
+                $firstDirection =   SORT_ASC;
+            } else {
+                $firstDirection =   SORT_DESC;
+            }
+
+            $iteration++;
+            $nextSort    =   $this->generateBibliographySort(
+                $this->keys[$iteration]['generate'],
+                $this->keys[$iteration]['sort']
+            );
+
+            if ($this->keys[$iteration]['sort'] == 'ascending') {
+                $nextDirection  =   SORT_ASC;
+            } else {
+                $nextDirection =   SORT_DESC;
+            }
+
+            array_multisort($sort, $firstDirection, $nextSort, $nextDirection, $sort);
+        }
+
+        Container::getData()->sort(array_keys($sort));
+    }
+
+    /**
+     * Generate the actual sorting data based on the bibliography data with the given sorting key.
+     *
+     * @param \Geissler\CSL\Interfaces\Sortable $key
+     * @param string $direction
+     * @return array
+     */
+    private function generateBibliographySort(Sortable $key, $direction)
+    {
+        Container::getData()->moveToFirst();
         $sort   =   array();
-        $key    =   $this->keys[0]['generate'];
+
         do {
             $sort[Container::getData()->getVariable('id')]  =   $key->render(Container::getData()->get());
         } while (Container::getData()->next() == true);
 
-        if ($this->keys[0]['sort'] == 'ascending') {
+        if ($direction == 'ascending') {
             asort($sort);
 
         } else {
             arsort($sort);
         }
 
-        if (array_values($sort) !== array_unique(array_values($sort))) {
-            // use next sorting key
-        }
-
-        Container::getData()->sort(array_keys($sort));
+        return $sort;
     }
 }

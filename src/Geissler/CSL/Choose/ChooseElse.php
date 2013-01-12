@@ -17,7 +17,7 @@ class ChooseElse extends ChooseIf implements Renderable, Groupable, Chooseable
     /**
      * An else statement will always validate to true.
      *
-     * @return boolea
+     * @return boolean
      */
     public function validate()
     {

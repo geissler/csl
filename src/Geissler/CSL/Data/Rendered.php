@@ -22,6 +22,7 @@ class Rendered
     private $rendered;
     /** @var array */
     private $replace;
+    private $useDifferentCitations;
 
     public function __construct()
     {
@@ -29,9 +30,23 @@ class Rendered
         $this->bibliography     =   array();
         $this->disambiguation   =   array();
 
-        $this->rendered =   array();
-        $this->replace  =   array();
+        $this->rendered                 =   array();
+        $this->replace                  =   array();
+        $this->useDifferentCitations    =   false;
     }
+
+    public function setUseDifferentCitations($useDifferentCitations)
+    {
+        $this->useDifferentCitations = $useDifferentCitations;
+        return $this;
+    }
+
+    public function getUseDifferentCitations()
+    {
+        return $this->useDifferentCitations;
+    }
+
+
 
     /**
      * Store a rendered citation under its id.
@@ -42,7 +57,35 @@ class Rendered
      */
     public function addCitation($id, $value)
     {
-        return $this->store($id, $value, 'citation');
+        if ($this->useDifferentCitations == false
+            || isset($this->rendered[$id]['firstCitation']) == true) {
+            return $this->store($id, $value, 'citation');
+        } else {
+            return $this->store($id, $value, 'firstCitation');
+        }
+    }
+
+    /**
+     * Update a already rendered citation or the first citation by comparison of the entries.
+     *
+     * @param string $id
+     * @param string $value
+     * @param string $valueToUpdate old value, which should be replaced
+     * @param bool $force
+     * @return Rendered
+     */
+    public function updateCitation($id, $value, $valueToUpdate, $force = false)
+    {
+        if ($this->getUseDifferentCitations() == true
+            && isset($this->rendered[$id]['firstCitation']) == true
+            && $this->rendered[$id]['firstCitation'] == $valueToUpdate) {
+            return $this->store($id, $value, 'firstCitation');
+        } elseif ($force == true
+            || $this->rendered[$id]['citation'] == $valueToUpdate) {
+            return $this->store($id, $value, 'citation');
+        }
+
+        return $this;
     }
 
     /**
@@ -105,8 +148,13 @@ class Rendered
     public function getCitationById($id)
     {
         $return =   $this->getById($id);
-
         if ($return !== false) {
+            if (isset($return['firstCitation']) == true
+                && $return['firstCitation'] !== '') {
+                $this->store($id, '', 'firstCitation');
+                return $return['firstCitation'];
+            }
+
             return $return['citation'];
         }
 
@@ -138,8 +186,6 @@ class Rendered
         return false;
     }
 
-
-
     public function getOtherByValue($value, $type, $selfId)
     {
         foreach ($this->rendered as $entry) {
@@ -153,20 +199,22 @@ class Rendered
         return false;
     }
 
-    public function isAmbiguous($value, $selfId)
-    {
-        foreach ($this->rendered as $id => $entry) {
-            if (((isset($entry['ambiguous']) == true
-                    && $entry['ambiguous'] == $value)
-                || (isset($entry['disambiguation']) == true
-                    && $entry['disambiguation'] == $value))
-                && $selfId != $id) {
-                return true;
+    /*
+        public function isAmbiguous($value, $selfId)
+        {
+            foreach ($this->rendered as $id => $entry) {
+                if (((isset($entry['ambiguous']) == true
+                        && $entry['ambiguous'] == $value)
+                    || (isset($entry['disambiguation']) == true
+                        && $entry['disambiguation'] == $value))
+                    && $selfId != $id) {
+                    return true;
+                }
             }
-        }
 
-        return false;
-    }
+            return false;
+        }
+    */
 
     /**
      * Finds the last used suffix for an ambiguous cite.
@@ -214,7 +262,6 @@ class Rendered
      */
     public function replace($value)
     {
-        //var_dump($this->replace);
         if (is_array($value) == true) {
             $length =   count($value);
 

@@ -20,18 +20,23 @@ class Context
     /** @var array */
     private $context;
     /** @var array */
-    private $diambiguation;
+    private $disambiguation;
+    /** @var bool */
+    private $ignoreEtAlSubsequent;
+    private $useChooseDisambiguate;
 
     /**
      * Init's the arrays.
      */
     public function __construct()
     {
-        $this->style            =   array();
-        $this->citation         =   array();
-        $this->bibliography     =   array();
-        $this->context          =   array();
-        $this->diambiguation    =   array();
+        $this->style                    =   array();
+        $this->citation                 =   array();
+        $this->bibliography             =   array();
+        $this->context                  =   array();
+        $this->disambiguation           =   array();
+        $this->ignoreEtAlSubsequent     =   false;
+        $this->useChooseDisambiguate    =   false;
     }
 
     /**
@@ -56,18 +61,73 @@ class Context
         return $this->name;
     }
 
+    /**
+     * De-/Activate et-al-subsequent ignoring.
+     *
+     * @param boolean $ignoreEtAlSubsequent
+     * @return Context
+     */
+    public function setIgnoreEtAlSubsequent($ignoreEtAlSubsequent)
+    {
+        $this->ignoreEtAlSubsequent = $ignoreEtAlSubsequent;
+        return $this;
+    }
+
+    /**
+     * De-/Activate a choose disambiguate.
+     *
+     * @param $useChooseDisambiguate
+     * @return Context
+     */
+    public function setUseChooseDisambiguate($useChooseDisambiguate)
+    {
+        $this->useChooseDisambiguate = $useChooseDisambiguate;
+        return $this;
+    }
+
+    /**
+     * Retrieve the choose disambiguate value.
+     *
+     * @return bool
+     */
+    public function getUseChooseDisambiguate()
+    {
+        return $this->useChooseDisambiguate;
+    }
+
+    /**
+     * Add a global style option.
+     *
+     * @param string $name
+     * @param string|boolean|integer $value
+     * @return Context
+     */
     public function addStyle($name, $value)
     {
         $this->style[$name] =   $value;
         return $this;
     }
 
+    /**
+     * Add a citation option.
+     *
+     * @param string $name
+     * @param string|boolean|integer $value
+     * @return Context
+     */
     public function addCitation($name, $value)
     {
         $this->citation[$name] =   $value;
         return $this;
     }
 
+    /**
+     * Adda bibliography option.
+     *
+     * @param string $name
+     * @param string|boolean|integer $value
+     * @return Context
+     */
     public function addBibliography($name, $value)
     {
         $this->bibliography[$name] =   $value;
@@ -112,13 +172,27 @@ class Context
      */
     public function getOptions()
     {
-        if ($this->name == 'citation') {
-            return array_merge($this->citation, $this->style);
-        } elseif ($this->name == 'bibliography') {
-            return array_merge($this->bibliography, $this->style);
+        if (isset($this->name) == false) {
+            throw new \ErrorException('No rendering context defined!');
         }
 
-        throw new \ErrorException('No rendering context defined!');
+        if ($this->name == 'citation') {
+            $return =   array_merge($this->citation, $this->style);
+        } elseif ($this->name == 'bibliography') {
+            $return =    array_merge($this->bibliography, $this->style);
+        }
+
+        if ($this->ignoreEtAlSubsequent == true) {
+            if (isset($return['etAlSubsequentMin']) == true) {
+                unset($return['etAlSubsequentMin']);
+            }
+
+            if (isset($return['etAlSubsequentUseFirst']) == true) {
+                unset($return['etAlSubsequentUseFirst']);
+            }
+        }
+
+        return $return;
     }
 
     /**
@@ -163,14 +237,26 @@ class Context
     }
 
     /**
-     * Retrieve a context option.
+     * Retrieve a context option from the actual context or the given context.
      *
      * @param string $option
+     * @param bool|string $contextName
      * @return null|mixed
      */
-    public function get($option)
+    public function get($option, $contextName = false)
     {
-        $context =  end($this->context);
+        if ($contextName == false) {
+            $context =  end($this->context);
+        } else {
+            $length =   count($this->context);
+
+            for ($i = 0; $i < $length; $i++) {
+                if ($this->context[$i]['name'] == $contextName) {
+                    $context    =   $this->context[$i];
+                    break;
+                }
+            }
+        }
 
         if (isset($context['option'][$option]) == true) {
             if (is_object($context['option'][$option]) == true) {
@@ -193,9 +279,9 @@ class Context
     public function setDisambiguationOptions($class, array $options)
     {
         if ($this->getDisambiguationOptions($class) == false) {
-            $this->diambiguation[$class]    =   $options;
+            $this->disambiguation[$class]    =   $options;
         } else {
-            $this->diambiguation[$class]    =   array_merge($this->getDisambiguationOptions($class), $options);
+            $this->disambiguation[$class]    =   array_merge($this->getDisambiguationOptions($class), $options);
         }
         return $this;
     }
@@ -208,11 +294,30 @@ class Context
      */
     public function getDisambiguationOptions($class)
     {
-        if (array_key_exists($class, $this->diambiguation) == true) {
-            return $this->diambiguation[$class];
+        if (array_key_exists($class, $this->disambiguation) == true) {
+            return $this->disambiguation[$class];
         }
 
         return false;
+    }
+
+    public function getDisambiguationOption($class, $option)
+    {
+        if ($this->getDisambiguationOptions($class) !== false
+            && isset($this->disambiguation[$class][$option]) == true) {
+            return $this->disambiguation[$class][$option];
+        }
+
+        return false;
+    }
+
+    public function removeDisambiguationOption($class, $option)
+    {
+        if (isset($this->disambiguation[$class][$option]) == true) {
+            unset($this->disambiguation[$class][$option]);
+        }
+
+        return $this;
     }
 
     /**
@@ -223,8 +328,8 @@ class Context
      */
     public function removeDisambiguationOptions($class)
     {
-        if (array_key_exists($class, $this->diambiguation) == true) {
-            unset($this->diambiguation[$class]);
+        if (array_key_exists($class, $this->disambiguation) == true) {
+            unset($this->disambiguation[$class]);
         }
 
         return $this;

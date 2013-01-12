@@ -1,7 +1,7 @@
 <?php
 namespace Geissler\CSL\Sorting;
 
-use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Interfaces\Sortable;
 use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Macro\Call;
 use Geissler\CSL\Container;
@@ -12,7 +12,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Macro implements Renderable
+class Macro implements Sortable
 {
     /** @var Call **/
     private $macro;

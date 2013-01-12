@@ -3,6 +3,7 @@ namespace Geissler\CSL\Macro;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Parental;
 use Geissler\CSL\Container;
 
 /**
@@ -11,7 +12,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Call implements Renderable, Groupable
+class Call implements Renderable, Groupable, Parental
 {
     /** @var string **/
     private $name;
@@ -56,5 +57,27 @@ class Call implements Renderable, Groupable
     public function hasAccessEmptyVariable()
     {
         return Container::getMacro($this->name)->hasAccessEmptyVariable();
+    }
+
+    /**
+     * Retrieve the first child element matching the given class name.
+     *
+     * @param string $class full, namespace aware class name
+     * @return object
+     */
+    public function getChildElement($class)
+    {
+        return Container::getMacro($this->name)->getChildElement($class);
+    }
+
+    /**
+     * Tests if the element or an child element is accessing the variable with the given name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function isAccessingVariable($name)
+    {
+        return Container::getMacro($this->name)->isAccessingVariable($name);
     }
 }

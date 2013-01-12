@@ -61,9 +61,11 @@ class Options
                     Container::getContext()->$method('etAlUseFirst', (string) $value);
                     break;
                 case 'et-al-subsequent-min':
+                    Container::getRendered()->setUseDifferentCitations(true);
                     Container::getContext()->$method('etAlSubsequentMin', (string) $value);
                     break;
                 case 'et-al-subsequent-use-first':
+                    Container::getRendered()->setUseDifferentCitations(true);
                     Container::getContext()->$method('etAlSubsequentUseFirst', (string) $value);
                     break;
                 case 'et-al-use-last':

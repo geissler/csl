@@ -78,8 +78,17 @@ class Bibliography implements Renderable
 
     public function render($data)
     {
-        Container::getContext()->enter('bibliography');
+        // render citation to create year-suffix if necessary
+        if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true
+            && (Container::getCitation()->getLayout()->isAccessingVariable('year-suffix') == true
+                || $this->layout->isAccessingVariable('year-suffix') == true)) {
+            Container::getContext()->setName('citation');
+            Container::getData()->moveToFirst();
+            Container::getCitation()->render($data);
+            Container::getContext()->setName('bibliography');
+        }
 
+        Container::getContext()->enter('bibliography');
         if (isset($this->sort) == true) {
             $this->sort->sort('bibliography');
         }

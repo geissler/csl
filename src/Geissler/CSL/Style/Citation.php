@@ -92,6 +92,16 @@ class Citation implements Renderable
         $options->set('citation', $xml);
     }
 
+    /**
+     * Access the citation layout.
+     *
+     * @return \Geissler\CSL\Rendering\Layout
+     */
+    public function getLayout()
+    {
+        return $this->layout;
+    }
+
     public function render($data)
     {
         Container::getContext()->enter('citation');
@@ -106,7 +116,8 @@ class Citation implements Renderable
         if (Container::getCitationItem() !== false) {
             // apply additional citation formatting options
             Container::getCitationItem()->moveToFirst();
-            if (Container::getCitationItem()->get('noteIndex') !== null) {
+            if (Container::getCitationItem()->get('noteIndex') !== null
+                || Container::getCitationItem()->get('index') !== null) {
                 $citation   =   array();
                 $length     =   count($result);
                 $prefix     =   '..';

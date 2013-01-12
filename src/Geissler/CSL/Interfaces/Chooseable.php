@@ -10,7 +10,7 @@ namespace Geissler\CSL\Interfaces;
 interface Chooseable
 {
     /**
-     * Validates the varibale.
+     * Validates the variable.
      *
      * @return boolean
      */

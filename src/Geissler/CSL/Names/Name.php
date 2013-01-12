@@ -74,14 +74,14 @@ class Name implements Renderable, Modifiable, Contextualize
 
         $this->form             =   'long';
         $this->initialize       =   true;
-        $this->initializeWith   =   '';
+        $this->initializeWith   =   false;
         $this->nameAsSortOrder  =   '';
         $this->sortSeparator    =   ', ';
         $this->nameParts        =   array();
         $this->literals         =   array();
 
         $this->affix        =   new Affix($xml);
-        $this->formatting    =   new Formatting($xml);
+        $this->formatting   =   new Formatting($xml);
 
         $this->modify($xml);
 
@@ -91,15 +91,14 @@ class Name implements Renderable, Modifiable, Contextualize
             }
         }
 
-        $backup         =   get_object_vars($this);
-        $this->backup   =   $backup;
+        $this->backup();
     }
 
     /**
      * Modifies the configuration of the name by parsing a new \SimpleXMLElement.
      *
      * @param \SimpleXMLElement $xml
-     * @return \Geissler\CSL\Names\Name
+     * @return \Geissler\CSL\Interfaces\Modifiable|\Geissler\CSL\Names\Name
      */
     public function modify(\SimpleXMLElement $xml)
     {
@@ -150,7 +149,34 @@ class Name implements Renderable, Modifiable, Contextualize
             }
         }
 
+        $this->backup();
+
         return $this;
+    }
+
+    /**
+     * Retrieve all configuration options.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return array(
+            'and' => $this->and,
+            'delimiter' => $this->delimiter,
+            'delimiter-precedes-et-al' => $this->delimiterPrecedesEtAl,
+            'delimiter-precedes-last' => $this->delimiterPrecedesLast,
+            'et-al-min' => $this->etAlMin,
+            'et-al-use-first' => $this->etAlUseFirst,
+            'et-al-subsequent-min' => $this->etAlSubsequentMin,
+            'et-al-subsequent-use-first' => $this->etAlSubsequentUseFirst,
+            'et-al-use-last' => $this->etAlUseLast,
+            'form' => $this->form,
+            'initialize' => $this->initialize,
+            'initialize-with' => $this->initializeWith,
+            'name-as-sort-order' => $this->nameAsSortOrder,
+            'sort-separator' => $this->sortSeparator
+        );
     }
 
     /**
@@ -340,7 +366,7 @@ class Name implements Renderable, Modifiable, Contextualize
         // initialize given names
         if (isset($names['given']) == true) {
             if ($this->initialize == true
-                && $this->initializeWith !== '') {
+                && $this->initializeWith !== false) {
 
                 $names['given']  =  preg_replace(
                     '/([A-Z])[a-z]+\b[ ]{0,1}/',
@@ -357,6 +383,10 @@ class Name implements Renderable, Modifiable, Contextualize
             // Hyphenation of Initialized Names
             if (Container::getContext()->get('initializeWithHyphen') == false) {
                 $names['given'] =   str_replace($this->initializeWith . '-', $this->initializeWith, $names['given']);
+            }
+
+            if (Container::getContext()->getDisambiguationOption('Geissler\CSL\Names\Name', 'trimGivenName') == true) {
+                $names['given'] =   str_replace(' ', '', $names['given']);
             }
         }
 
@@ -502,5 +532,11 @@ class Name implements Renderable, Modifiable, Contextualize
         }
 
         return '';
+    }
+
+    private function backup()
+    {
+        $backup         =   get_object_vars($this);
+        $this->backup   =   $backup;
     }
 }
