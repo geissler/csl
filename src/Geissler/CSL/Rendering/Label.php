@@ -102,9 +102,11 @@ class Label implements Groupable
         if ($this->variable == 'locator') {
             // Must be accompanied in the input data by a label indicating the locator type, which determines which
             // term is rendered by cs:label when the "locator" variable is selected
-            $variable   =   'page';
-            if (Container::getCitationItem()->get('label') !== null) {
+            if (is_object(Container::getCitationItem()) == true
+                && Container::getCitationItem()->get('label') !== null) {
                 $variable   =   Container::getCitationItem()->get('label');
+            } else {
+                return '';
             }
         }
 

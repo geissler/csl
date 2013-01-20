@@ -20,7 +20,7 @@ class Day implements Renderable, Modifiable
     /**
      * Parses the Day configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $day
      */
     public function __construct(\SimpleXMLElement $day)
     {
@@ -29,7 +29,7 @@ class Day implements Renderable, Modifiable
     }
 
     /**
-     * Modifys the actual day configuration.
+     * Modifies the actual day configuration.
      *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Date\Day

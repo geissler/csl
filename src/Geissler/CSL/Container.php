@@ -125,7 +125,8 @@ class Container
      */
     public static function getCitation()
     {
-        if (isset(self::$citation) == true) {
+        if (isset(self::$citation) == true
+            && self::$citation !== null) {
             return self::$citation;
         }
 
@@ -145,11 +146,21 @@ class Container
      */
     public static function getBibliography()
     {
-        if (isset(self::$bibliography) == true) {
+        if (self::hasBibliography() == true) {
             return self::$bibliography;
         }
 
         throw new \ErrorException('No bibliography defined!');
+    }
+
+    public static function hasBibliography()
+    {
+        if (isset(self::$bibliography) == true
+            && self::$bibliography !== null) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -204,7 +215,8 @@ class Container
      */
     public static function getCitationItem()
     {
-        if (isset(self::$citationItem) == true) {
+        if (isset(self::$citationItem) == true
+            && self::$citationItem !== null) {
             return self::$citationItem;
         }
 
@@ -247,5 +259,9 @@ class Container
         self::$citationItem = false;
         self::$context = new Context();
         self::$rendered = new Rendered();
+        self::setLocale(Factory::locale());
+        self::$locale->readFile();
+        self::$bibliography = null;
+        self::$citation = null;
     }
 }

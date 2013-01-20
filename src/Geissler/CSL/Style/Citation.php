@@ -111,8 +111,16 @@ class Citation implements Renderable
             $this->sort->sort('citation');
         }
 
-        // layout
+        // render citation
         $result =   $this->layout->render($data);
+
+        // sort bibliography and re-render citations
+        if (Container::hasBibliography() == true
+            && Container::getBibliography()->sort() == true) {
+            Container::getRendered()->clear();
+            $result =   $this->layout->render($data);
+        }
+
         if (Container::getCitationItem() !== false) {
             // apply additional citation formatting options
             Container::getCitationItem()->moveToFirst();
@@ -127,7 +135,7 @@ class Citation implements Renderable
                         $prefix =   '>>';
                     }
 
-                    $citation[] =   $prefix . '[' . $i . '] ' . Container::getRendered()->replace($result[$i]);
+                    $citation[] =   $prefix . '[' . $i . '] ' . $result[$i];
                 }
 
                 $return =   implode("\n", $citation);
@@ -144,11 +152,12 @@ class Citation implements Renderable
 
     private function replaceDisambiguation($result)
     {
+        /*
         $length =   count($result);
         for ($i = 0; $i < $length; $i++) {
             $result[$i] =   Container::getRendered()->replace($result[$i]);
         }
-
+        */
         return implode("\n", $result);
     }
 }

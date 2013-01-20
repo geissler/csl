@@ -134,10 +134,14 @@ class Names implements Groupable, Modifiable
         $compare    =   array();
 
         foreach ($this->variables as $variable) {
-            $content    =   $this->name->render(Container::getData()->getVariable($variable));
+            $names      =   Container::getData()->getVariable($variable);
+            $content    =   $this->name->render($names);
 
-            if (isset($this->etAl) == true) {
-                $content    =   $this->etAl->render($content);
+            // et-al
+            if (isset($this->etAl) == true
+                && Container::getContext()->getValue('etAlMin', Container::getContext()->getName()) !== null
+                && Container::getContext()->getValue('etAlMin', Container::getContext()->getName()) <= count($names)) {
+                $content    .=   $this->etAl->render($content);
             }
 
             $compare[$variable] =   $content;

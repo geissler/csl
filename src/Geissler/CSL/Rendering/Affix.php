@@ -30,7 +30,7 @@ class Affix implements Renderable, Modifiable
     }
 
     /**
-     * Modifys the actual affix configuration.
+     * Modifies the actual affix configuration.
      *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Rendering\Affix
@@ -56,7 +56,9 @@ class Affix implements Renderable, Modifiable
      */
     public function render($data)
     {
-        if ($data !== '') {
+        if ($data !== ''
+            && ($this->prefix !== ''
+                || $this->suffix !== '')) {
             $data   =   $this->prefix . $data . $this->suffix;
 
             // remove duplicated pre- and suffixes

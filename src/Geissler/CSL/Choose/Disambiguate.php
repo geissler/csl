@@ -14,13 +14,20 @@ use Geissler\CSL\Container;
 class Disambiguate implements Chooseable
 {
     /**
+     * Activate choose disambiguation usage.
+     */
+    public function __construct()
+    {
+        Container::getContext()->activateChooseDisambiguation();
+    }
+
+    /**
      * Validates the variable if the rendering context is disambiguation.
      *
      * @return boolean
      */
     public function validate()
     {
-        Container::getContext()->setUseChooseDisambiguate(true);
-        return Container::getContext()->in('disambiguation');
+        return Container::getContext()->getChooseDisambiguateValue();
     }
 }

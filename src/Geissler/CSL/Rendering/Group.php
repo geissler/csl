@@ -104,6 +104,30 @@ class Group implements Groupable, Parental
     }
 
     /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return boolean
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof $class) == true
+                && ($child instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
+                $child->modify($xml);
+                return true;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+                if ($child->modifyChildElement($class, $xml) == true) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the element or an child element is accessing the variable with the given name.
      *
      * @param string $name
@@ -138,19 +162,7 @@ class Group implements Groupable, Parental
             return '';
         }
 
-        $result =   array();
-        foreach ($this->children as $element) {
-            $rendered   =   $element->render('');
-            if ($rendered !== '') {
-                $result[] =   $rendered;
-            }
-        }
-
-        $return =   implode($this->delimiter, $result);
-        $return =   preg_replace('/[' . $this->delimiter . '][' . $this->delimiter . ']+/', $this->delimiter, $return);
-        $return =   $this->display->render($return);
-        $return =   $this->formatting->render($return);
-        return $this->affix->render($return);
+        return $this->renderGroup();
     }
 
     /**
@@ -161,6 +173,10 @@ class Group implements Groupable, Parental
      */
     public function hasAccessEmptyVariable()
     {
+        if ($this->renderGroup() !== '') {
+            return false;
+        }
+
         $variables  =   0;
         foreach ($this->children as $element) {
             if ($element->hasAccessEmptyVariable() === false) {
@@ -175,5 +191,29 @@ class Group implements Groupable, Parental
         }
 
         return null;
+    }
+
+    /**
+     * Render all child elements of the group.
+     */
+    private function renderGroup()
+    {
+        $result =   array();
+        foreach ($this->children as $element) {
+            $rendered   =   $element->render('');
+            if ($rendered !== '') {
+                $result[] =   $rendered;
+            }
+        }
+
+        $return =   implode($this->delimiter, $result);
+        $return =   preg_replace(
+            '/[' . preg_quote($this->delimiter) . '][' . preg_quote($this->delimiter) . ']+/',
+            $this->delimiter,
+            $return
+        );
+        $return =   $this->display->render($return);
+        $return =   $this->formatting->render($return);
+        return $this->affix->render($return);
     }
 }

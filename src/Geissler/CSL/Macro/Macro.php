@@ -52,6 +52,30 @@ class Macro implements Renderable, Groupable, Parental
     }
 
     /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return boolean
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof $class) == true
+                && ($child instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
+                $child->modify($xml);
+                return true;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+                if ($child->modifyChildElement($class, $xml) == true) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the element or an child element is accessing the variable with the given name.
      *
      * @param string $name

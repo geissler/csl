@@ -151,12 +151,52 @@ abstract class CitationAbstract
     }
 
     /**
+     * Sort citation items if there is only one entry per cite or sort all groups by new order.
+     *
+     * @param array $order
+     * @return bool
+     */
+    public function sort(array $order)
+    {
+        $this->moveToFirst();
+
+        if ($this->getGroupLength() == 1) {
+            $newOrder   =   array();
+            foreach ($order as $id) {
+                $this->moveToFirst();
+                do {
+                    if ($id == $this->get('id')) {
+                        $newOrder[]   = $this->data[$this->position];
+                        break;
+                    }
+                } while ($this->next() == true);
+            }
+
+            if (count($this->data) == count($newOrder)) {
+                $this->data =   $newOrder;
+                $this->moveToFirst();
+                return true;
+            }
+
+            return false;
+        } else {
+            // sort groups
+            do {
+                $this->sortGroup($order, false);
+            } while ($this->next() == true);
+        }
+
+        return false;
+    }
+
+    /**
      * Stores the new order of the citation-items.
      *
-     * @param array $group
-     * @return Geissler\CSL\Data\CitationAbstract
+     * @param array $group new order
+     * @param bool $byKeys sort by the values of the keys or the actual values of the group-array
+     * @return CitationAbstract
      */
-    abstract public function sortGroup(array $group);
+    abstract public function sortGroup(array $group, $byKeys = true);
 
     /**
      * Calculate the length of the actual citations items.

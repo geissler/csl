@@ -18,6 +18,15 @@ interface Parental
     public function getChildElement($class);
 
     /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return object
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml);
+
+    /**
      * Tests if the element or an child element is accessing the variable with the given name.
      *
      * @param string $name

@@ -53,6 +53,7 @@ class Name implements Renderable, Modifiable, Contextualize
     private $nameParts;
     /** @var array */
     private $literals;
+    /** @var array */
     private $backup;
 
     /**
@@ -188,7 +189,8 @@ class Name implements Renderable, Modifiable, Contextualize
     {
         // restore configuration parsed from csl file
         foreach ($this->backup as $property => $value) {
-            if ($value !== null) {
+            if ($value !== null
+                && $property !== 'backup') {
                 $this->$property    =   $value;
             }
         }

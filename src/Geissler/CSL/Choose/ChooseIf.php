@@ -108,13 +108,17 @@ class ChooseIf implements Renderable, Groupable, Chooseable, Parental
     }
 
     /**
-     * Tests if the variable is numeric.
+     * Tests if the variable is validates.
      *
      * @return boolean
      */
     public function validate()
     {
-        return $this->validation->validate();
+        if (isset($this->validation) == true) {
+            return $this->validation->validate();
+        }
+
+        return false;
     }
 
     /**
@@ -133,6 +137,30 @@ class ChooseIf implements Renderable, Groupable, Chooseable, Parental
 
                 if ($subChild !== false) {
                     return $subChild;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return boolean
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof $class) == true
+                && ($child instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
+                $child->modify($xml);
+                return true;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+                if ($child->modifyChildElement($class, $xml) == true) {
+                    return true;
                 }
             }
         }

@@ -11,42 +11,44 @@ use Geissler\CSL\Container;
  */
 class Rendered
 {
-    /** @var array **/
-    private $citation;
-    /** @var array */
-    private $bibliography;
-    /** @var array */
-    private $disambiguation;
-
     /** @var array */
     private $rendered;
     /** @var array */
     private $replace;
+    /** @var bool */
     private $useDifferentCitations;
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
-        $this->citation         =   array();
-        $this->bibliography     =   array();
-        $this->disambiguation   =   array();
-
         $this->rendered                 =   array();
         $this->replace                  =   array();
         $this->useDifferentCitations    =   false;
     }
 
+    /**
+     * Set if the first cite is different from the following.
+     *
+     * @param boolean $useDifferentCitations
+     * @return Rendered
+     */
     public function setUseDifferentCitations($useDifferentCitations)
     {
         $this->useDifferentCitations = $useDifferentCitations;
         return $this;
     }
 
+    /**
+     * Retrieve the configuration of the different citation usage.
+     *
+     * @return bool
+     */
     public function getUseDifferentCitations()
     {
         return $this->useDifferentCitations;
     }
-
-
 
     /**
      * Store a rendered citation under its id.
@@ -81,6 +83,7 @@ class Rendered
             && $this->rendered[$id]['firstCitation'] == $valueToUpdate) {
             return $this->store($id, $value, 'firstCitation');
         } elseif ($force == true
+            || isset($this->rendered[$id]['citation']) == false
             || $this->rendered[$id]['citation'] == $valueToUpdate) {
             return $this->store($id, $value, 'citation');
         }
@@ -89,53 +92,11 @@ class Rendered
     }
 
     /**
-     * Store a rendered citation under its id.
+     * Retrieve all rendered values for the id.
      *
-     * @param string $id
-     * @param string $value
-     * @return \Geissler\CSL\Data\Rendered
+     * @param integer $id
+     * @return array|bool
      */
-    public function addDisambiguation($id, $value)
-    {
-        return $this->store($id, $value, 'disambiguation');
-    }
-
-    /**
-     * Store a rendered citation under its id.
-     *
-     * @param string $id
-     * @param string $value
-     * @return \Geissler\CSL\Data\Rendered
-     */
-    public function addSuffix($id, $value)
-    {
-        return $this->store($id, $value, 'suffix');
-    }
-
-    /**
-     * Store a rendered citation under its id.
-     *
-     * @param string $id
-     * @param string $value
-     * @return \Geissler\CSL\Data\Rendered
-     */
-    public function addAmbiguous($id, $value)
-    {
-        return $this->store($id, $value, 'ambiguous');
-    }
-
-    /**
-     * Store a rendered citation under its id.
-     *
-     * @param string $id
-     * @param string $value
-     * @return \Geissler\CSL\Data\Rendered
-     */
-    public function addBibliography($id, $value)
-    {
-        return $this->store($id, $value, 'bibliography');
-    }
-
     public function getById($id)
     {
         if (isset($this->rendered[$id]) == true) {
@@ -145,6 +106,12 @@ class Rendered
         return false;
     }
 
+    /**
+     * Retrieve the actual citation, first if first access and first citation is used.
+     *
+     * @param integer $id
+     * @return string|bool
+     */
     public function getCitationById($id)
     {
         $return =   $this->getById($id);
@@ -153,14 +120,20 @@ class Rendered
                 && $return['firstCitation'] !== '') {
                 $this->store($id, '', 'firstCitation');
                 return $return['firstCitation'];
+            } elseif (isset($return['citation']) == true) {
+                return $return['citation'];
             }
-
-            return $return['citation'];
         }
 
         return false;
     }
 
+    /**
+     * Retrieve all rendered entries of a given type (citation, firstCitation etc.)
+     *
+     * @param string $type
+     * @return array
+     */
     public function getAllByType($type)
     {
         $return =   array();
@@ -174,129 +147,23 @@ class Rendered
         return $return;
     }
 
-    public function getByValue($value, $type)
-    {
-        foreach ($this->rendered as $entry) {
-            if (isset($entry[$type]) == true
-                && $entry[$type] == $value) {
-                return $entry;
-            }
-        }
-
-        return false;
-    }
-
-    public function getOtherByValue($value, $type, $selfId)
-    {
-        foreach ($this->rendered as $entry) {
-            if (isset($entry[$type]) == true
-                && $entry[$type] == $value
-                && $entry['id'] !== $selfId) {
-                return $entry;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-        public function isAmbiguous($value, $selfId)
-        {
-            foreach ($this->rendered as $id => $entry) {
-                if (((isset($entry['ambiguous']) == true
-                        && $entry['ambiguous'] == $value)
-                    || (isset($entry['disambiguation']) == true
-                        && $entry['disambiguation'] == $value))
-                    && $selfId != $id) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    */
-
     /**
-     * Finds the last used suffix for an ambiguous cite.
+     * Remove all rendered values.
      *
-     * @param string $value
-     * @return string
+     * @return Rendered
      */
-    public function findLastSuffix($value)
+    public function clear()
     {
-        $suffix =   'a';
-
-        foreach ($this->rendered as $entry) {
-            if (isset($entry['ambiguous']) == true
-                && $entry['ambiguous'] == $value
-                && isset($entry['suffix']) == true
-                && strcmp($entry['suffix'], $suffix) > 0) {
-                $suffix =   $entry['suffix'];
-            }
-        }
-
-        return $suffix;
-    }
-
-    /**
-     * Add a rendered citation to the replace list to replace previously rendered citations.
-     *
-     * @param string $target
-     * @param string $value
-     * @return \Geissler\CSL\Data\Rendered
-     */
-    public function addReplace($target, $value)
-    {
-        $this->replace[] = array(
-            'target'    =>  $target,
-            'replace'   =>  $value
-        );
+        $this->rendered =   array();
         return $this;
     }
 
     /**
-     * Replace all previously rendered citations with the one containing a suffix.
+     * Store the rendered value.
      *
-     * @param string|array $value
-     * @return string|array
-     */
-    public function replace($value)
-    {
-        if (is_array($value) == true) {
-            $length =   count($value);
-
-            for ($i = 0; $i < $length; $i++) {
-                $value[$i]  =   $this->replaceValue($value[$i]);
-            }
-
-            return $value;
-        } else {
-            return $this->replaceValue($value);
-        }
-
-    }
-
-    /**
-     * @param $value
-     * @return mixed
-     */
-    private function replaceValue($value)
-    {
-        foreach ($this->replace as $replace) {
-            $value  =   preg_replace(
-                '/([\b|;|\.|,|\]|\[|\(|\)]){0,1}' . preg_quote($replace['target']) . '([\b|;|\.|,|\]|\[|\(|\)])/',
-                '$1' . $replace['replace'] . '$2',
-                $value
-            );
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param $id
-     * @param $value
-     * @param $type
+     * @param integer $id
+     * @param string $value
+     * @param string $type
      * @return Rendered
      */
     private function store($id, $value, $type)

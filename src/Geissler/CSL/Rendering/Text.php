@@ -91,6 +91,29 @@ class Text implements Groupable, Parental
     }
 
     /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return boolean
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml)
+    {
+
+        if (($this->render instanceof $class) == true
+            && ($this->render instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
+            $this->render->modify($xml);
+            return true;
+        } elseif (($this->render instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+            if ($this->render->modifyChildElement($class, $xml) == true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the element or an child element is accessing the variable with the given name.
      *
      * @param string $name

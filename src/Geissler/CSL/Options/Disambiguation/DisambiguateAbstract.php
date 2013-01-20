@@ -179,25 +179,4 @@ abstract class DisambiguateAbstract implements Disambiguate
 
         return $values;
     }
-
-    /**
-     * Retrieves the ambiguous or disambiguate values.
-     *
-     * @param array $data
-     * @param bool $comparison true = ambiguous entries, false = disambiguate values
-     * @return array
-     */
-    protected function getEntries(array $data, $comparison = true)
-    {
-        $ambiguous  =   array_diff_assoc($data, array_unique($data));
-        $return     =   array();
-
-        foreach ($data as $id => $value) {
-            if (in_array($value, $ambiguous) == $comparison) {
-                $return[$id]    =   $value;
-            }
-        }
-
-        return $return;
-    }
 }

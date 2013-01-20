@@ -23,7 +23,8 @@ class Context
     private $disambiguation;
     /** @var bool */
     private $ignoreEtAlSubsequent;
-    private $useChooseDisambiguate;
+    private $chooseDisambiguation;
+    private $chooseDisambiguateValue;
 
     /**
      * Init's the arrays.
@@ -36,7 +37,8 @@ class Context
         $this->context                  =   array();
         $this->disambiguation           =   array();
         $this->ignoreEtAlSubsequent     =   false;
-        $this->useChooseDisambiguate    =   false;
+        $this->chooseDisambiguation     =   false;
+        $this->chooseDisambiguateValue  =   false;
     }
 
     /**
@@ -74,25 +76,45 @@ class Context
     }
 
     /**
-     * De-/Activate a choose disambiguate.
+     * Activate the usage of choose disambiguate.
      *
-     * @param $useChooseDisambiguate
      * @return Context
      */
-    public function setUseChooseDisambiguate($useChooseDisambiguate)
+    public function activateChooseDisambiguation()
     {
-        $this->useChooseDisambiguate = $useChooseDisambiguate;
+        $this->chooseDisambiguation =   true;
         return $this;
     }
 
     /**
-     * Retrieve the choose disambiguate value.
+     * Check if choose disambiguate is used.
+     * @return bool
+     */
+    public function isChooseDisambiguationActive()
+    {
+        return $this->chooseDisambiguation;
+    }
+
+    /**
+     * Set the result of a choose disambiguate.
+     *
+     * @param $useChooseDisambiguate
+     * @return Context
+     */
+    public function setChooseDisambiguateValue($useChooseDisambiguate)
+    {
+        $this->chooseDisambiguateValue = $useChooseDisambiguate;
+        return $this;
+    }
+
+    /**
+     * Retrieve the choose disambiguate result.
      *
      * @return bool
      */
-    public function getUseChooseDisambiguate()
+    public function getChooseDisambiguateValue()
     {
-        return $this->useChooseDisambiguate;
+        return $this->chooseDisambiguateValue;
     }
 
     /**
@@ -332,6 +354,17 @@ class Context
             unset($this->disambiguation[$class]);
         }
 
+        return $this;
+    }
+
+    /**
+     * Remove all disambiguation options.
+     *
+     * @return Context
+     */
+    public function clearDisambiguationOptions()
+    {
+        $this->disambiguation   =   array();
         return $this;
     }
 }

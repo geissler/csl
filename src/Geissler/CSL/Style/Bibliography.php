@@ -76,22 +76,52 @@ class Bibliography implements Renderable
         $options->set('bibliography', $xml);
     }
 
+    /**
+     * Sort the input data by the rules for bibliographies.
+     *
+     * @return bool|\Geissler\CSL\Sorting\Sort
+     */
+    public function sort()
+    {
+        if (isset($this->sort) == true) {
+            $name   =   'bibliography';
+            if (Container::getContext()->getName() == 'citation') {
+                $name   =   'citation';
+            }
+
+            Container::getContext()->setName('bibliography');
+            Container::getContext()->enter('bibliography');
+            $return =   $this->sort->sort('bibliography');
+            Container::getContext()->leave();
+            Container::getContext()->setName($name);
+
+            return $return;
+        }
+
+        return false;
+    }
+
+    /**
+     * Render a bibliography.
+     *
+     * @param string $data
+     * @return string
+     */
     public function render($data)
     {
         // render citation to create year-suffix if necessary
-        if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true
-            && (Container::getCitation()->getLayout()->isAccessingVariable('year-suffix') == true
-                || $this->layout->isAccessingVariable('year-suffix') == true)) {
+        if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true) {
             Container::getContext()->setName('citation');
             Container::getData()->moveToFirst();
             Container::getCitation()->render($data);
             Container::getContext()->setName('bibliography');
         }
 
+        // sort
+        $this->sort();
+
+        // render
         Container::getContext()->enter('bibliography');
-        if (isset($this->sort) == true) {
-            $this->sort->sort('bibliography');
-        }
         $result =   $this->layout->render($data);
         Container::getContext()->leave();
 
@@ -104,6 +134,12 @@ class Bibliography implements Renderable
         return '';
     }
 
+    /**
+     * Add additional options for displaying a bibliography.
+     *
+     * @param array $result
+     * @return array
+     */
     private function addOptions($result)
     {
         $length =   count($result);

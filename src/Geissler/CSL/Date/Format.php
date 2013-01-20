@@ -57,7 +57,7 @@ class Format
     }
 
     /**
-     * Access the well formated date.
+     * Access the well formatted date.
      *
      * @return array
      */

@@ -39,44 +39,47 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
      */
     private function addYearSuffix()
     {
-        if (array_values($this->tmpAmbiguous) > array_unique(array_values($this->tmpAmbiguous))) {
-            $layout                 =   Container::getContext()->get('layout', 'layout');
-            $useYearSuffixVariable  =   $layout->isAccessingVariable('year-suffix');
-            $suffix =   'a';
+        // test if year is rendered, if not try if year is rendered through choose disambiguate
+        $layout =   Container::getContext()->get('layout', 'layout');
+        if (preg_match('/([0-9]{2,4})/', current($this->tmpAmbiguous)) == 0
+            && Container::getContext()->isChooseDisambiguationActive() == true) {
+            Container::getContext()->setChooseDisambiguateValue(true);
 
             foreach (array_keys($this->tmpAmbiguous) as $id) {
-                $addYearSuffix = true;
+                $reRendered =   $layout->renderById($id, '');
 
-                // test if year is rendered
-                if (preg_match('/([0-9]{2,4})/', $this->tmpAmbiguous[$id]) == 0
-                    && Container::getContext()->getUseChooseDisambiguate() == true) {
-                    $reRendered =   $layout->renderById($id, '');
-
-                    if (isset($this->tmpAmbiguous[$id]) == true
-                        && $reRendered !== $this->tmpAmbiguous[$id]) {
-                        $this->tmpDisambiguate[$id]    =   $reRendered;
-                        unset($this->tmpAmbiguous[$id]);
-                        $addYearSuffix  =   false;
-                    }
+                if (isset($this->tmpAmbiguous[$id]) == true
+                    && $reRendered !== $this->tmpAmbiguous[$id]) {
+                    $this->tmpAmbiguous[$id]    =   $reRendered;
                 }
+            }
+        }
 
-                if ($addYearSuffix == true) {
+        if (array_values($this->tmpAmbiguous) > array_unique(array_values($this->tmpAmbiguous))) {
+            $useYearSuffix  =   $layout->isAccessingVariable('year-suffix');
+            $suffix         =   'a';
+
+            foreach (array_keys($this->tmpAmbiguous) as $id) {
+                Container::getData()->moveToId($id);
+                $actualSuffix   =   Container::getData()->getVariable('year-suffix');
+
+                if ($actualSuffix === null) {
                     // store year-suffix variable
-                    Container::getData()->moveToId($id);
                     Container::getData()->setVariable('year-suffix', $suffix);
-
-                    if ($useYearSuffixVariable == true) {
-                        $this->tmpDisambiguate[$id]    =   $layout->renderById($id, '');
-                        unset($this->tmpAmbiguous[$id]);
-                    } else {
-                        $withYearSuffix =   preg_replace('/([0-9]{2,4})/', '$1' . $suffix, $this->tmpAmbiguous[$id]);
-                        $withYearSuffix =   str_replace('&#38' . $suffix . ';', '&#38;', $withYearSuffix);
-                        $this->tmpDisambiguate[$id]    =   $withYearSuffix;
-                        unset($this->tmpAmbiguous[$id]);
-                    }
-
-                    $suffix++;
+                    $actualSuffix   =   $suffix;
                 }
+
+                if ($useYearSuffix == true) {
+                    $this->tmpDisambiguate[$id]    =   $layout->renderById($id, '');
+                    unset($this->tmpAmbiguous[$id]);
+                } else {
+                    $withYearSuffix =   preg_replace('/([0-9]{2,4})/', '$1' . $actualSuffix, $this->tmpAmbiguous[$id]);
+                    $withYearSuffix =   str_replace('&#38' . $actualSuffix . ';', '&#38;', $withYearSuffix);
+                    $this->tmpDisambiguate[$id]    =   $withYearSuffix;
+                    unset($this->tmpAmbiguous[$id]);
+                }
+
+                $suffix++;
             }
         }
     }

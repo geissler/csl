@@ -59,13 +59,19 @@ class Citations extends CitationAbstract
     /**
      * Changes the order of the actual group.
      *
-     * @param array $group
+     * @param array $group new order
+     * @param bool $byKeys sort by the values of the keys or the actual values of the group-array
      * @return Citations
      */
-    public function sortGroup(array $group)
+    public function sortGroup(array $group, $byKeys = true)
     {
         $newOrder   =   array();
-        foreach (array_keys($group) as $id) {
+        if ($byKeys == true) {
+            $order  =   array_keys($group);
+        } else {
+            $order  =   $group;
+        }
+        foreach ($order as $id) {
             for ($i = 0; $i < $this->getGroupLength(); $i++) {
                 if ($id == $this->data[$this->position][0]['citationItems'][$i]['id']) {
                     $newOrder[] =   $this->data[$this->position][0]['citationItems'][$i];

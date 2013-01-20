@@ -58,18 +58,24 @@ class Sort
     public function sort($context)
     {
         if (count($this->keys) == 0) {
-            return $this;
+            return false;
         }
 
-        Container::getContext()->enter('sort', array('sort' => $this->keys[0]['sort']));
-        if ($context == 'citation') {
-            $this->citation();
-        } else {
-            $this->bibliography();
-        }
-        Container::getContext()->leave();
+        try {
+            Container::getContext()->enter('sort', array('sort' => $this->keys[0]['sort']));
+            if ($context == 'citation') {
+                $this->citation();
+            } else {
+                $this->bibliography();
+            }
+            Container::getContext()->leave();
 
-        return $this;
+            return true;
+        } catch (\ErrorException $error) {
+            // ignore exceptions, because they are mainly thrown by incomplete tests
+        }
+
+        return false;
     }
 
     /**
@@ -78,7 +84,24 @@ class Sort
     private function citation()
     {
         if (Container::getCitationItem() !== false) {
+            $length =   count($this->keys);
+
             do {
+                $sort   =   array();
+                for ($i = 0; $i < $length; $i++) {
+                    $keys   =   $this->generateCitationSort($this->keys[$i]['generate'], $this->keys[$i]['sort']);
+
+                    $j = 0;
+                    foreach ($keys as $k => $value) {
+                        if (isset($sort[$j]) == false) {
+                            $sort[$j]   =   array('id' => $k);
+                        }
+                        $sort[$j][$i]   =   array('value' => $value, 'sort' => $this->keys[$i]['sort']);
+                        $j++;
+                    }
+                }
+
+                /*
                 $sort   =   $this->generateCitationSort($this->keys[0]['generate'], $this->keys[0]['sort']);
                 $iteration  =   0;
 
@@ -105,8 +128,9 @@ class Sort
 
                     array_multisort($sort, $firstDirection, $nextSort, $nextDirection, $sort);
                 }
+                */
 
-                Container::getCitationItem()->sortGroup($sort);
+                Container::getCitationItem()->sortGroup($this->multiSort($sort));
             } while (Container::getCitationItem()->next() == true);
         } else {
             $this->bibliography();
@@ -145,57 +169,63 @@ class Sort
      */
     private function bibliography()
     {
-        $sort       =   $this->generateBibliographySort($this->keys[0]['generate'], $this->keys[0]['sort']);
-        $iteration  =   0;
+        $order  =   $this->multiSort($this->generateBibliographySort());
+        Container::getData()->sort($order);
 
-        while ($iteration + 1 < count($this->keys)) {
-            if ($this->keys[$iteration]['sort'] == 'ascending') {
-                $firstDirection =   SORT_ASC;
-            } else {
-                $firstDirection =   SORT_DESC;
-            }
-
-            $iteration++;
-            $nextSort    =   $this->generateBibliographySort(
-                $this->keys[$iteration]['generate'],
-                $this->keys[$iteration]['sort']
-            );
-
-            if ($this->keys[$iteration]['sort'] == 'ascending') {
-                $nextDirection  =   SORT_ASC;
-            } else {
-                $nextDirection =   SORT_DESC;
-            }
-
-            array_multisort($sort, $firstDirection, $nextSort, $nextDirection, $sort);
+        if (Container::getCitationItem() !== false) {
+            Container::getCitationItem()->sort($order);
         }
-
-        Container::getData()->sort(array_keys($sort));
     }
 
     /**
      * Generate the actual sorting data based on the bibliography data with the given sorting key.
      *
-     * @param \Geissler\CSL\Interfaces\Sortable $key
-     * @param string $direction
      * @return array
      */
-    private function generateBibliographySort(Sortable $key, $direction)
+    private function generateBibliographySort()
     {
-        Container::getData()->moveToFirst();
         $sort   =   array();
+        $length =   count($this->keys);
 
-        do {
-            $sort[Container::getData()->getVariable('id')]  =   $key->render(Container::getData()->get());
-        } while (Container::getData()->next() == true);
+        for ($i = 0; $i < $length; $i++) {
+            Container::getData()->moveToFirst();
 
-        if ($direction == 'ascending') {
-            asort($sort);
+            do {
+                $id =   Container::getData()->getVariable('id');
+                if (isset($sort[$id]) == false) {
+                    $sort[$id]  =   array('id' => $id);
+                }
 
-        } else {
-            arsort($sort);
+                $sort[$id][$i]  =   array(
+                    'value' =>  $this->keys[$i]['generate']->render(Container::getData()->get()),
+                    'sort'  =>  $this->keys[$i]['sort']
+                );
+
+            } while (Container::getData()->next() == true);
         }
 
         return $sort;
+    }
+
+    /**
+     * Sort the values by all keys, until all values are sorted or no more sorting key ist left.
+     *
+     * @param array $sort
+     * @return array
+     */
+    private function multiSort($sort)
+    {
+        // sort
+        $sort   =   array_values($sort);
+        mergesort($sort, 'multiSort');
+
+        // get keys in order
+        $keys   =   array();
+        $length =   count($sort);
+        for ($i = 0; $i < $length; $i++) {
+            $keys[] =   $sort[$i]['id'];
+        }
+
+        return $keys;
     }
 }

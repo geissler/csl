@@ -71,6 +71,18 @@ class Call implements Renderable, Groupable, Parental
     }
 
     /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return boolean
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml)
+    {
+        return Container::getMacro($this->name)->modifyChildElement($class, $xml);
+    }
+
+    /**
      * Tests if the element or an child element is accessing the variable with the given name.
      *
      * @param string $name

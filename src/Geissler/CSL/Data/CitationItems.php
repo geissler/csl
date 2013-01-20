@@ -11,6 +11,14 @@ use Geissler\CSL\Data\CitationAbstract;
  */
 class CitationItems extends CitationAbstract
 {
+    /**
+     * Retrieve a variable at a position.
+     *
+     * @param string $variable
+     * @param int $position
+     * @param bool $groupPosition
+     * @return int|null|string
+     */
     public function getAtPosition($variable, $position, $groupPosition = false)
     {
         if ($groupPosition == false) {
@@ -26,11 +34,23 @@ class CitationItems extends CitationAbstract
         return null;
     }
 
-    public function sortGroup(array $group)
+    /**
+     * Order the values in the actual group by the given order.
+     *
+     * @param array $group
+     * @param bool $byKeys
+     * @return CitationItems
+     */
+    public function sortGroup(array $group, $byKeys = true)
     {
         $newOrder   =   array();
+        if ($byKeys == true) {
+            $order  =   array_keys($group);
+        } else {
+            $order  =   $group;
+        }
 
-        foreach (array_keys($group) as $id) {
+        foreach ($order as $id) {
             $newOrder[] =   array('id' => $id);
         }
 
@@ -39,6 +59,10 @@ class CitationItems extends CitationAbstract
         return $this;
     }
 
+    /**
+     * Retrieve the actual group length.
+     * @return int
+     */
     protected function getGroupLength()
     {
         return count($this->data[$this->position]);

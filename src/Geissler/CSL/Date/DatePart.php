@@ -23,7 +23,7 @@ class DatePart implements Renderable, Modifiable
     /** @var Affix **/
     private $affix;
     /** @var Formatting **/
-    private $formating;
+    private $formatting;
     /** @var TextCase **/
     private $textCase;
     /** @var string **/
@@ -40,7 +40,7 @@ class DatePart implements Renderable, Modifiable
         $this->name         =   '';
         $this->delimiter    =   '–';
 
-        $this->formating    =   new Formatting($date);
+        $this->formatting   =   new Formatting($date);
         $this->textCase     =   new TextCase($date);
         $this->affix        =   new Affix($date);
 
@@ -68,14 +68,14 @@ class DatePart implements Renderable, Modifiable
     }
 
     /**
-     * Modifys the configuration.
+     * Modifies the configuration.
      *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Date\DatePart
      */
     public function modify(\SimpleXMLElement $xml)
     {
-        $this->formating->modify($xml);
+        $this->formatting->modify($xml);
         $this->textCase->modify($xml);
         $this->affix->modify($xml);
 
@@ -117,7 +117,7 @@ class DatePart implements Renderable, Modifiable
         }
 
         $value   =   $this->render->render($data[$this->name]);
-        $value   =   $this->formating->render($value);
+        $value   =   $this->formatting->render($value);
         $value   =   $this->textCase->render($value);
         return $this->affix->render($value);
     }

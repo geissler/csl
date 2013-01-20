@@ -3,6 +3,7 @@ namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
+use Geissler\CSL\Date\Format;
 
 /**
  * Renders the text contents of a variable.
@@ -56,7 +57,6 @@ class Variable implements Groupable
     {
         if ($this->form !== '') {
             $return = Container::getData()->getVariable($this->name . '-' . $this->form);
-
             if ($return !== null) {
                 return $return;
             }
@@ -70,26 +70,71 @@ class Variable implements Groupable
             }
         }
 
-        $return =   Container::getData()->getVariable($this->name);
+        // special cases
+        switch ($this->name) {
+            case 'title-short':
+                $return = Container::getData()->getVariable('shortTitle');
+                if ($return !== null) {
+                    return $return;
+                }
+                break;
+            case 'title':
+                if ($this->form == 'short') {
+                    $return = Container::getData()->getVariable('shortTitle');
+                    if ($return !== null) {
+                        return $return;
+                    }
+                }
+                break;
+            case 'citation-label':
+                $return =   Container::getData()->getVariable($this->name);
+                if ($return !== null) {
+                    return $return;
+                }
 
-        if ($return !== null) {
-            return $return;
+                // first 4 letters from the first two author family names and last to year digits
+                $authors    =   Container::getData()->getVariable('author');
+                $format     =   new Format();
+
+                if (isset($authors[0]['family']) == true
+                    && $format->format('issued') == true) {
+                    $year   =   $format->getData();
+
+                    if (isset($year[0]['year']) == true) {
+                        switch (count($authors)) {
+                            case 1:
+                                $author =   substr($authors[0]['family'], 0, 4);
+                                break;
+                            case 2:
+                                $author =   substr($authors[0]['family'], 0, 2) . substr($authors[1]['family'], 0, 2);
+                                break;
+                            default:
+                                $author =   '';
+                                for ($i = 0; $i < 4; $i++) {
+                                    if (preg_match('/[A-Z]/', $authors[$i]['family'], $match) == 1) {
+                                        $author .=  $match[0];
+                                    }
+                                }
+                                break;
+                        }
+
+                        $length =   strlen($year[0]['year']);
+                        return  $author . substr($year[0]['year'], $length - 2, $length);
+                    }
+                }
+                break;
         }
 
-        // special case
-        if ($this->name == 'title-short') {
-            $return = Container::getData()->getVariable('shortTitle');
-
-            if ($return !== null) {
-                return $return;
-            }
+        $return =   Container::getData()->getVariable($this->name);
+        if ($return !== null) {
+            return $return;
         }
 
         // retrieve variables form citations
         if (Container::getContext()->getName() == 'citation'
             && Container::getCitationItem() !== false) {
-            $return =   Container::getCitationItem()->get($this->name);
 
+            $return =   Container::getCitationItem()->get($this->name);
             if ($return !== null) {
                 return $return;
             }

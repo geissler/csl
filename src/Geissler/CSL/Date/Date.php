@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Groupable;
+use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -16,14 +17,14 @@ use Geissler\CSL\Date\Format;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Date implements Groupable
+class Date implements Groupable, Modifiable
 {
     /** @var Affix **/
     private $affix;
     /** @var Display **/
     private $display;
     /** @var Formatting **/
-    private $formating;
+    private $formatting;
     /** @var TextCase **/
     private $textCase;
     /** @var string **/
@@ -34,6 +35,8 @@ class Date implements Groupable
     private $dateParts;
     /** @var array|string **/
     private $data;
+    /** @var bool */
+    private $addYearSuffix;
 
     /**
      * Parses the affix configuration.
@@ -42,43 +45,18 @@ class Date implements Groupable
      */
     public function __construct(\SimpleXMLElement $date)
     {
-        $this->variable     =   '';
-        $this->form         =   '';
-        $this->dateParts    =   array();
+        $this->variable         =   '';
+        $this->form             =   '';
+        $this->dateParts        =   array();
+        $this->addYearSuffix    =   false;
 
         $this->affix        =   new Affix($date);
         $this->display      =   new Display($date);
-        $this->formating    =   new Formatting($date);
+        $this->formatting   =   new Formatting($date);
         $this->textCase     =   new TextCase($date);
 
-        foreach ($date->attributes() as $name => $value) {
-            switch ($name) {
-                case 'variable':
-                    $this->variable   =   (string) $value;
-                    break;
-                case 'form':
-                    $this->form =   (string) $value;
-                    break;
-                case 'date-parts':
-                    if ($this->form !== '') {
-                        $dateParts      =   explode('-', (string) $value);
-                        $localeDates    =   Container::getLocale()->getDate($this->form);
-
-                        foreach ($localeDates as $localeDate) {
-                            if (in_array($localeDate['name'], $dateParts) == true) {
-                                $this->dateParts[]  =   array(
-                                            'name'      =>  $localeDate['name'],
-                                            'datepart'  =>  new DatePart(
-                                                new \SimpleXMLElement($localeDate['xml']),
-                                                array('form' => $this->form)
-                                            )
-                                    );
-                            }
-                        }
-                    }
-                    break;
-            }
-        }
+        // load config from xml
+        $this->modify($date);
 
         // load date-part configuration
         if ($this->form !== ''
@@ -104,6 +82,23 @@ class Date implements Groupable
             }
         }
 
+        // load standard date format
+        if (count($this->dateParts) == 0) {
+            $localeDates    =   Container::getLocale()->getDate($this->form);
+
+            if ($localeDates !== null) {
+                foreach ($localeDates as $localeDate) {
+                    $this->dateParts[]  =   array(
+                        'name'      =>  $localeDate['name'],
+                        'datepart'  =>  new DatePart(
+                            new \SimpleXMLElement($localeDate['xml']),
+                            array('form' => $this->form)
+                        )
+                    );
+                }
+            }
+        }
+
         // override locale date configurations with single date-part objects
         $additional =   array('form' => $this->form);
         $length     =   count($this->dateParts);
@@ -123,7 +118,7 @@ class Date implements Groupable
                                                     'name'      =>  $childName,
                                                     'datepart'  =>  new DatePart($child, $additional));
                     } else {
-                        // override standard configuration by modifing the existing date-part configuration
+                        // override standard configuration by modifying the existing date-part configuration
                         for ($i = 0; $i < $length; $i++) {
                             if ($this->dateParts[$i]['name'] == $childName) {
                                 $datePartObject =   $this->dateParts[$i]['datepart'];
@@ -133,6 +128,47 @@ class Date implements Groupable
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Modifies the configuration of the name by parsing a new \SimpleXMLElement.
+     *
+     * @param \SimpleXMLElement $xml
+     * @return \Geissler\CSL\Interfaces\Modifiable|\Geissler\CSL\Names\Name
+     */
+    public function modify(\SimpleXMLElement $xml)
+    {
+        foreach ($xml->attributes() as $name => $value) {
+            switch ($name) {
+                case 'variable':
+                    $this->variable   =   (string) $value;
+                    break;
+                case 'form':
+                    $this->form =   (string) $value;
+                    break;
+                case 'add-year-suffix':
+                    $this->addYearSuffix    =   ((string) $value == 'true' ? true : false);
+                    break;
+                case 'date-parts':
+                    if ($this->form !== '') {
+                        $dateParts      =   explode('-', (string) $value);
+                        $localeDates    =   Container::getLocale()->getDate($this->form);
+
+                        foreach ($localeDates as $localeDate) {
+                            if (in_array($localeDate['name'], $dateParts) == true) {
+                                $this->dateParts[]  =   array(
+                                    'name'      =>  $localeDate['name'],
+                                    'datepart'  =>  new DatePart(
+                                        new \SimpleXMLElement($localeDate['xml']),
+                                        array('form' => $this->form)
+                                    )
+                                );
+                            }
+                        }
+                    }
+                    break;
             }
         }
     }
@@ -203,9 +239,14 @@ class Date implements Groupable
             $value  =   $this->renderSeason();
         }
 
+        // add year-suffix for disambiguation
+        if ($this->addYearSuffix == true) {
+            $value  .=  Container::getData()->getVariable('year-suffix');
+        }
+
         $value =   $this->affix->render($value);
         $value =   $this->display->render($value);
-        $value =   $this->formating->render($value);
+        $value =   $this->formatting->render($value);
         return $this->textCase->render($value);
     }
 

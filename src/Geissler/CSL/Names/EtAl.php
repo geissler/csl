@@ -12,21 +12,20 @@ use Geissler\CSL\Rendering\Formatting;
  */
 class EtAl implements Renderable
 {
-    /** @var term **/
+    /** @var string **/
     private $term;
     /** @var Formatting **/
-    private $formating;
+    private $formatting;
 
     /**
      * Parses the EtAl configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->term =   'et-al';
-
-        $this->formating    =   new Formatting($xml);
+        $this->term         =   'et-al';
+        $this->formatting   =   new Formatting($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'term') {
@@ -43,6 +42,6 @@ class EtAl implements Renderable
      */
     public function render($data)
     {
-        return $this->formating->render($this->term);
+        return $this->formatting->render($this->term);
     }
 }

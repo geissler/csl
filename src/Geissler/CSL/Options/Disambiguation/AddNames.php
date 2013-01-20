@@ -3,6 +3,7 @@ namespace Geissler\CSL\Options\Disambiguation;
 
 use Geissler\CSL\Interfaces\Disambiguate;
 use Geissler\CSL\Options\Disambiguation\DisambiguateAbstract;
+use Geissler\CSL\Helper\ArrayData;
 use Geissler\CSL\Container;
 
 /**
@@ -29,13 +30,13 @@ class AddNames extends DisambiguateAbstract implements Disambiguate
         $this->tmpAmbiguous     =   $this->getAmbiguous();
         $this->tmpDisambiguate  =   array();
 
-        // init disambiguation
+        // set min et-al
         $this->etAl     =   Container::getContext()->getValue('etAlUseFirst', 'citation');
         if ($this->etAl == '') {
             $this->etAl =   0;
         }
 
-        $namesAdded             =   $this->addNames($this->tmpAmbiguous);
+        $namesAdded =   $this->addNames($this->tmpAmbiguous);
 
         // use same number of et-al-first in all citations
         if ($namesAdded['etAl'] > 0) {
@@ -50,57 +51,64 @@ class AddNames extends DisambiguateAbstract implements Disambiguate
             }
         }
 
-        if (count(array_unique(array_values($this->tmpAmbiguous))) > 1) {
+        if (count(array_unique(array_values($this->tmpAmbiguous))) > 0) {
+            $actualAmbiguous    =   $this->tmpAmbiguous;
             $this->addNamesWithDuplication($namesAdded['ambiguous']);
 
-            // group identical "disambiguated" values
-            asort($this->tmpAmbiguous);
-            $last   =   '';
-            $groups =   array();
-            foreach ($this->tmpAmbiguous as $id => $value) {
-                if ($last !== $value) {
-                    if (isset($group) == true) {
-                        $groups[]   =   $group;
-                    }
-                    $group  =   array($id => $value);
-                    $last   =   $value;
-                } else {
-                    $group[$id] =   $value;
-                }
-            }
-            $groups[]   =   $group;
-
-            // restore order inside the splitter groups
-            $sort   =   array();
-            $length =   count($groups);
-            foreach (array_keys($this->getAmbiguous()) as $id) {
-                for ($i = 0; $i < $length; $i++) {
-                    if (array_key_exists($id, $groups[$i]) == true) {
-                        if (isset($sort[$i]) == false) {
-                            $sort[$i]   =   array();
+            if (count(array_unique(array_values($namesAdded['ambiguous']))) > 1) {
+                // group identical "disambiguated" values
+                asort($this->tmpAmbiguous);
+                $last   =   '';
+                $groups =   array();
+                foreach ($this->tmpAmbiguous as $id => $value) {
+                    if ($last !== $value) {
+                        if (isset($group) == true) {
+                            $groups[]   =   $group;
                         }
-
-                        $sort[$i][$id]  =   $groups[$i][$id];
-                        break;
+                        $group  =   array($id => $value);
+                        $last   =   $value;
+                    } else {
+                        $group[$id] =   $value;
                     }
                 }
-            }
+                $groups[]   =   $group;
 
-            $this->setDisambiguate($this->tmpDisambiguate);
-            $store  =   false;
-            if (is_object($this->getSuccessor()) == false) {
-                $store  =   true;
-            }
+                // restore order inside the splitter groups
+                $sort   =   array();
+                $length =   count($groups);
+                foreach (array_keys($this->getAmbiguous()) as $id) {
+                    for ($i = 0; $i < $length; $i++) {
+                        if (array_key_exists($id, $groups[$i]) == true) {
+                            if (isset($sort[$i]) == false) {
+                                $sort[$i]   =   array();
+                            }
 
-            // call successor if exists or store actual values
-            for ($i = 0; $i < $length; $i++) {
-                if ($store == false) {
-                    $this->succeed($this->tmpDisambiguate, $sort[$i]);
-                } else {
-                    $this->store($this->tmpDisambiguate, $sort[$i]);
+                            $sort[$i][$id]  =   $groups[$i][$id];
+                            break;
+                        }
+                    }
                 }
+
+                $this->setDisambiguate($this->tmpDisambiguate);
+                $store  =   false;
+                if (is_object($this->getSuccessor()) == false) {
+                    $store  =   true;
+                }
+
+                // call successor if exists or store actual values
+                for ($i = 0; $i < $length; $i++) {
+                    if ($store == false) {
+                        $this->succeed($this->tmpDisambiguate, $sort[$i]);
+                    } else {
+                        $this->store($this->tmpDisambiguate, $sort[$i]);
+                    }
+                }
+            } else {
+                // there are no double ambiguous citations
+                $this->succeed($this->tmpDisambiguate, $actualAmbiguous);
             }
-        } elseif (is_object($this->getSuccessor()) == true) {
+        } elseif (is_object($this->getSuccessor()) == true
+            && count($this->tmpAmbiguous) > 0) {
             $this->succeed($this->tmpDisambiguate, $this->tmpAmbiguous);
         } else {
             $this->store($this->tmpDisambiguate, $this->tmpAmbiguous);
@@ -130,14 +138,15 @@ class AddNames extends DisambiguateAbstract implements Disambiguate
             $values =   $this->renderNames($ambiguous);
 
             // keep disambiguate values
-            foreach ($this->getEntries($values, false) as $id => $newValue) {
+            $keep   =   ArrayData::disambiguate($values);
+            foreach ($keep as $id => $newValue) {
                 $this->tmpDisambiguate[$id]    =   str_replace($original[$id], $newValue, $this->tmpAmbiguous[$id]);
                 unset($this->tmpAmbiguous[$id]);
                 $highestEtAl    =   $this->etAl;
                 $names[$id]     =   $newValue;
             }
 
-            $ambiguous      =   $this->getEntries($values, true);
+            $ambiguous  =   ArrayData::ambiguous($values);
             if ($last == implode('', $ambiguous)) {
                 break;
             } else {

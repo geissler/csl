@@ -3,14 +3,23 @@ namespace Geissler\CSL\Options\Disambiguation;
 
 use Geissler\CSL\Interfaces\Disambiguate;
 use Geissler\CSL\Options\Disambiguation\DisambiguateAbstract;
+use Geissler\CSL\Helper\ArrayData;
 use Geissler\CSL\Container;
 
+/**
+ * Disambiguate by adding given names.
+ *
+ * @author Benjamin Geißler <benjamin.geissler@gmail.com>
+ * @license MIT
+ */
 class AddGivenName extends DisambiguateAbstract implements Disambiguate
 {
     /** @var array */
     protected $tmpAmbiguous;
     /** @var array */
     protected $tmpDisambiguate;
+    /** @var array */
+    private $replaceNames = array();
 
     /**
      * Try to disambiguate the ambiguous values. If not possible, pass the values to the successor and try to
@@ -29,6 +38,12 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
         }
     }
 
+    /**
+     * Render names in all possible forms an pick the right one.
+     *
+     * @param $ambiguous
+     * @return bool
+     */
     protected function addGivenName($ambiguous)
     {
         $layout         =   Container::getContext()->get('layout', 'layout');
@@ -45,9 +60,10 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
         Container::getContext()->setDisambiguationOptions(
             'Geissler\CSL\Names\Name',
             array(
-                'form'          => 'long',
+                'form'  => 'long',
             )
         );
+
         // long form with spaces in given names
         $longGivenNames =   $this->renderNames($ambiguous, true);
 
@@ -93,7 +109,7 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
                 $actualInitTrim =   $this->createArrayWithDataFromPosition($notInitTrimNames, $i);
 
                 // check which standard forms are already ambiguous
-                $standardAmbiguous  =   $this->getEntries($actualStandard, false);
+                $standardAmbiguous  =   ArrayData::disambiguate($actualStandard);
                 if (count($standardAmbiguous) > 0) {
                     foreach (array_keys($standardAmbiguous) as $id) {
                         if (isset($actualLong[$id]) == true) {
@@ -107,7 +123,7 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
                 }
 
                 // disambiguate by long form
-                $longAmbiguous  =   $this->getEntries($actualLong, false);
+                $longAmbiguous  =   ArrayData::disambiguate($actualLong);
                 if (count($longAmbiguous) > 0) {
                     foreach ($longAmbiguous as $id => $name) {
                         if (isset($disambiguate[$id]) == false) {
@@ -129,7 +145,7 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
                 // disambiguate by initialize set to false
                 if ($disambiguationRule !== 'all-names-with-initials'
                     && $disambiguationRule !== 'primary-name-with-initials') {
-                    $initAmbiguous  =   $this->getEntries($actualInit, false);
+                    $initAmbiguous  =   ArrayData::disambiguate($actualInit);
                     if (count($initAmbiguous) > 0) {
                         foreach ($initAmbiguous as $id => $name) {
                             if (isset($disambiguate[$id]) == false) {
@@ -171,6 +187,14 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
         $form               =   '';
         foreach ($disambiguate as $id => $changes) {
             $originalValue  =   $originalFull[$id];
+
+            // replace previously modified names
+            if (isset($this->replaceNames[$id]) == true) {
+                foreach ($this->replaceNames[$id] as $replace => $replaceBy) {
+                    $originalValue  =   str_replace($replace, $replaceBy, $originalValue);
+                }
+            }
+
             foreach ($changes as $options) {
                 $replace        =   $standard[$id][$options['position']];
                 $originalValue  =   str_replace($replace, $options['value'], $originalValue);
@@ -210,6 +234,12 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
                         }
 
                         $this->tmpAmbiguous[$id]   =   str_replace($replace, $replaceBy, $this->tmpAmbiguous[$id]);
+
+                        // store name replacement
+                        if (isset($this->replaceNames[$id]) == false) {
+                            $this->replaceNames[$id]    =   array();
+                        }
+                        $this->replaceNames[$id][$replace]  =   $replaceBy;
                     }
                 }
             }
@@ -222,6 +252,13 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
         return true;
     }
 
+    /**
+     * Create an array with only the names at the given position.
+     *
+     * @param array $data
+     * @param integer $position
+     * @return array
+     */
     private function createArrayWithDataFromPosition(array $data, $position)
     {
         $return =   array();

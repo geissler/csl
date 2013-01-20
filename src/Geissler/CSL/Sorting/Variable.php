@@ -3,6 +3,7 @@ namespace Geissler\CSL\Sorting;
 
 use Geissler\CSL\Interfaces\Sortable;
 use Geissler\CSL\Container;
+use Geissler\CSL\Names\Name;
 use Geissler\CSL\Date\Format;
 
 /**
@@ -59,7 +60,8 @@ class Variable implements Sortable
             case 'recipient':
             case 'reviewed-author':
             case 'translator':
-                return Container::getData()->getVariable($this->variable . '-long');
+                $name   =   new Name(new \SimpleXMLElement('<name form="long" name-as-sort-order="all"/>'));
+                return $name->render(Container::getData()->getVariable($this->variable));
                 break;
             case 'accessed':
             case 'container':

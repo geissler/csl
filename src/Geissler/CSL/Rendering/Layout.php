@@ -77,6 +77,30 @@ class Layout implements Renderable, Parental
     }
 
     /**
+     * Modify the first child element.
+     *
+     * @param string $class full, namespace aware class name
+     * @param \SimpleXMLElement $xml
+     * @return boolean
+     */
+    public function modifyChildElement($class, \SimpleXMLElement $xml)
+    {
+        foreach ($this->children as $child) {
+            if (($child instanceof $class) == true
+                && ($child instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
+                $child->modify($xml);
+                return true;
+            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
+                if ($child->modifyChildElement($class, $xml) == true) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the element or an child element is accessing the variable with the given name.
      *
      * @param string $name
@@ -195,7 +219,7 @@ class Layout implements Renderable, Parental
         } while (Container::getCitationItem()->next() == true);
 
 
-        return explode("\n", $this->disambiguateCites($result, "\n"));
+        return explode("\n", $this->addCitationOptions($this->disambiguateCites($result, "\n"), "\n"));
     }
 
     /**
@@ -216,7 +240,12 @@ class Layout implements Renderable, Parental
             $result[]   =   $id;
         } while (Container::getData()->next() == true);
 
-        return array($this->format($this->disambiguateCites($result, $this->delimiter)));
+        return array(
+            $this->collapseCitations(
+                $this->disambiguateCites($result, $this->delimiter),
+                $this->delimiter
+            )
+        );
     }
 
     private function disambiguateCites($data, $delimiter)
@@ -225,7 +254,7 @@ class Layout implements Renderable, Parental
         if (Container::getContext()->getValue('disambiguateAddNames', 'citation') === true
             || Container::getContext()->getValue('disambiguateAddGivenname', 'citation') === true
             || Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
-            || Container::getContext()->getUseChooseDisambiguate() == true) {
+            || Container::getContext()->isChooseDisambiguationActive() == true) {
             $disambiguation =   new Disambiguation();
             $disambiguation->solve();
         }
@@ -268,7 +297,7 @@ class Layout implements Renderable, Parental
                     }
                 }
 
-                $data[$i]   =   $this->addCitationOptions($data[$i], $this->delimiter);
+                $data[$i]   =   $this->collapseCitations($data[$i], $this->delimiter);
             } else {
                 // re-render citation if missing
                 $actualCitation =   Container::getRendered()->getCitationById($data[$i]);
@@ -286,29 +315,50 @@ class Layout implements Renderable, Parental
             }
         }
 
-        return $this->addCitationOptions($data, $delimiter);
+        // remove all additional temporary disambiguation options
+        Container::getContext()->clearDisambiguationOptions();
+        return $data;
+    }
+
+    private function collapseCitations($data, $delimiter)
+    {
+        if (Container::getContext()->getValue('collapse', 'citation') !== '') {
+            $collapse   =   new CiteCollapsing();
+            return $this->format($collapse->collapse($data, $delimiter));
+        } else {
+            return $this->addCitationOptions($data, $delimiter);
+        }
     }
 
     private function addCitationOptions($data, $delimiter)
     {
-        // Collapsing options
-        if (Container::getContext()->getValue('collapse', 'citation') !== '') {
-            $collapse   =   new CiteCollapsing();
-            $return     =   $collapse->collapse($data, $delimiter);
-        } else {
-            // remove wrong or duplicated delimiters (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
-            $return =   implode($delimiter, $data);
-            $return =   str_replace('. ' . $this->delimiter, '. ', $return);
-            $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
-        }
+        // remove wrong or duplicated delimiters (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
+        $return =   implode($delimiter, $data);
+        $return =   str_replace('. ' . $this->delimiter, '. ', $return);
+        $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
 
         return $this->format($return);
     }
 
+    /**
+     * Render the entries for the bibliograhpy.
+     *
+     * @param $data
+     * @return array
+     */
     private function bibliography($data)
     {
         Container::getData()->moveToFirst();
         $result =   array();
+
+        // add year-suffix to the first year rendered through cs:date in the bibliographic entry
+        if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true
+            && $this->isAccessingVariable('year-suffix') == false) {
+            $this->modifyChildElement(
+                'Geissler\CSL\Date\Date',
+                new \SimpleXMLElement('<date add-year-suffix="true" />')
+            );
+        }
 
         do {
             $entry   =   array();

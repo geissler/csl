@@ -62,7 +62,7 @@ class Data
     public function getVariable($name)
     {
         if (isset($this->data[$this->position]) == true
-            & array_key_exists($name, $this->data[$this->position]) == true) {
+            && array_key_exists($name, $this->data[$this->position]) == true) {
                 return $this->data[$this->position][$name];
         } elseif ($name == 'citation-number') {
             if (Container::getContext()->in('sort') == true) {
@@ -190,5 +190,10 @@ class Data
         $this->position =   0;
 
         return $this;
+    }
+
+    public function dump()
+    {
+        var_dump($this->data);
     }
 }
