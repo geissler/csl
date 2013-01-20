@@ -18,10 +18,9 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $object;
     protected $dir = '/citeproc-test/processor-tests/humans';
     protected $style = '/citeproc-test/styles';
-    protected $testJustSelected = true;
+    protected $testJustSelected = false;
     protected $selectedTests = array(
-        //'disambiguate_YearSuffixMidInsert.txt',
-        'disambiguate_.'
+        //'sort_AuthorDateWithYearSuffix.txt'
         //'sort_'
     );
     protected $errors = array(
@@ -124,7 +123,8 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         $result = str_replace('</i>', '</font>', $result);
         $result = str_replace('<b>', '<font style="font-weight:bold">', $result);
         $result = str_replace('</b>', '</font>', $result);
-        //$result = str_replace('&#38;', '&', $result);
+        $result = str_replace('&#38;', '&', $result);
+        $rendered = str_replace('&#38;', '&', $rendered);
         $result = str_replace('<sup>a</sup>', 'ª', $result);
         $result = str_replace(
             '<span style="font-variant:small-caps;">',

@@ -147,6 +147,12 @@ class Layout implements Renderable, Parental
         return $return;
     }
 
+    /**
+     * Render the actual entry.
+     *
+     * @param $data
+     * @return string
+     */
     public function renderJustActualEntry($data)
     {
         Container::getData()->moveToId(Container::getActualId());
@@ -208,11 +214,15 @@ class Layout implements Renderable, Parental
             $group = array();
             do {
                 $id =   Container::getActualId();
-                Container::getData()->moveToId($id);
 
-                // store rendered citation
-                Container::getRendered()->addCitation($id, $this->renderJustActualEntry($data));
-                $group[] = $id;
+                if ($id !== null) {
+                    Container::getData()->moveToId($id);
+
+                    // store rendered citation
+                    $tmp = $this->renderJustActualEntry($data);
+                    Container::getRendered()->addCitation($id, $tmp);
+                    $group[] = $id;
+                }
             } while (Container::getCitationItem()->nextInGroup() == true);
 
             $result[]   =   $group;
@@ -248,7 +258,13 @@ class Layout implements Renderable, Parental
         );
     }
 
-    private function disambiguateCites($data, $delimiter)
+    /**
+     * Disambiguate ambiguous cites and restore the rendere values.
+     *
+     * @param $data
+     * @return mixed
+     */
+    private function disambiguateCites($data)
     {
         // disambiguate cites
         if (Container::getContext()->getValue('disambiguateAddNames', 'citation') === true

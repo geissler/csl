@@ -175,4 +175,9 @@ class Rendered
         $this->rendered[$id][$type]    =   $value;
         return $this;
     }
+
+    public function dump()
+    {
+        var_dump($this->rendered);
+    }
 }

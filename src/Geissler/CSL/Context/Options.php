@@ -2,6 +2,10 @@
 namespace Geissler\CSL\Context;
 
 use Geissler\CSL\Container;
+use Geissler\CSL\Options\PageRange\Chicago;
+use Geissler\CSL\Options\PageRange\Expanded;
+use Geissler\CSL\Options\PageRange\Minimal;
+use Geissler\CSL\Options\PageRange\MinimalTwo;
 
 /**
  * Parses the global and inheritable name options.
@@ -39,7 +43,20 @@ class Options
                     Container::getContext()->$method('initializeWithHyphen', ($value === 'true' ? true : false));
                     break;
                 case 'page-range-format':
-                    Container::getContext()->$method('pageRangeFormat', (string) $value);
+                    switch ((string) $value) {
+                        case 'chicago':
+                            Container::getContext()->$method('pageRangeFormat', new Chicago());
+                            break;
+                        case 'expanded':
+                            Container::getContext()->$method('pageRangeFormat', new Expanded());
+                            break;
+                        case 'minimal':
+                            Container::getContext()->$method('pageRangeFormat', new Minimal());
+                            break;
+                        case 'minimal-two':
+                            Container::getContext()->$method('pageRangeFormat', new MinimalTwo());
+                            break;
+                    }
                     break;
                 case 'demote-non-dropping-particle':
                     Container::getContext()->$method('demoteNonDroppingParticle', (string) $value);

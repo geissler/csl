@@ -71,6 +71,7 @@ class Citations extends CitationAbstract
         } else {
             $order  =   $group;
         }
+
         foreach ($order as $id) {
             for ($i = 0; $i < $this->getGroupLength(); $i++) {
                 if ($id == $this->data[$this->position][0]['citationItems'][$i]['id']) {
@@ -80,7 +81,10 @@ class Citations extends CitationAbstract
             }
         }
 
-        $this->data[$this->position][0]['citationItems']    =   $newOrder;
+        if (count($newOrder) > 0) {
+            $this->data[$this->position][0]['citationItems']    =   $newOrder;
+        }
+
         $this->groupPosition    =   0;
         return $this;
     }

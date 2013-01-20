@@ -108,6 +108,7 @@ abstract class CitationAbstract
     {
         $this->position         =   0;
         $this->groupPosition    =   0;
+        $this->groupLength      =   $this->getGroupLength();
         return $this;
     }
 

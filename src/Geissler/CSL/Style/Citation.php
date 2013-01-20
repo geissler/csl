@@ -8,7 +8,7 @@ use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
 
 /**
- * .
+ * Citation.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT

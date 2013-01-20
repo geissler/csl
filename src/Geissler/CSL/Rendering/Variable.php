@@ -123,6 +123,12 @@ class Variable implements Groupable
                     }
                 }
                 break;
+            case 'page':
+                $format =   Container::getContext()->getValue('pageRangeFormat');
+                if (is_object($format) == true) {
+                    return $format->format(Container::getData()->getVariable($this->name));
+                }
+                break;
         }
 
         $return =   Container::getData()->getVariable($this->name);
