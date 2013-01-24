@@ -150,7 +150,11 @@ class ReferenceGrouping
             $names  =   $this->names->renderAsArray('');
             foreach ($names as $name) {
                 if (in_array($name, $previous) == true) {
-                    $bibliography[$i]   =   preg_replace('/' . preg_quote($name, '/') . '/', $this->value, $bibliography[$i]);
+                    $bibliography[$i]   =   preg_replace(
+                        '/' . preg_quote($name, '/') . '/',
+                        $this->value,
+                        $bibliography[$i]
+                    );
                 } else {
                     break;
                 }
