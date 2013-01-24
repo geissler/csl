@@ -43,7 +43,9 @@ function multiCompare($first, $second)
     } while ($return == 0);
 
     if ($return == 0) {
-        $return =   end($first)[1] < end($second)[1] ? -1 : 1;
+        $firstEnd   =   end($first);
+        $secondEnd  =   end($second);
+        $return     =   $firstEnd[1] < $secondEnd[1] ? -1 : 1;
     }
 
     return (int) $return;
