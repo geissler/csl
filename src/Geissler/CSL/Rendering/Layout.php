@@ -183,6 +183,13 @@ class Layout implements Renderable, Parental
         return implode('', $entry);
     }
 
+    /**
+     * Render entry by its id.
+     *
+     * @param integer|string $id
+     * @param mixed $data
+     * @return bool|string
+     */
     public function renderById($id, $data)
     {
         $actualId   =   Container::getActualId();
@@ -259,7 +266,7 @@ class Layout implements Renderable, Parental
     }
 
     /**
-     * Disambiguate ambiguous cites and restore the rendere values.
+     * Disambiguate ambiguous cites and restore the render values.
      *
      * @param $data
      * @return mixed
@@ -336,6 +343,13 @@ class Layout implements Renderable, Parental
         return $data;
     }
 
+    /**
+     * Apply cite collapsing.
+     *
+     * @param array $data
+     * @param string $delimiter
+     * @return string
+     */
     private function collapseCitations($data, $delimiter)
     {
         if (Container::getContext()->getValue('collapse', 'citation') !== '') {
@@ -346,6 +360,13 @@ class Layout implements Renderable, Parental
         }
     }
 
+    /**
+     * Implode the cites and remove duplicated delimiters.
+     *
+     * @param array $data
+     * @param string $delimiter
+     * @return string
+     */
     private function addCitationOptions($data, $delimiter)
     {
         // remove wrong or duplicated delimiters (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
@@ -357,7 +378,7 @@ class Layout implements Renderable, Parental
     }
 
     /**
-     * Render the entries for the bibliograhpy.
+     * Render the entries for the bibliography.
      *
      * @param $data
      * @return array

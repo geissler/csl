@@ -6,6 +6,7 @@ use Geissler\CSL\Sorting\Sort;
 use Geissler\CSL\Rendering\Layout;
 use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
+use Geissler\CSL\Options\ReferenceGrouping;
 
 /**
  * Bibliography.
@@ -19,6 +20,10 @@ class Bibliography implements Renderable
     private $layout;
     /** @var Sort **/
     private $sort;
+    /** @var bool */
+    private $doNotSort;
+    /** @var \Geissler\CSL\Options\ReferenceGrouping */
+    private $referenceGrouping;
 
     /**
      * Parses the Bibliography configuration.
@@ -27,6 +32,8 @@ class Bibliography implements Renderable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
+        $this->doNotSort    =   false;
+
         // init child elements
         foreach ($xml->children() as $child) {
             switch ($child->getName()) {
@@ -43,15 +50,13 @@ class Bibliography implements Renderable
         Container::getContext()->addBibliography('hangingIndent', false);
         Container::getContext()->addBibliography('lineSpacing', 1);
         Container::getContext()->addBibliography('entrySpacing', 1);
-        Container::getContext()->addBibliography('subsequentAuthorSubstituteRule', 'complete-all');
+        $this->referenceGrouping    =   new ReferenceGrouping();
+        $this->referenceGrouping->setRule('complete-all');
 
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'hanging-indent':
-                    Container::getContext()->addBibliography(
-                        'hangingIndent',
-                        ((string) $value == 'true' ? true : false)
-                    );
+                    Container::getContext()->addBibliography('hangingIndent', isBoolean($value));
                     break;
                 case 'second-field-align':
                     Container::getContext()->addBibliography('secondFieldAlign', (string) $value);
@@ -63,10 +68,10 @@ class Bibliography implements Renderable
                     Container::getContext()->addBibliography('entrySpacing', (integer) $value);
                     break;
                 case 'subsequent-author-substitute':
-                    Container::getContext()->addBibliography('subsequentAuthorSubstitute', (string) $value);
+                    $this->referenceGrouping->setValue((string) $value);
                     break;
                 case 'subsequent-author-substitute-rule':
-                    Container::getContext()->addBibliography('subsequentAuthorSubstituteRule', (string) $value);
+                    $this->referenceGrouping->setRule((string) $value);
                     break;
             }
         }
@@ -77,13 +82,27 @@ class Bibliography implements Renderable
     }
 
     /**
+     * De-/Activate the sorting option.
+     *
+     * @param boolean $doNotSort
+     * @return \Geissler\CSL\Style\Bibliography
+     */
+    public function setDoNotSort($doNotSort)
+    {
+        $this->doNotSort = $doNotSort;
+        return $this;
+    }
+
+
+    /**
      * Sort the input data by the rules for bibliographies.
      *
-     * @return bool|\Geissler\CSL\Sorting\Sort
+     * @return bool
      */
     public function sort()
     {
-        if (isset($this->sort) == true) {
+        if (isset($this->sort) == true
+            && $this->doNotSort == false) {
             $name   =   'bibliography';
             if (Container::getContext()->getName() == 'citation') {
                 $name   =   'citation';
@@ -124,6 +143,9 @@ class Bibliography implements Renderable
         Container::getContext()->enter('bibliography');
         $result =   $this->layout->render($data);
         Container::getContext()->leave();
+
+        // Reference Grouping
+        $result =   $this->referenceGrouping->apply($result, $this->layout);
 
         if (count($result) > 0) {
             return '<div class="csl-bib-body"><div class="csl-entry">'

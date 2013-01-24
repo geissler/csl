@@ -4,5 +4,6 @@ Comming soon
 [![Build Status](https://travis-ci.org/geissler/csl.png)](https://travis-ci.org/geissler/csl)
 
 ## Tests
-Most of the examples for the phpunit-tests are taken/copied from [https://bitbucket.org/bdarcus/citeproc-test](CiteProc Test), "the standard test bundle for use in CSL processor and style
-development".
+Most of the examples for the phpunit-tests under tests/src and all tests in tests/citeproc-test are taken/copied
+from [https://bitbucket.org/bdarcus/citeproc-test](CiteProc Test), "the standard test bundle for use in CSL processor
+and style development" written by Frank G. Bennett, Jr. and Bruce D'Arcus.

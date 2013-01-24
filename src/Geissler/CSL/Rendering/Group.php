@@ -208,7 +208,7 @@ class Group implements Groupable, Parental
 
         $return =   implode($this->delimiter, $result);
         $return =   preg_replace(
-            '/[' . preg_quote($this->delimiter) . '][' . preg_quote($this->delimiter) . ']+/',
+            '/[' . preg_quote($this->delimiter, '/') . '][' . preg_quote($this->delimiter, '/') . ']+/',
             $this->delimiter,
             $return
         );

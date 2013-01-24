@@ -202,6 +202,8 @@ class Context
             $return =   array_merge($this->citation, $this->style);
         } elseif ($this->name == 'bibliography') {
             $return =    array_merge($this->bibliography, $this->style);
+        } else {
+            $return =   $this->style;
         }
 
         if ($this->ignoreEtAlSubsequent == true) {
@@ -323,6 +325,13 @@ class Context
         return false;
     }
 
+    /**
+     * Retrieve a disambiguation option.
+     *
+     * @param string $class
+     * @param string $option
+     * @return mixed|bool
+     */
     public function getDisambiguationOption($class, $option)
     {
         if ($this->getDisambiguationOptions($class) !== false
@@ -333,6 +342,13 @@ class Context
         return false;
     }
 
+    /**
+     * Remove a disambiguation option.
+     *
+     * @param string $class
+     * @param string $option
+     * @return Context
+     */
     public function removeDisambiguationOption($class, $option)
     {
         if (isset($this->disambiguation[$class][$option]) == true) {

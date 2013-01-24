@@ -130,13 +130,13 @@ class Name implements Renderable, Modifiable, Contextualize
                     $this->etAlSubsequentUseFirst  =   (string) $value;
                     break;
                 case 'et-al-use-last':
-                    $this->etAlUseLast  =   ((string) $value == 'true' ? true : false);
+                    $this->etAlUseLast  =   isBoolean($value);
                     break;
                 case 'form':
                     $this->form  =   (string) $value;
                     break;
                 case 'initialize':
-                    $this->initialize  =   ((string) $value == 'true' ? true : false);
+                    $this->initialize  =   isBoolean($value);
                     break;
                 case 'initialize-with':
                     $this->initializeWith  =   (string) $value;
@@ -151,7 +151,6 @@ class Name implements Renderable, Modifiable, Contextualize
         }
 
         $this->backup();
-
         return $this;
     }
 
@@ -195,9 +194,11 @@ class Name implements Renderable, Modifiable, Contextualize
             }
         }
 
-        foreach (Container::getContext()->getOptions() as $name => $value) {
-            if (property_exists($this, $name) == true) {
-                $this->$name    =   $value;
+        if (is_array(Container::getContext()->getOptions()) == true) {
+            foreach (Container::getContext()->getOptions() as $name => $value) {
+                if (property_exists($this, $name) == true) {
+                    $this->$name    =   $value;
+                }
             }
         }
 
@@ -273,8 +274,10 @@ class Name implements Renderable, Modifiable, Contextualize
 
         $namesAndSplitter   =   array();
         $and                =   $this->getAndDelimiter();
+        $countNames         =   0;
         for ($i = 0; $i < $length; $i++) {
             $namesAndSplitter[] =   $names[$i];
+            $countNames++;
 
             if ($etAl == true
                 && $i == $etAlUseFirst - 1) {
@@ -333,6 +336,12 @@ class Name implements Renderable, Modifiable, Contextualize
             }
 
         }
+
+        // returns the total number of names that would otherwise be rendered
+        if ($this->form == 'count') {
+            return (int) $countNames;
+        }
+
         $return =   str_replace('  ', ' ', implode('', $namesAndSplitter));
 
         // do not connect literals with an and
@@ -368,7 +377,8 @@ class Name implements Renderable, Modifiable, Contextualize
         // initialize given names
         if (isset($names['given']) == true) {
             if ($this->initialize == true
-                && $this->initializeWith !== false) {
+                && ($this->initializeWith !== false
+                    && $this->initializeWith !== '')) {
 
                 $names['given']  =  preg_replace(
                     '/([A-Z])[a-z]+\b[ ]{0,1}/',
@@ -398,9 +408,9 @@ class Name implements Renderable, Modifiable, Contextualize
                 $names[$namePart->getName()] =   $namePart->render($names);
             }
 
-            $names['suffix']  =   '';
-            $names['non-dropping-particle']  =   '';
-            $names['dropping-particle']  =   '';
+            $names['suffix']                =   '';
+            $names['non-dropping-particle'] =   '';
+            $names['dropping-particle']     =   '';
         } elseif (isset($data['literal']) == true) {
             // institutions
             $literal            =   $this->stripEnglishArticles($data['literal']);
@@ -509,6 +519,12 @@ class Name implements Renderable, Modifiable, Contextualize
         return $return;
     }
 
+    /**
+     * Remove articles in english non-personal names.
+     *
+     * @param string $nonPersonal
+     * @return string
+     */
     private function stripEnglishArticles($nonPersonal)
     {
         if (strpos(Container::getLocale()->getLanguage(), 'en-') !== false) {

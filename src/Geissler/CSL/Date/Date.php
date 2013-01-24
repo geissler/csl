@@ -149,7 +149,7 @@ class Date implements Groupable, Modifiable
                     $this->form =   (string) $value;
                     break;
                 case 'add-year-suffix':
-                    $this->addYearSuffix    =   ((string) $value == 'true' ? true : false);
+                    $this->addYearSuffix    =   isBoolean($value);
                     break;
                 case 'date-parts':
                     if ($this->form !== '') {

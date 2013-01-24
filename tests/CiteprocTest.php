@@ -20,7 +20,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $style = '/citeproc-test/styles';
     protected $testJustSelected = false;
     protected $selectedTests = array(
-        //'sort_AuthorDateWithYearSuffix.txt'
+        'sort_ChicagoYearSuffix2.txt',
         //'sort_'
     );
     protected $errors = array(
@@ -228,6 +228,9 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         if ($mode == 'citation') {
             return array($result, Container::getCitation()->render(''), $name);
         } elseif ($mode == 'bibliography') {
+            return array($result, Container::getBibliography()->render(''), $name);
+        } elseif ($mode == 'bibliography-nosort') {
+            Container::getBibliography()->setDoNotSort(true);
             return array($result, Container::getBibliography()->render(''), $name);
         } else {
             return array('Missing mode', '', $name);

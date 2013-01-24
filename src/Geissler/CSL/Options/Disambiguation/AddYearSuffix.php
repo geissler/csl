@@ -4,6 +4,7 @@ namespace Geissler\CSL\Options\Disambiguation;
 use Geissler\CSL\Interfaces\Disambiguate;
 use Geissler\CSL\Options\Disambiguation\DisambiguateAbstract;
 use Geissler\CSL\Container;
+use Geissler\CSL\Helper\ArrayData;
 
 /**
  * Disambiguate by adding an alphabetic year-suffix.
@@ -28,7 +29,34 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
         $this->tmpDisambiguate  =   $this->getDisambiguate();
         $this->tmpAmbiguous     =   $this->getAmbiguous();
 
-        $this->addYearSuffix();
+        // disambiguate only where names and year are identical
+        foreach ($this->tmpAmbiguous as $id => $name) {
+            if (preg_match('/[0-9]{2,4}/', $name) == 0) {
+                $rendered   =   Container::getRendered()->getById($id);
+                $citation   =   '';
+
+                if (isset($rendered['firstCitation']) == true) {
+                    $citation   =   $rendered['firstCitation'];
+                } elseif (isset($rendered['citation']) == true) {
+                    $citation   =   $rendered['citation'];
+                }
+
+                if (preg_match('/[0-9]{2,4}/', $citation) == 1) {
+                    $this->tmpAmbiguous[$id] =  $citation;
+                }
+            }
+        }
+
+        $ambiguous =   ArrayData::ambiguous($this->tmpAmbiguous);
+        if (count($ambiguous) > 0) {
+            $this->tmpAmbiguous =   $ambiguous;
+            $this->addYearSuffix();
+        } elseif (is_array($this->tmpDisambiguate) == true) {
+            $this->tmpDisambiguate  =   array_merge($this->tmpDisambiguate, $this->getAmbiguous());
+        } else {
+            $this->tmpDisambiguate  =   $this->getAmbiguous();
+        }
+
         $this->store($this->tmpDisambiguate, $this->tmpAmbiguous);
     }
 

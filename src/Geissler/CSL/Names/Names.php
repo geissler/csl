@@ -101,7 +101,7 @@ class Names implements Groupable, Modifiable
     }
 
     /**
-     * Modifies the configuration of the object by parsing a new \SimpleXMLElement.
+     * New configurations are passed to the name and substitute object.
      *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Interfaces\Modifiable
@@ -109,6 +109,11 @@ class Names implements Groupable, Modifiable
     public function modify(\SimpleXMLElement $xml)
     {
         $this->name->modify($xml);
+
+        if (isset($this->substitute) == true) {
+            $this->substitute->modify($xml);
+        }
+
         return $this;
     }
 
@@ -154,7 +159,6 @@ class Names implements Groupable, Modifiable
 
             if ($content == ''
                 && isset($this->substitute) == true) {
-
                 $content    =   $this->substitute->render('');
             }
 

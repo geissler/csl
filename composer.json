@@ -16,6 +16,9 @@
         "psr-0": {
                 "Geissler": "src/"
         },
-        "files": ["src/Geissler/CSL/Sorting/Function.php"]
+        "files": [
+            "src/Geissler/CSL/Sorting/Function.php",
+            "src/Geissler/CSL/Helper/Function.php"
+        ]
     }
 }

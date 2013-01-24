@@ -49,25 +49,16 @@ class Citation implements Renderable
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'disambiguate-add-names':
-                    Container::getContext()->addCitation(
-                        'disambiguateAddNames',
-                        ((string) $value == 'true' ? true : false)
-                    );
+                    Container::getContext()->addCitation('disambiguateAddNames', isBoolean($value));
                     break;
                 case 'disambiguate-add-givenname':
-                    Container::getContext()->addCitation(
-                        'disambiguateAddGivenname',
-                        ((string) $value == 'true' ? true : false)
-                    );
+                    Container::getContext()->addCitation('disambiguateAddGivenname', isBoolean($value));
                     break;
                 case 'givenname-disambiguation-rule':
                     Container::getContext()->addCitation('givennameDisambiguationRule', (string) $value);
                     break;
                 case 'disambiguate-add-year-suffix':
-                    Container::getContext()->addCitation(
-                        'disambiguateAddYearSuffix',
-                        ((string) $value === 'true' ? true : false)
-                    );
+                    Container::getContext()->addCitation('disambiguateAddYearSuffix', isBoolean($value));
                     break;
                 case 'cite-group-delimiter':
                     Container::getContext()->addCitation('citeGroupDelimiter', (string) $value);
@@ -102,6 +93,12 @@ class Citation implements Renderable
         return $this->layout;
     }
 
+    /**
+     * Render the citations.
+     *
+     * @param string $data
+     * @return string
+     */
     public function render($data)
     {
         Container::getContext()->enter('citation');
@@ -140,24 +137,13 @@ class Citation implements Renderable
 
                 $return =   implode("\n", $citation);
             } else {
-                $return =   $this->replaceDisambiguation($result);
+                $return =   implode("\n", $result);
             }
         } else {
-            $return =   $this->replaceDisambiguation($result);
+            $return =   implode("\n", $result);
         }
 
         Container::getContext()->leave();
         return $return;
-    }
-
-    private function replaceDisambiguation($result)
-    {
-        /*
-        $length =   count($result);
-        for ($i = 0; $i < $length; $i++) {
-            $result[$i] =   Container::getRendered()->replace($result[$i]);
-        }
-        */
-        return implode("\n", $result);
     }
 }

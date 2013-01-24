@@ -2,7 +2,6 @@
 namespace Geissler\CSL\Sorting;
 
 use Geissler\CSL\Interfaces\Sortable;
-use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Macro\Call;
 use Geissler\CSL\Container;
 
@@ -34,9 +33,13 @@ class Macro implements Sortable
                     $this->macro    =   new Call($value);
                     break;
                 case 'names-min':
+                    $this->nameModifications[]  =   'et-al-min="' . (int) $value . '"';
+                    break;
                 case 'names-use-first':
+                    $this->nameModifications[]  =   'et-al-use-first="' . (int) $value . '"';
+                    break;
                 case 'names-use-last':
-                    $this->nameModifications[]  =   $name . '="' . (int) $value . '"';
+                    $this->nameModifications[]  =   'et-al-use-last="' . (int) $value . '"';
                     break;
             }
         }
@@ -51,9 +54,10 @@ class Macro implements Sortable
     public function render($data)
     {
         $macro  =   clone $this->macro->getMacro();
-        if (($macro instanceof Modifiable) == true) {
-            $macro->modify(new \SimpleXMLElement('<macro ' . implode(' ', $this->nameModifications) . ' />'));
-        }
+        $macro->modifyChildElement(
+            'Geissler\CSL\Names\Names',
+            new \SimpleXMLElement('<macro ' . implode(' ', $this->nameModifications) . ' />')
+        );
 
         return $this->removeEtAl($macro->render($data));
     }

@@ -101,23 +101,31 @@ class CiteCollapsing
      */
     private function year(array $data)
     {
-        preg_match('/^(.*) ([0-9]{4})([a-z]{0,2})([,|;|\.| ]){0,2}$/', $data[0], $match);
-        $length =   count($data);
-        $actual =   false;
+        preg_match('/^(.*)(. )([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[0], $match);
+        $length     =   count($data);
+        $actual     =   false;
+        $delimiter  =   '';
+        $position   =   false;
         if (isset($match[1]) == true) {
-            $actual =   str_replace('/', '\/', $match[1]);
+            $actual     =   str_replace('/', '\/', $match[1] . $match[2]);
+            $delimiter  =   $match[2];
+            $position   =   0;
+            $data[0]    =   str_replace($match[5], '', $data[0]);
         }
 
         for ($i = 1; $i < $length; $i++) {
             if ($actual !== false
                 && preg_match('/^' . $actual . '/', $data[$i], $match) == 1) {
-                $data[$i]   =   trim(str_replace($actual, '', $data[$i]));
-            } elseif (preg_match('/^(.*) ([0-9]{4})([a-z]{0,2})([,|;|\.| ]){0,2}$/', $data[$i], $match) == 1) {
-                $actual =   str_replace('/', '\/', $match[1]);
+                $data[$position]    .=   $delimiter . trim(str_replace($actual, '', $data[$i]));
+                unset($data[$i]);
+            } elseif (preg_match('/^(.*)(. )([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[$i], $match) == 1) {
+                $actual     =   str_replace('/', '\/', $match[1] . $match[2]);
+                $position   =   $i;
+                $data[$i]   =   str_replace($match[5], '', $data[$i]);
             }
         }
 
-        return $data;
+        return array_values($data);
     }
 
     /**
