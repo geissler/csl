@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Options;
 
+use Geissler\CSL\Interfaces\Optional;
 use Geissler\CSL\Container;
 use Geissler\CSL\Names\Names;
 
@@ -10,7 +11,7 @@ use Geissler\CSL\Names\Names;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class ReferenceGrouping
+class ReferenceGrouping implements Optional
 {
     /** @var string */
     private $value;
@@ -46,35 +47,36 @@ class ReferenceGrouping
     /**
      * Apply the reference grouping rule, if activated by setting a replace value.
      *
-     * @param array $bibliography
-     * @param \Geissler\CSL\Rendering\Layout $layout
+     * @param array $data
      * @return array
      */
-    public function apply(array $bibliography, \Geissler\CSL\Rendering\Layout $layout)
+    public function apply(array $data)
     {
         Container::getData()->moveToFirst();
-        $this->names    =   $layout->getChildElement('\Geissler\CSL\Names\Names');
+        $this->names    =   Container::getContext()
+            ->get('layout', 'layout')
+            ->getChildElement('\Geissler\CSL\Names\Names');
 
         if (isset($this->value) == false
             || is_object($this->names) == false) {
-            return $bibliography;
+            return $data;
         }
 
         switch ($this->rule) {
             case 'complete-all':
-                return $this->completeAll($bibliography);
+                return $this->completeAll($data);
                 break;
             case 'complete-each':
-                return $this->completeEach($bibliography);
+                return $this->completeEach($data);
                 break;
             case 'partial-each':
-                return $this->partialEach($bibliography);
+                return $this->partialEach($data);
                 break;
             case 'partial-first':
-                return $this->partialFirst($bibliography);
+                return $this->partialFirst($data);
                 break;
             default:
-                return $bibliography;
+                return $data;
                 break;
         }
     }

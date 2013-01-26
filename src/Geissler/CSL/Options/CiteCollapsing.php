@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Options;
 
+use Geissler\CSL\Interfaces\Optional;
 use Geissler\CSL\Container;
 
 /**
@@ -10,50 +11,111 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class CiteCollapsing
+class CiteCollapsing implements Optional
 {
     /** @var string */
-    private $suffixDelimiter;
+    private $yearSuffixDelimiter;
     /** @var string */
-    private $collapseDelimiter;
+    private $afterCollapseDelimiter;
+    /** @var string */
+    private $collapse;
+
+    /**
+     * Specifies the cite delimiter to be used after a collapsed cite group.
+     *
+     * @param string $afterCollapseDelimiter
+     * @return \Geissler\CSL\Options\CiteCollapsing
+     */
+    public function setAfterCollapseDelimiter($afterCollapseDelimiter)
+    {
+        $this->afterCollapseDelimiter = $afterCollapseDelimiter;
+        return $this;
+    }
+
+    /**
+     * Activates cite grouping and collapsing.
+     *
+     * @param string $collapse
+     * @return \Geissler\CSL\Options\CiteCollapsing
+     */
+    public function setCollapse($collapse)
+    {
+        $this->collapse = $collapse;
+        return $this;
+    }
+
+    /**
+     * Specifies the delimiter for year-suffixes.
+     *
+     * @param string $yearSuffixDelimiter
+     * @return \Geissler\CSL\Options\CiteCollapsing
+     */
+    public function setYearSuffixDelimiter($yearSuffixDelimiter)
+    {
+        $this->yearSuffixDelimiter = $yearSuffixDelimiter;
+        return $this;
+    }
 
     /**
      * Collapses the cites.
      *
      * @param array $data
-     * @param string $delimiter
-     * @return string
+     * @return array
      */
-    public function collapse(array $data, $delimiter)
+    public function apply(array $data)
     {
-        if (Container::getContext()->getValue('yearSuffixDelimiter', 'citation') === '') {
-            $this->suffixDelimiter  =   $delimiter;
+        if (isset($this->collapse) == false) {
+            return $data;
+        }
+
+        // use layout delimiter if no other is set
+        $delimiter  =   Container::getContext()->get('delimiter', 'layout');
+        if (isset($this->afterCollapseDelimiter) == false) {
+            $this->afterCollapseDelimiter   =   $delimiter;
+        }
+
+        if (isset($this->yearSuffixDelimiter) == false) {
+            $this->yearSuffixDelimiter  =   $delimiter;
+        }
+
+        // citation-items
+        if (is_array($data[0]) == true) {
+            $length =   count($data);
+
+            for ($i = 0; $i < $length; $i++) {
+                switch ($this->collapse) {
+                    case 'citation-number':
+                        $data[$i]   =   $this->citationNumber($data[$i]);
+                        break;
+                    case 'year':
+                        $data[$i]   =   $this->year($data[$i]);
+                        break;
+                    case 'year-suffix':
+                        $data[$i]   =   $this->yearSuffix($data[$i]);
+                        break;
+                    case 'year-suffix-ranged':
+                        $data[$i]   =   $this->yearSuffixRanged($data[$i]);
+                        break;
+                }
+            }
         } else {
-            $this->suffixDelimiter  =   Container::getContext()->getValue('yearSuffixDelimiter', 'citation');
+            switch ($this->collapse) {
+                case 'citation-number':
+                    $data   =   $this->citationNumber($data);
+                    break;
+                case 'year':
+                    $data   =   $this->year($data);
+                    break;
+                case 'year-suffix':
+                    $data   =   $this->yearSuffix($data);
+                    break;
+                case 'year-suffix-ranged':
+                    $data   =  $this->yearSuffixRanged($data);
+                    break;
+            }
         }
 
-        if (Container::getContext()->getValue('afterCollapseDelimiter', 'citation') === '') {
-            $this->collapseDelimiter    =   $delimiter;
-        } else {
-            $this->collapseDelimiter    =   Container::getContext()->getValue('afterCollapseDelimiter', 'citation');
-        }
-
-        switch (Container::getContext()->getValue('collapse', 'citation')) {
-            case 'citation-number':
-                $data   =   $this->citationNumber($data);
-                break;
-            case 'year':
-                $data   =   $this->year($data);
-                break;
-            case 'year-suffix':
-                $data   =   $this->yearSuffix($data);
-                break;
-            case 'year-suffix-ranged':
-                $data   =  $this->yearSuffixRanged($data);
-                break;
-        }
-
-        return $this->implode($data, $delimiter);
+        return $data;
     }
 
     /**
@@ -75,7 +137,7 @@ class CiteCollapsing
                 $last++;
             } else {
                 if ($position !== $i -1) {
-                    $data[$position] .= '-' . $data[$i - 1] . $this->collapseDelimiter;
+                    $data[$position] .= '-' . $data[$i - 1] . $this->afterCollapseDelimiter;
                 }
                 $last       =   $data[$i];
                 $position   =   $i;
@@ -101,27 +163,37 @@ class CiteCollapsing
      */
     private function year(array $data)
     {
-        preg_match('/^(.*)(. )([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[0], $match);
+        $delimiter  =   '';
+        if (preg_match('/[A-z|0-9](.)[0-9]{4}/', $data[0], $match) == 1
+            || preg_match('/[A-z|0-9](.)(.)[0-9]{4}/', $data[0], $match) == 1) {
+            $delimiter  =   $match[1];
+            if (isset($match[2]) == true) {
+                $delimiter  .=  $match[2];
+            }
+        }
+
+        // determine first value
+        preg_match('/^(.*)([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[0], $match);
         $length     =   count($data);
         $actual     =   false;
-        $delimiter  =   '';
-        $position   =   false;
         if (isset($match[1]) == true) {
-            $actual     =   str_replace('/', '\/', $match[1] . $match[2]);
-            $delimiter  =   $match[2];
-            $position   =   0;
-            $data[0]    =   str_replace($match[5], '', $data[0]);
+            $actual     =   $match[1];
+            if ($delimiter == $match[4]) {
+                $data[0]    =   str_replace($match[4], '', $data[0]);
+            }
         }
 
         for ($i = 1; $i < $length; $i++) {
             if ($actual !== false
                 && preg_match('/^' . $actual . '/', $data[$i], $match) == 1) {
-                $data[$position]    .=   $delimiter . trim(str_replace($actual, '', $data[$i]));
-                unset($data[$i]);
-            } elseif (preg_match('/^(.*)(. )([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[$i], $match) == 1) {
-                $actual     =   str_replace('/', '\/', $match[1] . $match[2]);
-                $position   =   $i;
-                $data[$i]   =   str_replace($match[5], '', $data[$i]);
+                $data[$i]   =   str_replace($actual, '', $data[$i]);
+                $data[$i]   =   $delimiter . str_replace($delimiter, '', $data[$i]);
+
+            } elseif (preg_match('/^(.*)([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[$i], $match) == 1) {
+                $actual     =   $match[1];
+                if ($delimiter == $match[4]) {
+                    $data[0]    =   str_replace($match[4], '', $data[0]);
+                }
             }
         }
 
@@ -140,8 +212,8 @@ class CiteCollapsing
         $length =   count($data);
 
         for ($i = 1; $i < $length; $i++) {
-            if (preg_match('/^([0-9]{4})([a-z]{1,2})/', $data[$i], $match) == 1) {
-                $data[$i] = $this->suffixDelimiter . $match[2];
+            if (preg_match('/([0-9]{4})([a-z]{1,2})/', $data[$i], $match) == 1) {
+                $data[$i] = $this->yearSuffixDelimiter . $match[2];
             }
         }
 
@@ -163,7 +235,7 @@ class CiteCollapsing
         $last       =   false;
 
         for ($i = 1; $i < $length; $i++) {
-            if (preg_match('/^(' . $this->suffixDelimiter . '){0,1}([a-z]){1,2}/', $data[$i], $match) == 1) {
+            if (preg_match('/^(' . $this->yearSuffixDelimiter . '){0,1}([a-z]){1,2}/', $data[$i], $match) == 1) {
                 $actual =   $match[2];
 
                 if ($last == false) {
@@ -200,14 +272,14 @@ class CiteCollapsing
                 }
             } elseif ($last !== false) {
                 // add to last if not identical
-                preg_match('/^[' . $this->suffixDelimiter . ']{0,1}([a-z]){1,2}/', $data[$position], $match);
+                preg_match('/^[' . $this->yearSuffixDelimiter . ']{0,1}([a-z]){1,2}/', $data[$position], $match);
                 if (in_array($position, $remove) == false) {
                     if (isset($match[1]) == false
                         || $last !== $match[1]) {
                         $data[$position]    =   $this->addSuffixRange($data[$position], $last);
                     }
 
-                    $data[$position]    .=  $this->collapseDelimiter;
+                    $data[$position]    .=  $this->afterCollapseDelimiter;
                 }
                 $last   =   false;
             }
@@ -253,13 +325,28 @@ class CiteCollapsing
     private function implode($data, $delimiter)
     {
         $return =   implode($delimiter, $data);
-        $return =   str_replace($this->suffixDelimiter . $delimiter, $this->suffixDelimiter, $return);
-        $return =   str_replace($delimiter. $this->suffixDelimiter, $this->suffixDelimiter, $return);
-        $return =   str_replace($delimiter . $delimiter, $delimiter, $return);
-        $return =   str_replace($this->suffixDelimiter . $this->suffixDelimiter, $this->suffixDelimiter, $return);
-        $return =   str_replace($this->collapseDelimiter . $this->collapseDelimiter, $this->collapseDelimiter, $return);
-        $return =   str_replace($delimiter . $this->collapseDelimiter, $this->collapseDelimiter, $return);
-        $return =   str_replace($this->collapseDelimiter . $delimiter, $this->collapseDelimiter, $return);
+        $return =   str_replace(
+            array(
+                $this->yearSuffixDelimiter . $delimiter,
+                $delimiter. $this->yearSuffixDelimiter,
+                $delimiter . $delimiter,
+                $this->yearSuffixDelimiter . $this->yearSuffixDelimiter,
+                $this->afterCollapseDelimiter . $this->afterCollapseDelimiter,
+                $delimiter . $this->afterCollapseDelimiter,
+                $this->afterCollapseDelimiter . $delimiter,
+            ),
+            array(
+                $this->yearSuffixDelimiter,
+                $this->yearSuffixDelimiter,
+                $delimiter,
+                $this->yearSuffixDelimiter,
+                $this->afterCollapseDelimiter,
+                $this->afterCollapseDelimiter,
+                $this->afterCollapseDelimiter,
+            ),
+            $return
+        );
+
         $return =   preg_replace('/([,|;]) ([,|;])/', '$1', $return);
         $return =   preg_replace('/[,][,]+/', ',', $return);
         $return =   preg_replace('/[;][;]+/', ';', $return);

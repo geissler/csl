@@ -46,7 +46,6 @@ class Substitute implements Groupable, Modifiable
         }
     }
 
-
     /**
      * Modifies the configuration of the object by parsing a new \SimpleXMLElement.
      *

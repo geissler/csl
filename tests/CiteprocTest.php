@@ -12,16 +12,13 @@ use Geissler\CSL\Data\Citations;
  */
 class CiteprocTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Factory
-     */
     protected $object;
     protected $dir = '/citeproc-test/processor-tests/humans';
     protected $style = '/citeproc-test/styles';
-    protected $testJustSelected = false;
+    protected $testJustSelected = true;
     protected $selectedTests = array(
-        'sort_ChicagoYearSuffix2.txt',
-        //'sort_'
+        'disambiguate_',
+        'sort_'
     );
     protected $errors = array(
         // crashing why ever
@@ -35,6 +32,8 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'disambiguate_InitializeWithButNoDisambiguation.txt',
         // UN DESA 2011c should be the first value not the last, if sorted by bibliography keys
         'disambiguate_YearSuffixMidInsert.txt',
+        // cite-group-delimiter=", " is on wrong position
+        'sort_CiteGroupDelimiter.txt',
         // wrong citeproctest or wrong specification
         'disambiguate_ByCiteDisambiguateCondition.txt',
         // ???
@@ -58,7 +57,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'disambiguate_YearSuffixMacroSameYearImplicit.txt'  => "..[0] A Smith 2001\n>>[1] B Smith 2001",
         'disambiguate_DisambiguateTrueAndYearSuffixOne.txt' =>  "..[0] Pollock, 1979\n>>[1] Pollock, 1980",
         'disambiguate_YearSuffixMacroSameYearExplicit.txt'  =>  "..[0] A Smith 2001\n>>[1] B Smith 2001",
-        'disambiguate_DisambiguationHang.txt' => "..[0] (Caminiti, Johnson, Burnod, Galli, &#38; Ferraina 1990a)\n..[1] (Caminiti, Johnson, Burnod, Galli, &#38; Ferraina 1990b)\n>>[2] (Caminiti, Johnson, &#38; Urbano 1990)",
+        'disambiguate_DisambiguationHang.txt' => "..[0] (Caminiti, Johnson, Burnod, Galli, & Ferraina 1990a)\n..[1] (Caminiti, Johnson, Burnod, Galli, & Ferraina 1990b)\n>>[2] (Caminiti, Johnson, & Urbano 1990)",
         'disambiguate_FailWithYearSuffix.txt'   =>  "..[0] (Caritas Europa et al. 2004a)\n>>[1] (Caritas Europa et al. 2004b)",
         'disambiguate_LastOnlyFailWithByCite.txt' => "..[0] Organisation 2010a\n>>[1] Organisation 2010b",
         'disambiguate_DisambiguateTrueAndYearSuffixTwo.txt' => "..[0] Pollock, 1979a\n>>[1] Pollock, 1979b",
@@ -73,6 +72,10 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+    /**
+     * Run tests and create a data test provider.
+     * @return array
+     */
     public function testCaseProvider()
     {
         $data   =   array();

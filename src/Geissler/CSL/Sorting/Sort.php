@@ -85,9 +85,11 @@ class Sort
     {
         if (Container::getCitationItem() !== false) {
             do {
-                $sort   =   $this->generateCitationSortGroup();
-
-                Container::getCitationItem()->sortGroup($this->multiSort($sort), false);
+                // ignore citation if properties => unsorted is set to true
+                if (Container::getCitationItem()->get('unsorted') !== true) {
+                    $sort   =   $this->generateCitationSortGroup();
+                    Container::getCitationItem()->sortGroup($this->multiSort($sort), false);
+                }
             } while (Container::getCitationItem()->next() == true);
         } else {
             $this->bibliography();

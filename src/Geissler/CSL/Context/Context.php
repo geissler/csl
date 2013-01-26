@@ -233,6 +233,27 @@ class Context
     }
 
     /**
+     * Add an additional option to a specific position in the "CSL rendering tree".
+     * @param string $name
+     * @param string $option
+     * @param mixed $value
+     * @return bool
+     */
+    public function addOption($name, $option, $value)
+    {
+        $length =   count($this->context);
+
+        for ($i = 0; $i < $length; $i++) {
+            if ($this->context[$i]['name'] == $name) {
+                $this->context[$i]['option'][$option]   =   $value;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Leave the actual context.
      *
      * @return Context

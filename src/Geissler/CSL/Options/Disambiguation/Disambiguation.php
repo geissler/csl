@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Options\Disambiguation;
 
+use Geissler\CSL\Interfaces\Optional;
 use Geissler\CSL\Container;
 use Geissler\CSL\Options\Disambiguation\Chain;
 use Geissler\CSL\Helper\ArrayData;
@@ -11,7 +12,7 @@ use Geissler\CSL\Helper\ArrayData;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @licence MIT
  */
-class Disambiguation
+class Disambiguation implements Optional
 {
     /** @var array */
     private $sorted;
@@ -20,7 +21,28 @@ class Disambiguation
     /** @var \Geissler\CSL\Names\Names */
     private $names;
 
-    public function solve()
+    /**
+     * Apply the disambiguation options.
+     *
+     * @param array $data
+     * @return array|string
+     */
+    public function apply(array $data)
+    {
+        if (Container::getContext()->getValue('disambiguateAddNames', 'citation') === true
+            || Container::getContext()->getValue('disambiguateAddGivenname', 'citation') === true
+            || Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
+            || Container::getContext()->isChooseDisambiguationActive() == true) {
+            $this->solve();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Disambiguate ambiguous values.
+     */
+    private function solve()
     {
         Container::getContext()->enter('disambiguation');
         $this->layout   =   Container::getContext()->get('layout', 'layout');
@@ -98,7 +120,7 @@ class Disambiguation
                 $lastNames      =   $actualNames;
                 $identical      =   array();
                 $identical[]    =   array(
-                    'id'    =>  $id,
+                    'id'        =>  $id,
                     'citation'  =>  $citation,
                     'position'  =>  $this->getSortedPosition($id),
                     'names'     =>  $actualNames
@@ -114,11 +136,22 @@ class Disambiguation
         Container::getContext()->leave();
     }
 
+    /**
+     * Retrieve the position of the id in the sorted data.
+     *
+     * @param string $id
+     * @return integer
+     */
     private function getSortedPosition($id)
     {
         return array_search($id, $this->sorted);
     }
 
+    /**
+     * Disambiguate an array of identical values.
+     *
+     * @param array $identical
+     */
     private function disambiguateIdentical($identical)
     {
         $reRender       =   false;
@@ -170,6 +203,13 @@ class Disambiguation
         }
     }
 
+    /**
+     * Restore the position of ambiguous values based on the position entry.
+     *
+     * @param array $data
+     * @param string $field
+     * @return array
+     */
     private function rePositioningCitations($data, $field = 'citation')
     {
         $positions  =   array();

@@ -28,6 +28,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
         Container::getContext()->removeDisambiguationOptions('Geissler\CSL\Names\Name');
         $this->tmpDisambiguate  =   $this->getDisambiguate();
         $this->tmpAmbiguous     =   $this->getAmbiguous();
+        $firstDifferent         =   false;
 
         // disambiguate only where names and year are identical
         foreach ($this->tmpAmbiguous as $id => $name) {
@@ -36,7 +37,8 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
                 $citation   =   '';
 
                 if (isset($rendered['firstCitation']) == true) {
-                    $citation   =   $rendered['firstCitation'];
+                    $citation       =   $rendered['firstCitation'];
+                    $firstDifferent =   true;
                 } elseif (isset($rendered['citation']) == true) {
                     $citation   =   $rendered['citation'];
                 }
@@ -50,6 +52,10 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
         $ambiguous =   ArrayData::ambiguous($this->tmpAmbiguous);
         if (count($ambiguous) > 0) {
             $this->tmpAmbiguous =   $ambiguous;
+            $this->addYearSuffix();
+        } elseif ($firstDifferent == true) {
+            // test if second citation is ambiguous
+            $this->tmpAmbiguous =   $this->getAmbiguous();
             $this->addYearSuffix();
         } elseif (is_array($this->tmpDisambiguate) == true) {
             $this->tmpDisambiguate  =   array_merge($this->tmpDisambiguate, $this->getAmbiguous());

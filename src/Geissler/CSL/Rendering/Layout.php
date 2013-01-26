@@ -10,6 +10,7 @@ use Geissler\CSL\Rendering\ExpandFormatting;
 use Geissler\CSL\Container;
 use Geissler\CSL\Options\Disambiguation\Disambiguation;
 use Geissler\CSL\Options\CiteCollapsing;
+use Geissler\CSL\Interfaces\Option;
 
 /**
  * Layout.
@@ -29,6 +30,8 @@ class Layout implements Renderable, Parental
     private $expand;
     /** @var array **/
     private $children;
+    /** @var \Geissler\CSL\Interfaces\Option */
+    private $options;
 
     /**
      * Parses the layout configuration.
@@ -51,6 +54,18 @@ class Layout implements Renderable, Parental
 
         $children       =   new Children();
         $this->children =   $children->create($xml);
+    }
+
+    /**
+     * Inject the additional options.
+     *
+     * @param \Geissler\CSL\Interfaces\Option $options
+     * @return \Geissler\CSL\Rendering\Layout
+     */
+    public function setOptions(Option $options)
+    {
+        $this->options = $options;
+        return $this;
     }
 
     /**
@@ -214,6 +229,7 @@ class Layout implements Renderable, Parental
      */
     private function citation($data)
     {
+        Container::getContext()->addOption('layout', 'delimiter', $this->delimiter);
         Container::getCitationItem()->moveToFirst();
         $result =   array();
 
@@ -236,7 +252,7 @@ class Layout implements Renderable, Parental
         } while (Container::getCitationItem()->next() == true);
 
 
-        return explode("\n", $this->addCitationOptions($this->disambiguateCites($result, "\n"), "\n"));
+        return explode("\n", $this->applyCitationOptions($result, "\n"));
     }
 
     /**
@@ -247,6 +263,7 @@ class Layout implements Renderable, Parental
      */
     private function citationFromData($data)
     {
+        Container::getContext()->addOption('layout', 'delimiter', $this->delimiter);
         Container::getData()->moveToFirst();
         $result =   array();
 
@@ -257,124 +274,35 @@ class Layout implements Renderable, Parental
             $result[]   =   $id;
         } while (Container::getData()->next() == true);
 
-        return array(
-            $this->collapseCitations(
-                $this->disambiguateCites($result, $this->delimiter),
-                $this->delimiter
-            )
-        );
+        return array($this->applyCitationOptions($result, $this->delimiter));
     }
 
     /**
-     * Disambiguate ambiguous cites and restore the render values.
-     *
-     * @param $data
-     * @return mixed
-     */
-    private function disambiguateCites($data)
-    {
-        // disambiguate cites
-        if (Container::getContext()->getValue('disambiguateAddNames', 'citation') === true
-            || Container::getContext()->getValue('disambiguateAddGivenname', 'citation') === true
-            || Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
-            || Container::getContext()->isChooseDisambiguationActive() == true) {
-            $disambiguation =   new Disambiguation();
-            $disambiguation->solve();
-        }
-
-        // move to starting position for citations and citations items
-        $citationData   =   false;
-        if (Container::getCitationItem() !== false) {
-            $citationData   =   true;
-            Container::getCitationItem()->moveToFirst();
-        }
-        // replace item ids by disambiguate cite
-        $length =   count($data);
-        for ($i = 0; $i < $length; $i++) {
-            if (is_array($data[$i]) == true) {
-                $innerLength    =   count($data[$i]);
-                for ($j = 0; $j < $innerLength; $j++) {
-                    // re-render citation if missing
-                    $actualCitation =   Container::getRendered()->getCitationById($data[$i][$j]);
-                    if ($actualCitation == false) {
-                        Container::getContext()->enter('disambiguation');
-                        $data[$i][$j]   =   $this->renderJustActualEntry('');
-                        Container::getContext()->leave();
-                    } else {
-                        $data[$i][$j]   =   $actualCitation;
-                    }
-
-                    // Add delimiter at end if not ending with a dot
-                    // (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
-                    if ($j < $innerLength - 1) {
-                        if (preg_match('/\.$/', $data[$i][$j]) == 0) {
-                            $data[$i][$j] .=  $this->delimiter;
-                        } else {
-                            $data[$i][$j] .= ' ';
-                        }
-                    }
-
-                    // move to next in group
-                    if ($citationData == true) {
-                        Container::getCitationItem()->nextInGroup();
-                    }
-                }
-
-                $data[$i]   =   $this->collapseCitations($data[$i], $this->delimiter);
-            } else {
-                // re-render citation if missing
-                $actualCitation =   Container::getRendered()->getCitationById($data[$i]);
-                if ($actualCitation == false) {
-                    Container::getContext()->enter('disambiguation');
-                    $data[$i]   =   $this->renderJustActualEntry('');
-                    Container::getContext()->leave();
-                } else {
-                    $data[$i]   =   $actualCitation;
-                }
-            }
-
-            if ($citationData == true) {
-                Container::getCitationItem()->next();
-            }
-        }
-
-        // remove all additional temporary disambiguation options
-        Container::getContext()->clearDisambiguationOptions();
-        return $data;
-    }
-
-    /**
-     * Apply cite collapsing.
+     * Apply additional options on citations.
      *
      * @param array $data
      * @param string $delimiter
      * @return string
      */
-    private function collapseCitations($data, $delimiter)
+    private function applyCitationOptions($data, $delimiter)
     {
-        if (Container::getContext()->getValue('collapse', 'citation') !== '') {
-            $collapse   =   new CiteCollapsing();
-            return $this->format($collapse->collapse($data, $delimiter));
-        } else {
-            return $this->addCitationOptions($data, $delimiter);
+        $data   =   $this->options->apply($data);
+
+        if (is_array($data) == true) {
+            $length =   count($data);
+            for ($i = 0; $i < $length; $i++) {
+                if (is_array($data[$i]) == true) {
+                    $data[$i]   =   $this->format(implode('', $data[$i]));
+                }
+            }
+
+            $return =   implode($delimiter, $data);
+            $return =   str_replace('. ' . $this->delimiter, '. ', $return);
+            $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
+            return $this->format($return);
         }
-    }
 
-    /**
-     * Implode the cites and remove duplicated delimiters.
-     *
-     * @param array $data
-     * @param string $delimiter
-     * @return string
-     */
-    private function addCitationOptions($data, $delimiter)
-    {
-        // remove wrong or duplicated delimiters (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
-        $return =   implode($delimiter, $data);
-        $return =   str_replace('. ' . $this->delimiter, '. ', $return);
-        $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
-
-        return $this->format($return);
+        return $this->format($data);
     }
 
     /**
@@ -405,7 +333,7 @@ class Layout implements Renderable, Parental
             $result[]   =   $this->format(implode('', $entry));
         } while (Container::getData()->next() == true);
 
-        return $result;
+        return $this->options->apply($result);
     }
 
     /**

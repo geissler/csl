@@ -161,7 +161,7 @@ class Name implements Renderable, Modifiable, Contextualize
      */
     public function getOptions()
     {
-        return array(
+        $return = array(
             'and' => $this->and,
             'delimiter' => $this->delimiter,
             'delimiter-precedes-et-al' => $this->delimiterPrecedesEtAl,
@@ -173,10 +173,15 @@ class Name implements Renderable, Modifiable, Contextualize
             'et-al-use-last' => $this->etAlUseLast,
             'form' => $this->form,
             'initialize' => $this->initialize,
-            'initialize-with' => $this->initializeWith,
             'name-as-sort-order' => $this->nameAsSortOrder,
             'sort-separator' => $this->sortSeparator
         );
+
+        if ($this->initializeWith !== false) {
+            $return['initialize-with']  =   $this->initializeWith;
+        }
+
+        return $return;
     }
 
     /**
@@ -377,8 +382,7 @@ class Name implements Renderable, Modifiable, Contextualize
         // initialize given names
         if (isset($names['given']) == true) {
             if ($this->initialize == true
-                && ($this->initializeWith !== false
-                    && $this->initializeWith !== '')) {
+                && ($this->initializeWith !== false)) {
 
                 $names['given']  =  preg_replace(
                     '/([A-Z])[a-z]+\b[ ]{0,1}/',

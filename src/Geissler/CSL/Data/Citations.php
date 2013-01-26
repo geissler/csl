@@ -40,6 +40,7 @@ class Citations extends CitationAbstract
                     break;
                 case 'noteIndex':
                 case 'index':
+                case 'unsorted':
                     if (isset($this->data[$position][0]['properties']) == true
                         && isset($this->data[$position][0]['properties'][$variable]) == true) {
                         return $this->data[$position][0]['properties'][$variable];

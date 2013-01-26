@@ -19,7 +19,7 @@ class Chain
 {
     /**
      * Create a chain of objects to disambiguate the ambiguous values. The first element tries to disambiguate the
-     * values. If it fails, the ambiguous values are passed to the next chain element. The chain stops, if all
+     * values. If it fails, the ambiguous values are passed to the next element in the chain. The chain stops, if all
      * ambiguous values are disambiguated or if no succeeding chain element exists.
      *
      * @param array $ambiguous

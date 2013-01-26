@@ -7,6 +7,7 @@ use Geissler\CSL\Rendering\Layout;
 use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
 use Geissler\CSL\Options\ReferenceGrouping;
+use Geissler\CSL\Options\Bibliography as BibliographyOptions;
 
 /**
  * Bibliography.
@@ -22,8 +23,6 @@ class Bibliography implements Renderable
     private $sort;
     /** @var bool */
     private $doNotSort;
-    /** @var \Geissler\CSL\Options\ReferenceGrouping */
-    private $referenceGrouping;
 
     /**
      * Parses the Bibliography configuration.
@@ -41,17 +40,17 @@ class Bibliography implements Renderable
                     $this->layout   =   new Layout($child);
                     break;
                 case 'sort':
-                    $this->sort =   new Sort($child);
+                    $this->sort     =   new Sort($child);
                     break;
             }
         }
 
         // set Bibliography-specific Options
+        $this->layout->setOptions(new BibliographyOptions($xml));
+
         Container::getContext()->addBibliography('hangingIndent', false);
         Container::getContext()->addBibliography('lineSpacing', 1);
         Container::getContext()->addBibliography('entrySpacing', 1);
-        $this->referenceGrouping    =   new ReferenceGrouping();
-        $this->referenceGrouping->setRule('complete-all');
 
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
@@ -66,12 +65,6 @@ class Bibliography implements Renderable
                     break;
                 case 'entry-spacing':
                     Container::getContext()->addBibliography('entrySpacing', (integer) $value);
-                    break;
-                case 'subsequent-author-substitute':
-                    $this->referenceGrouping->setValue((string) $value);
-                    break;
-                case 'subsequent-author-substitute-rule':
-                    $this->referenceGrouping->setRule((string) $value);
                     break;
             }
         }
@@ -92,7 +85,6 @@ class Bibliography implements Renderable
         $this->doNotSort = $doNotSort;
         return $this;
     }
-
 
     /**
      * Sort the input data by the rules for bibliographies.
@@ -128,6 +120,9 @@ class Bibliography implements Renderable
      */
     public function render($data)
     {
+        // sort
+        $this->sort();
+
         // render citation to create year-suffix if necessary
         if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true) {
             Container::getContext()->setName('citation');
@@ -136,16 +131,10 @@ class Bibliography implements Renderable
             Container::getContext()->setName('bibliography');
         }
 
-        // sort
-        $this->sort();
-
         // render
         Container::getContext()->enter('bibliography');
         $result =   $this->layout->render($data);
         Container::getContext()->leave();
-
-        // Reference Grouping
-        $result =   $this->referenceGrouping->apply($result, $this->layout);
 
         if (count($result) > 0) {
             return '<div class="csl-bib-body"><div class="csl-entry">'
