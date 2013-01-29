@@ -79,7 +79,7 @@ class CiteCollapsing implements Optional
         }
 
         // citation-items
-        if (is_array($data[0]) == true) {
+        if (isset($data[0][0]) == true) {
             $length =   count($data);
 
             for ($i = 0; $i < $length; $i++) {
@@ -127,25 +127,26 @@ class CiteCollapsing implements Optional
     private function citationNumber(array $data)
     {
         $length     =   count($data);
-        $last       =   $data[0];
+        $last       =   $data[0]['value'];
         $position   =   0;
         $remove     =   array();
 
         for ($i = 1; $i < $length; $i++) {
-            if ($last + 1 == $data[$i]) {
+            if ($last + 1 == $data[$i]['value']) {
                 $remove[]   =   $i;
                 $last++;
             } else {
                 if ($position !== $i -1) {
-                    $data[$position] .= '-' . $data[$i - 1] . $this->afterCollapseDelimiter;
+                    $data[$position]['value']       .=  '-' . $data[$i - 1]['value'];
+                    $data[$position]['position']    =   $this->afterCollapseDelimiter;
                 }
-                $last       =   $data[$i];
+                $last       =   $data[$i]['value'];
                 $position   =   $i;
             }
         }
 
         if ($position < $length - 1) {
-            $data[$position]    .=  '-' . $last;
+            $data[$position]['value']    .=  '-' . $last;
         }
 
         foreach ($remove as $i) {
@@ -163,37 +164,16 @@ class CiteCollapsing implements Optional
      */
     private function year(array $data)
     {
-        $delimiter  =   '';
-        if (preg_match('/[A-z|0-9](.)[0-9]{4}/', $data[0], $match) == 1
-            || preg_match('/[A-z|0-9](.)(.)[0-9]{4}/', $data[0], $match) == 1) {
-            $delimiter  =   $match[1];
-            if (isset($match[2]) == true) {
-                $delimiter  .=  $match[2];
-            }
-        }
-
         // determine first value
-        preg_match('/^(.*)([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[0], $match);
-        $length     =   count($data);
-        $actual     =   false;
-        if (isset($match[1]) == true) {
-            $actual     =   $match[1];
-            if ($delimiter == $match[4]) {
-                $data[0]    =   str_replace($match[4], '', $data[0]);
-            }
-        }
+        preg_match('/^(.*)([0-9]{4})([a-z]{0,2})$/', $data[0]['value'], $match);
+        $actual =   preg_quote($match[1], '/');
 
+        $length =   count($data);
         for ($i = 1; $i < $length; $i++) {
-            if ($actual !== false
-                && preg_match('/^' . $actual . '/', $data[$i], $match) == 1) {
-                $data[$i]   =   str_replace($actual, '', $data[$i]);
-                $data[$i]   =   $delimiter . str_replace($delimiter, '', $data[$i]);
-
-            } elseif (preg_match('/^(.*)([0-9]{4})([a-z]{0,2})([,|;|\.| ]{0,2})$/', $data[$i], $match) == 1) {
-                $actual     =   $match[1];
-                if ($delimiter == $match[4]) {
-                    $data[0]    =   str_replace($match[4], '', $data[0]);
-                }
+            if (preg_match('/^' . $actual . '([0-9]{4})([a-z]{0,2})$/', $data[$i]['value'], $match) == 1) {
+                $data[$i]['value']  =   str_replace($actual, '', $data[$i]['value']);
+            } elseif (preg_match('/^(.*)([0-9]{4})([a-z]{0,2})$/', $data[$i]['value'], $match) == 1) {
+                $actual     =   preg_quote($match[1], '/');
             }
         }
 
@@ -212,8 +192,9 @@ class CiteCollapsing implements Optional
         $length =   count($data);
 
         for ($i = 1; $i < $length; $i++) {
-            if (preg_match('/([0-9]{4})([a-z]{1,2})/', $data[$i], $match) == 1) {
-                $data[$i] = $this->yearSuffixDelimiter . $match[2];
+            if (preg_match('/^([0-9]{4})([a-z]{1,2})$/', $data[$i]['value'], $match) == 1) {
+                $data[$i]['value']          =   $match[2];
+                $data[$i - 1]['delimiter']  =   $this->yearSuffixDelimiter;
             }
         }
 

@@ -199,7 +199,9 @@ class Name implements Renderable, Modifiable, Contextualize
             }
         }
 
-        if (is_array(Container::getContext()->getOptions()) == true) {
+        // don't override if in sorting context
+        if (is_array(Container::getContext()->getOptions()) == true
+            && Container::getContext()->in('sort') == false) {
             foreach (Container::getContext()->getOptions() as $name => $value) {
                 if (property_exists($this, $name) == true) {
                     $this->$name    =   $value;
@@ -355,6 +357,13 @@ class Name implements Renderable, Modifiable, Contextualize
             foreach ($this->literals as $literal) {
                 $return =   str_replace($and . $literal, $literal, $return);
             }
+        }
+
+        // name lists truncated by et-al abbreviation are followed by the name delimiter, the ellipsis character,
+        // and the last name of the original name list.
+        if ($this->etAlUseLast == true
+            && count($names) + 2 >= $countNames) {
+            $return =   str_replace(Container::getLocale()->getTerms('et-al'), ' … ' . end($names), $return);
         }
 
         $return =   $this->formatting->render($return);

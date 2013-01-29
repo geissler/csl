@@ -244,6 +244,11 @@ class Date implements Groupable, Modifiable
             $value  .=  Container::getData()->getVariable('year-suffix');
         }
 
+        // no formatting while sorting
+        if (Container::getContext()->in('sort') == true) {
+            return$value;
+        }
+
         $value =   $this->affix->render($value);
         $value =   $this->display->render($value);
         $value =   $this->formatting->render($value);

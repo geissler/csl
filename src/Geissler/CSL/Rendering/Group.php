@@ -3,6 +3,7 @@ namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Interfaces\Parental;
+use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
 use Geissler\CSL\Rendering\Formatting;
@@ -31,6 +32,8 @@ class Group implements Groupable, Parental
     private $formatting;
     /** @var array **/
     private $children;
+    /** @var array */
+    private $renderedGroup;
 
     /**
      * Parses the Group configuration.
@@ -162,7 +165,7 @@ class Group implements Groupable, Parental
             return '';
         }
 
-        return $this->renderGroup();
+        return $this->renderedGroup;
     }
 
     /**
@@ -195,6 +198,8 @@ class Group implements Groupable, Parental
 
     /**
      * Render all child elements of the group.
+     *
+     * @return string
      */
     private function renderGroup()
     {
@@ -212,8 +217,14 @@ class Group implements Groupable, Parental
             $this->delimiter,
             $return
         );
+
+        if (Container::getContext()->in('sort') == true) {
+            return $return;
+        }
+
         $return =   $this->display->render($return);
         $return =   $this->formatting->render($return);
-        return $this->affix->render($return);
+        $this->renderedGroup    =   $this->affix->render($return);
+        return $this->renderedGroup;
     }
 }

@@ -60,9 +60,11 @@ class Citation implements Option
                     break;
                 case 'cite-group-delimiter':
                     $this->citeGrouping->setCiteGroupDelimiter((string) $value);
+                    $this->citeGrouping->setActive(true);
                     break;
                 case 'collapse':
                     $this->citeCollapsing->setCollapse((string) $value);
+                    $this->citeGrouping->setActive(true);
                     break;
                 case 'year-suffix-delimiter':
                     $this->citeCollapsing->setYearSuffixDelimiter((string) $value);

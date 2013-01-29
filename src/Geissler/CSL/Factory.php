@@ -21,6 +21,7 @@ class Factory
 
     /**
      * Creates a Locale object and injects the configuration parameters.
+     *
      * @return \Geissler\CSL\Locale\Locale
      */
     public static function locale()

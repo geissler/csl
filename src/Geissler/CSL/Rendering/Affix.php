@@ -5,7 +5,7 @@ use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
 
 /**
- * Display affixs.
+ * Display affixes.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -49,6 +49,20 @@ class Affix implements Renderable, Modifiable
     }
 
     /**
+     * Retrieve the suffix if set.
+     *
+     * @return string
+     */
+    public function getSuffix()
+    {
+        if (isset($this->suffix) == true) {
+            return $this->suffix;
+        }
+
+        return '';
+    }
+
+    /**
      * Adds the affixes.
      *
      * @param string $data
@@ -57,9 +71,10 @@ class Affix implements Renderable, Modifiable
     public function render($data)
     {
         if ($data !== ''
+            && $data !== null
             && ($this->prefix !== ''
                 || $this->suffix !== '')) {
-            $data   =   $this->prefix . $data . $this->suffix;
+            $data   =   $this->addPrefix($this->addSuffix($data));
 
             // remove duplicated pre- and suffixes
             if ($this->prefix !== '') {
@@ -76,5 +91,35 @@ class Affix implements Renderable, Modifiable
         }
 
         return $data;
+    }
+
+    /**
+     * Add a prefix inside a div or html element.
+     *
+     * @param  string$data
+     * @return string
+     */
+    private function addPrefix($data)
+    {
+        if (preg_match('/^(<div[A-z| |=|"|\'|\-|0-9|\.]+>)(.*)/', $data, $match) == 1) {
+            return $match[1] . $this->prefix . $match[2];
+        }
+
+        return $this->prefix . $data;
+    }
+
+    /**
+     * Add a suffix inside a div or html element.
+     *
+     * @param  string$data
+     * @return string
+     */
+    private function addSuffix($data)
+    {
+        if (preg_match('/(.*)(<\/div>)$/', $data, $match) == 1) {
+            return $match[1] . $this->suffix . $match[2];
+        }
+
+        return $data . $this->suffix;
     }
 }

@@ -21,27 +21,24 @@ class ReferenceGrouping implements Optional
     private $names;
 
     /**
-     * Set the subsequent-author-substitute value.
+     * Configure the reference grouping.
      *
-     * @param string $value
-     * @return ReferenceGrouping
+     * @param \SimpleXMLElement $xml
      */
-    public function setValue($value)
+    public function __construct(\SimpleXMLElement $xml)
     {
-        $this->value = $value;
-        return $this;
-    }
+        $this->rule =   'complete-all';
 
-    /**
-     * Set the subsequent-author-substitute-rule rule.
-     *
-     * @param string $rule
-     * @return ReferenceGrouping
-     */
-    public function setRule($rule)
-    {
-        $this->rule = $rule;
-        return $this;
+        foreach ($xml->attributes() as $name => $value) {
+            switch ($name) {
+                case 'subsequent-author-substitute':
+                    $this->value    =   (string) $value;
+                    break;
+                case 'subsequent-author-substitute-rule':
+                    $this->rule     =   (string) $value;
+                    break;
+            }
+        }
     }
 
     /**
@@ -90,12 +87,13 @@ class ReferenceGrouping implements Optional
      */
     private function completeAll($bibliography)
     {
+        $delimiter  =   '(' . preg_quote($this->names->getDelimiter(), '/') . '|\.|;|,)';
         $previous   =   preg_quote($this->names->render(''), '/');
         $length     =   count($bibliography);
 
         for ($i = 1; $i < $length; $i++) {
             Container::getData()->next();
-            if (preg_match('/^' . $previous . '/', $bibliography[$i]) == 1) {
+            if (preg_match('/^' . $previous . $delimiter . '/', $bibliography[$i]) == 1) {
                 $bibliography[$i]   =   preg_replace('/^' . $previous . '/', $this->value, $bibliography[$i]);
             } else {
                 $previous   =   preg_quote($this->names->render(''), '/');
@@ -114,11 +112,12 @@ class ReferenceGrouping implements Optional
      */
     private function completeEach($bibliography)
     {
+        $delimiter  =   '(' . preg_quote($this->names->getDelimiter(), '/') . '|\.|;|,)';
         $previous   =   preg_quote($this->names->render(''), '/');
         $length     =   count($bibliography);
 
         for ($i = 1; $i < $length; $i++) {
-            if (preg_match('/^' . $previous . '/', $bibliography[$i]) == 1) {
+            if (preg_match('/^' . $previous . $delimiter . '/', $bibliography[$i]) == 1) {
                 $names  =   $this->names->renderAsArray('');
                 $values =   array_fill(0, count($names), $this->value);
                 $value  =   str_replace($names, $values, $previous);

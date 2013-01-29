@@ -14,12 +14,56 @@ function multiCompare($first, $second)
 
     do {
         if (isset($first[$position]) == true) {
-            if (preg_match('/^[1-9][0-9]*$/', $first[$position][0]) == 1) {
-                $firstInt   =   (int) $first[$position][0];
-                $secondInt  =   (int) $second[$position][0];
-                if ($firstInt == $secondInt) {
+            if (preg_match('/^[1-9][0-9]*$/', $first[$position][0]) == 1
+                && preg_match('/^[1-9][0-9]*$/', $second[$position][0]) == 1) {
+                // compare as numbers
+                $firstNumber   =   $first[$position][0] * 1;
+                $secondNumber  =   $second[$position][0] * 1;
+
+                if ($firstNumber == $secondNumber) {
                     $return =   0;
-                } elseif ($firstInt < $secondInt) {
+                } elseif ($firstNumber < $secondNumber) {
+                    $return =   -1;
+                } else {
+                    $return =   1;
+                }
+            } elseif (preg_match('/^([1-9]{4})([a-z]{1,2})$/', $first[$position][0], $matchFirst) == 1
+                && preg_match('/^([1-9]{4})([a-z]{1,2})$/', $second[$position][0], $matchSecond) == 1) {
+                // compare disambiguated years with suffix
+                if ($matchFirst[1] < $matchSecond[1]) {
+                    $return =   -1;
+                } elseif ($matchFirst[1] > $matchSecond[1]) {
+                    $return =   1;
+                } elseif ($matchFirst[2] < $matchSecond[2]) {
+                    $return =   -1;
+                } elseif ($matchFirst[2] > $matchSecond[2]) {
+                    $return =   1;
+                } else {
+                    $return =   0;
+                }
+
+            } elseif (strtotime($first[$position][0]) !== false
+                || strtotime($second[$position][0]) !== false) {
+                // compare as dates
+
+                // catch missing day and month
+                if (preg_match('/^[0-9]{4}$/', $first[$position][0]) == 1) {
+                    $firstDate  =   new \DateTime();
+                    $firstDate->setDate($first[$position][0], 1, 1);
+                } else {
+                    $firstDate  =   new \DateTime($first[$position][0]);
+                }
+
+                if (preg_match('/^[0-9]{4}$/', $second[$position][0]) == 1) {
+                    $secondDate  =   new \DateTime();
+                    $secondDate->setDate($second[$position][0], 1, 1);
+                } else {
+                    $secondDate  =   new \DateTime($second[$position][0]);
+                }
+
+                if ($firstDate == $secondDate) {
+                    $return =   0;
+                } elseif ($firstDate < $secondDate) {
                     $return =   -1;
                 } else {
                     $return =   1;

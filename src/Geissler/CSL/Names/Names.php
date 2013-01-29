@@ -104,7 +104,7 @@ class Names implements Groupable, Modifiable
      * New configurations are passed to the name and substitute object.
      *
      * @param \SimpleXMLElement $xml
-     * @return \Geissler\CSL\Interfaces\Modifiable
+     * @return \Geissler\CSL\Names\Names
      */
     public function modify(\SimpleXMLElement $xml)
     {
@@ -128,6 +128,31 @@ class Names implements Groupable, Modifiable
     }
 
     /**
+     * Retrieve the variables to call.
+     *
+     * @return array
+     */
+    public function getVariables()
+    {
+        return $this->variables;
+    }
+
+    /**
+     * Retrieve the delimiter for the names set in names or name.
+     *
+     * @return string
+     */
+    public function getDelimiter()
+    {
+        if ($this->delimiter == '') {
+            $options    =   $this->name->getOptions();
+            return $options['delimiter'];
+        }
+
+        return $this->delimiter;
+    }
+
+    /**
      * Render the names.
      *
      * @param string|array $data
@@ -135,10 +160,16 @@ class Names implements Groupable, Modifiable
      */
     public function render($data)
     {
-        $returns    =   array();
-        $compare    =   array();
+        $returns        =   array();
+        $compare        =   array();
+        $lastSubstitute =   Container::getContext()->getSubstitute()->getVariable();
 
         foreach ($this->variables as $variable) {
+            // don't render if variable is already used as substitute value
+            if ($lastSubstitute === $variable) {
+                return '';
+            }
+
             $names      =   Container::getData()->getVariable($variable);
             $content    =   $this->name->render($names);
 
@@ -151,15 +182,21 @@ class Names implements Groupable, Modifiable
 
             $compare[$variable] =   $content;
 
-            if ($content != ''
-                && isset($this->label) == true) {
-                $this->label->setVariable($variable);
-                $content    .=   $this->label->render($content);
-            }
-
+            // use substitute
             if ($content == ''
                 && isset($this->substitute) == true) {
                 $content    =   $this->substitute->render('');
+
+                if (Container::getContext()->getSubstitute()->getVariable() !== '') {
+                    $variable   =   Container::getContext()->getSubstitute()->getVariable();
+                }
+            }
+
+            if ($content != ''
+                && isset($this->label) == true
+                && Container::getContext()->in('sort') == false) {
+                $this->label->setVariable($variable);
+                $content    .=   $this->label->render($content);
             }
 
             $returns[]  =   $content;

@@ -7,6 +7,7 @@ use Geissler\CSL\Rendering\Text;
 use Geissler\CSL\Date\Date;
 use Geissler\CSL\Rendering\Number;
 use Geissler\CSL\Names\Names;
+use Geissler\CSL\Container;
 
 /**
  * Substitute.
@@ -73,6 +74,11 @@ class Substitute implements Groupable, Modifiable
             $return =   $rendering->render($data);
 
             if ($return != '') {
+                Container::getContext()->getSubstitute()->setValue($return);
+                if (($rendering instanceof Names) == true) {
+                    $variables  =   $rendering->getVariables();
+                    Container::getContext()->getSubstitute()->setVariable($variables[0]);
+                }
                 return $return;
             }
         }

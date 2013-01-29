@@ -13,7 +13,7 @@ use Geissler\CSL\Container;
 class RenderFromIds implements Optional
 {
     /**
-     * Apply the optional modification.
+     * Replacing the id's by the rendered and disambiguated values and add the delimiter.
      *
      * @param array $data
      * @return array|string
@@ -43,19 +43,19 @@ class RenderFromIds implements Optional
                     $actualCitation =   Container::getRendered()->getCitationById($data[$i][$j]);
                     if ($actualCitation == false) {
                         Container::getContext()->enter('disambiguation');
-                        $data[$i][$j]   =   $layout->renderJustActualEntry('');
+                        $data[$i][$j]   =   array('value' => $layout->renderJustActualEntry(''), 'delimiter' => '');
                         Container::getContext()->leave();
                     } else {
-                        $data[$i][$j]   =   $actualCitation;
+                        $data[$i][$j]   =   array('value' => $actualCitation, 'delimiter' => '');
                     }
 
                     // Add delimiter at end if not ending with a dot
                     // (see affix_SuppressDelimiterCharsWhenFullStopInSuffix.txt)
                     if ($j < $innerLength - 1) {
-                        if (preg_match('/\.$/', $data[$i][$j]) == 0) {
-                            $data[$i][$j] .=  $delimiter;
+                        if (preg_match('/\.$/', $data[$i][$j]['value']) == 0) {
+                            $data[$i][$j]['delimiter']  =  $delimiter;
                         } else {
-                            $data[$i][$j] .= ' ';
+                            $data[$i][$j]['delimiter']  =   ' ';
                         }
                     }
 
@@ -69,10 +69,10 @@ class RenderFromIds implements Optional
                 $actualCitation =   Container::getRendered()->getCitationById($data[$i]);
                 if ($actualCitation == false) {
                     Container::getContext()->enter('disambiguation');
-                    $data[$i]   =   $layout->renderJustActualEntry('');
+                    $data[$i]   =   array('value' => $layout->renderJustActualEntry(''), 'delimiter' => '');
                     Container::getContext()->leave();
                 } else {
-                    $data[$i]   =   $actualCitation;
+                    $data[$i]   =   array('value' => $actualCitation, 'delimiter' => '');
                 }
             }
 

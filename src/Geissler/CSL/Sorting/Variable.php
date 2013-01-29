@@ -69,30 +69,27 @@ class Variable implements Sortable
             case 'issued':
             case 'original-date':
             case 'submitted':
+                // 00000000 represent the first date and if existing a second date of a date range
                 $format =   new Format();
                 if ($format->format($this->variable) == true) {
                     $data   =   $format->getData();
 
-                    if ($data[0]['year'] == '') {
-                        $data[0]['year']   =   '0000';
+                    $first  =   $this->formatDate($data[0]);
+                    $second =   '00000000';
+                    if (isset($data[1]) == true) {
+                        $second =   $this->formatDate($data[1]);
+
+                        if ($second < $first) {
+                            return $second . $first;
+                        }
+
+                        return $first . $second;
                     }
 
-                    if ($data[0]['month'] == '') {
-                        $data[0]['month']  =   '00';
-                    } elseif ($data[0]['month'] < 10) {
-                        $data[0]['month'] = '0' . $data[0]['month'];
-                    }
-
-                    if ($data[0]['day'] == '') {
-                        $data[0]['day'] = '00';
-                    } elseif ($data[0]['day'] < 10) {
-                        $data[0]['day'] = '0' . $data[0]['day'];
-                    }
-
-                    return $data[0]['year'] . $data[0]['month'] . $data[0]['day'];
+                    return $first . $second;
                 }
 
-                return '00000000';
+                return '0000000000000000';
                 break;
             case 'chapter-number':
             case 'collection-number':
@@ -105,8 +102,39 @@ class Variable implements Sortable
                 return (int) Container::getData()->getVariable($this->variable);
                 break;
             default:
-                return Container::getData()->getVariable($this->variable);
+                return preg_replace(
+                    '/(<.*?>)(.*?)(<\/.*?>)/',
+                    '$2',
+                    Container::getData()->getVariable($this->variable)
+                );
                 break;
         }
+    }
+
+    /**
+     * Formats a date to be sorted.
+     *
+     * @param array $data
+     * @return string
+     */
+    private function formatDate($data)
+    {
+        if ($data['year'] == '') {
+            $data['year']   =   '0000';
+        }
+
+        if ($data['month'] == '') {
+            $data['month']  =   '00';
+        } elseif ($data['month'] < 10) {
+            $data['month'] = '0' . $data['month'];
+        }
+
+        if ($data['day'] == '') {
+            $data['day'] = '00';
+        } elseif ($data['day'] < 10) {
+            $data['day'] = '0' . $data['day'];
+        }
+
+        return $data['year'] . $data['month'] . $data['day'];
     }
 }

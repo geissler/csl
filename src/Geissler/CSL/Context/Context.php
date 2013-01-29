@@ -1,6 +1,8 @@
 <?php
 namespace Geissler\CSL\Context;
 
+use Geissler\CSL\Context\Substitute;
+
 /**
  * Stores all globally changeable options to override local configurations and the actual rendering context.
  *
@@ -25,6 +27,7 @@ class Context
     private $ignoreEtAlSubsequent;
     private $chooseDisambiguation;
     private $chooseDisambiguateValue;
+    private $substitute;
 
     /**
      * Init's the arrays.
@@ -39,6 +42,7 @@ class Context
         $this->ignoreEtAlSubsequent     =   false;
         $this->chooseDisambiguation     =   false;
         $this->chooseDisambiguateValue  =   false;
+        $this->substitute               =   new Substitute();
     }
 
     /**
@@ -403,5 +407,15 @@ class Context
     {
         $this->disambiguation   =   array();
         return $this;
+    }
+
+    /**
+     * Access the actual substitute context.
+     *
+     * @return Substitute
+     */
+    public function getSubstitute()
+    {
+        return $this->substitute;
     }
 }

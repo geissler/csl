@@ -39,7 +39,7 @@ class Macro implements Sortable
                     $this->nameModifications[]  =   'et-al-use-first="' . (int) $value . '"';
                     break;
                 case 'names-use-last':
-                    $this->nameModifications[]  =   'et-al-use-last="' . (int) $value . '"';
+                    $this->nameModifications[]  =   'et-al-use-last="' . isBoolean((string) $value) . '"';
                     break;
             }
         }

@@ -86,7 +86,7 @@ class Options
                     Container::getContext()->$method('etAlSubsequentUseFirst', (string) $value);
                     break;
                 case 'et-al-use-last':
-                    Container::getContext()->$method('etAlUseLast', (string) $value);
+                    Container::getContext()->$method('etAlUseLast', isBoolean((string) $value));
                     break;
                 case 'initialize':
                     Container::getContext()->$method('initialize', (string) $value);

@@ -14,6 +14,20 @@ class CiteGrouping implements Optional
 {
     /** @var string */
     private $citeGroupDelimiter;
+    /** @var bool */
+    private $active = false;
+
+    /**
+     * Active the usage if cite grouping.
+     *
+     * @param boolean $active
+     * @return CiteGrouping
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+        return $this;
+    }
 
     /**
      * Activates cite grouping and specifies the delimiter for cites within a cite group.
@@ -37,7 +51,7 @@ class CiteGrouping implements Optional
     {
         $names  =   Container::getContext()->get('layout', 'layout')->getChildElement('\Geissler\CSL\Names\Names');
 
-        if (isset($this->citeGroupDelimiter) == false
+        if ($this->active == false
             || is_object($names) == false
             || Container::getCitationItem() === false) {
             return $data;
@@ -45,6 +59,11 @@ class CiteGrouping implements Optional
 
         Container::getCitationItem()->moveToFirst();
         $delimiter  =   Container::getContext()->get('delimiter', 'layout');
+        if (isset($this->citeGroupDelimiter) == false) {
+            $this->citeGroupDelimiter   =   $delimiter;
+            $this->citeGroupDelimiter   =   ', ';
+        }
+
         $length     =   count($data);
         $newData    =   array();
 
@@ -63,33 +82,30 @@ class CiteGrouping implements Optional
 
                 // check if name already used
                 if ($actualName !== '') {
-                    $added  =   false;
+                    $actualGroup    =   array($data[$i][$j]);
+                    $groupPosition  =   0;
 
                     for ($k = $j + 1; $k < $citeLength; $k++) {
                         if ($actualName == $namesAsArray[$k][0]) {
-                            if ($added == false) {
-                                $newData[$i][]  =   preg_replace(
-                                    '/' . $delimiter . '( )?$/',
-                                    $this->citeGroupDelimiter,
-                                    $data[$i][$j]
-                                );
-                                $added  =   true;
-                            }
-
-                            $newData[$i][]  =   preg_replace(
-                                '/' . $delimiter . '( )?$/',
-                                $this->citeGroupDelimiter,
-                                $data[$i][$k]
-                            );
+                            // replace delimiter in previous group entry with cite group delimiter
+                            $actualGroup[$groupPosition]['delimiter']   =   $this->citeGroupDelimiter;
+                            $actualGroup[]          =   $data[$i][$k];
                             $namesAsArray[$k][0]    =   '';
+                            $groupPosition++;
+
+                            // Add delimiter to values without one
+                            if ($actualGroup[$groupPosition]['delimiter'] == '') {
+                                $actualGroup[$groupPosition]['delimiter']   =   $delimiter;
+                            }
                         }
                     }
 
-                    if ($added == false) {
-                        $newData[$i][]  =   $data[$i][$j];
-                    }
+                    $newData[$i]    =   array_merge($newData[$i], $actualGroup);
                 }
             }
+
+            // remove delimiter from last entry in group
+            $newData[$i][count($newData[$i]) - 1]['delimiter']   =   '';
 
             Container::getCitationItem()->next();
         }

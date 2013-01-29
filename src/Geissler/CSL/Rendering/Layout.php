@@ -242,8 +242,7 @@ class Layout implements Renderable, Parental
                     Container::getData()->moveToId($id);
 
                     // store rendered citation
-                    $tmp = $this->renderJustActualEntry($data);
-                    Container::getRendered()->addCitation($id, $tmp);
+                    Container::getRendered()->addCitation($id, $this->renderJustActualEntry($data));
                     $group[] = $id;
                 }
             } while (Container::getCitationItem()->nextInGroup() == true);
@@ -288,11 +287,21 @@ class Layout implements Renderable, Parental
     {
         $data   =   $this->options->apply($data);
 
+        //var_dump($data);
         if (is_array($data) == true) {
             $length =   count($data);
             for ($i = 0; $i < $length; $i++) {
-                if (is_array($data[$i]) == true) {
-                    $data[$i]   =   $this->format(implode('', $data[$i]));
+                if (isset($data[$i][0]) == true) {
+                    $innerLength    =   count($data[$i]);
+                    $innerData      =   array();
+
+                    for ($j = 0; $j < $innerLength; $j++) {
+                        $innerData[]    =   $data[$i][$j]['value'] . $data[$i][$j]['delimiter'];
+                    }
+
+                    $data[$i]   =   $this->format(implode('', $innerData));
+                } else {
+                    $data[$i]   =   $data[$i]['value'] . $data[$i]['delimiter'];
                 }
             }
 
@@ -330,7 +339,8 @@ class Layout implements Renderable, Parental
             foreach ($this->children as $child) {
                 $entry[]   =   $child->render($data);
             }
-            $result[]   =   $this->format(implode('', $entry));
+
+            $result[]   =   $this->format($this->options->apply($entry, true));
         } while (Container::getData()->next() == true);
 
         return $this->options->apply($result);

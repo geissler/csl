@@ -128,6 +128,7 @@ class Data
      */
     public function next()
     {
+        Container::getContext()->getSubstitute()->clear();
         $this->position++;
 
         if ($this->position < $this->length) {
@@ -145,6 +146,7 @@ class Data
      */
     public function moveToId($id)
     {
+        Container::getContext()->getSubstitute()->clear();
         for ($i = 0; $i < $this->length; $i++) {
             if (isset($this->data[$i]['id']) == true
                 && $this->data[$i]['id'] == $id) {
@@ -187,6 +189,7 @@ class Data
      */
     public function moveToFirst()
     {
+        Container::getContext()->getSubstitute()->clear();
         $this->position =   0;
 
         return $this;

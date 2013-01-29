@@ -110,9 +110,13 @@ class Label implements Groupable
             }
         }
 
+        // The term is only rendered if the selected variable is non-empty.
         $content    =   Container::getData()->getVariable($variable);
-        $plural     =   'single';
+        if ($content == '') {
+            return '';
+        }
 
+        $plural     =   'single';
         switch ($this->plural) {
             case 'contextual':
                 if (is_array($content) == true) {
@@ -140,7 +144,6 @@ class Label implements Groupable
         }
 
         $return =   Container::getLocale()->getTerms($variable, $form, $plural);
-
         if ($return !== '') {
             $return =   $this->formating->render($return);
             $return =   $this->textCase->render($return);

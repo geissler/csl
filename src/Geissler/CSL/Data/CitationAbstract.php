@@ -1,6 +1,8 @@
 <?php
 namespace Geissler\CSL\Data;
 
+use Geissler\CSL\Container;
+
 /**
  * Data container for citation data.
  *
@@ -72,6 +74,7 @@ abstract class CitationAbstract
      */
     public function nextInGroup()
     {
+        Container::getContext()->getSubstitute()->clear();
         $this->groupPosition++;
 
         if ($this->groupPosition < $this->groupLength) {
@@ -88,6 +91,7 @@ abstract class CitationAbstract
      */
     public function next()
     {
+        Container::getContext()->getSubstitute()->clear();
         $this->position++;
 
         if ($this->position < $this->length) {
@@ -106,6 +110,7 @@ abstract class CitationAbstract
      */
     public function moveToFirst()
     {
+        Container::getContext()->getSubstitute()->clear();
         $this->position         =   0;
         $this->groupPosition    =   0;
         $this->groupLength      =   $this->getGroupLength();
@@ -119,6 +124,7 @@ abstract class CitationAbstract
      */
     public function moveToFirstInGroup()
     {
+        Container::getContext()->getSubstitute()->clear();
         $this->groupPosition    =   0;
         return $this;
     }

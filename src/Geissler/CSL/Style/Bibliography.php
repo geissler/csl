@@ -48,27 +48,6 @@ class Bibliography implements Renderable
         // set Bibliography-specific Options
         $this->layout->setOptions(new BibliographyOptions($xml));
 
-        Container::getContext()->addBibliography('hangingIndent', false);
-        Container::getContext()->addBibliography('lineSpacing', 1);
-        Container::getContext()->addBibliography('entrySpacing', 1);
-
-        foreach ($xml->attributes() as $name => $value) {
-            switch ($name) {
-                case 'hanging-indent':
-                    Container::getContext()->addBibliography('hangingIndent', isBoolean($value));
-                    break;
-                case 'second-field-align':
-                    Container::getContext()->addBibliography('secondFieldAlign', (string) $value);
-                    break;
-                case 'line-spacing':
-                    Container::getContext()->addBibliography('lineSpacing', (integer) $value);
-                    break;
-                case 'entry-spacing':
-                    Container::getContext()->addBibliography('entrySpacing', (integer) $value);
-                    break;
-            }
-        }
-
          // set global options and inheritable name options
         $options    =   new Options();
         $options->set('bibliography', $xml);
@@ -136,13 +115,16 @@ class Bibliography implements Renderable
         $result =   $this->layout->render($data);
         Container::getContext()->leave();
 
-        if (count($result) > 0) {
-            return '<div class="csl-bib-body"><div class="csl-entry">'
-                . implode('</div><div class="csl-entry">', $this->addOptions($result))
-                . '</div></div>';
+        // format return
+        $return =   '<div class="csl-bib-body"><div class="csl-entry">';
+        if (is_array($result) == true
+            && count($result) > 0) {
+            $return .=  implode('</div><div class="csl-entry">', $result);
+        } else {
+            $return .=  $result;
         }
 
-        return '';
+        return $return . '</div></div>';
     }
 
     /**

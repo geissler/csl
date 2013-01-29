@@ -184,8 +184,33 @@ class Sort
     private function multiSort($sort)
     {
         $oldOrder   =   array_keys($sort);
+        $sort       =   $this->removeNotToSort($sort);
 
-        // remove sorting keys where all values are identical to avoid errors
+        // test if nothing is to sort
+        if (isset($sort[0][0][0]) == false) {
+            return $oldOrder;
+        }
+
+        // sort
+        uasort($sort, 'multiCompare');
+        //var_dump($sort);
+        // get keys in order
+        $keys   =   array();
+        foreach ($sort as $entry) {
+            $keys[] =   $entry[0][3];
+        }
+
+        return $keys;
+    }
+
+    /**
+     * Remove sorting keys where all values are identical to avoid errors.
+     *
+     * @param array $sort
+     * @return array
+     */
+    private function removeNotToSort($sort)
+    {
         $sort       =   array_values($sort);
         $length     =   count($sort);
         $keys       =   count($sort[0]);
@@ -215,20 +240,6 @@ class Sort
             $sort[$i]   =   $values;
         }
 
-        // test if nothing is to sort
-        if (isset($sort[0][0][0]) == false) {
-            return $oldOrder;
-        }
-
-        // sort
-        uasort($sort, 'multiCompare');
-
-        // get keys in order
-        $keys   =   array();
-        foreach ($sort as $entry) {
-            $keys[] =   $entry[0][3];
-        }
-
-        return $keys;
+        return $sort;
     }
 }
