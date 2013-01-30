@@ -25,6 +25,7 @@ class Citation implements Renderable
      * Parses the CitationItems configuration.
      *
      * @param \SimpleXMLElement $xml
+     * @throws \ErrorException If layout is missing
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -38,6 +39,10 @@ class Citation implements Renderable
                     $this->sort =   new Sort($child);
                     break;
             }
+        }
+
+        if (isset($this->layout) == false) {
+            throw new \ErrorException('Missing layout!');
         }
 
         // citation options
@@ -77,11 +82,13 @@ class Citation implements Renderable
         $result =   $this->layout->render($data);
 
         // sort bibliography and re-render citations
+        /* wrong test file (?)
         if (Container::hasBibliography() == true
             && Container::getBibliography()->sort() == true) {
             Container::getRendered()->clear();
-            //$result =   $this->layout->render($data);
+            $result =   $this->layout->render($data);
         }
+        */
 
         if (Container::getCitationItem() !== false) {
             // apply additional citation formatting options

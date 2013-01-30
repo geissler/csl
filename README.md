@@ -5,7 +5,7 @@ standard, is 100% OOP and follows the
 standard.
 
 ## Installation
-### Via composer
+### Via [composer](http://getcomposer.org/ "composer")
 Add to the `composer.json` the `require` key and run composer install.
 ```
     "require" : {
@@ -46,7 +46,7 @@ Render a single bibliography entry.
                   ]
               },
               "title": "The monumental centre of Herculaneum. In search of the identities of the public buildings",
-              "container-title" : "Journal of Roman archaeology",
+              "container-title" : "Journal of Roman Archaeology",
               "volume" : "24",
               "page" : "121-160",
               "original-publisher-place" : "Ann Arbor, Mich.",
@@ -61,8 +61,8 @@ Render a single bibliography entry.
     Wallace-Hadrill, Andrew. 2011. "The monumental centre of Herculaneum. In search of the identities of the public
     buildings". Journal of Roman archaeology 24: 121-160.
 ```
+As HTML
 ```html
-    // the full HTML
     <div class="csl-bib-body">
         <div class="csl-entry">Wallace-Hadrill, Andrew. 2011. "The monumental centre of Herculaneum. In search of the
         identities of the public buildings". <font style="font-style:italic">Journal of Roman archaeology</font>
@@ -75,6 +75,6 @@ Render a single bibliography entry.
 ## Tests and Comments
 [![Build Status](https://travis-ci.org/geissler/csl.png)](https://travis-ci.org/geissler/csl)
 
-Most of the examples for the phpunit-tests under tests/src, all tests in tests/citeproc-test and some comments are
+Most of the examples for the phpunit-tests under *tests/src*, all files in *tests/citeproc-test* and some comments are
 taken/copied from [CiteProc Test](https://bitbucket.org/bdarcus/citeproc-test "CiteProc Test"), **"the standard test
 bundle for use in CSL processor and style development"** written by Frank G. Bennett, Jr. and Bruce D'Arcus.

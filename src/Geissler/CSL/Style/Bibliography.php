@@ -28,6 +28,7 @@ class Bibliography implements Renderable
      * Parses the Bibliography configuration.
      *
      * @param \SimpleXMLElement $xml
+     * @throws \ErrorException If layout is missing
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -43,6 +44,10 @@ class Bibliography implements Renderable
                     $this->sort     =   new Sort($child);
                     break;
             }
+        }
+
+        if (isset($this->layout) == false) {
+            throw new \ErrorException('Missing layout!');
         }
 
         // set Bibliography-specific Options
