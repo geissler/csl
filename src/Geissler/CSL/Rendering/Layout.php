@@ -8,8 +8,6 @@ use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\Children;
 use Geissler\CSL\Rendering\ExpandFormatting;
 use Geissler\CSL\Container;
-use Geissler\CSL\Options\Disambiguation\Disambiguation;
-use Geissler\CSL\Options\CiteCollapsing;
 use Geissler\CSL\Interfaces\Option;
 
 /**
@@ -285,9 +283,8 @@ class Layout implements Renderable, Parental
      */
     private function applyCitationOptions($data, $delimiter)
     {
-        $data   =   $this->options->apply($data);
+        $data   =   $this->applyOptions($data);
 
-        //var_dump($data);
         if (is_array($data) == true) {
             $length =   count($data);
             for ($i = 0; $i < $length; $i++) {
@@ -340,10 +337,10 @@ class Layout implements Renderable, Parental
                 $entry[]   =   $child->render($data);
             }
 
-            $result[]   =   $this->format($this->options->apply($entry, true));
+            $result[]   =   $this->format($this->applyOptions($entry, true));
         } while (Container::getData()->next() == true);
 
-        return $this->options->apply($result);
+        return $this->applyOptions($result);
     }
 
     /**
@@ -361,5 +358,20 @@ class Layout implements Renderable, Parental
         $data   =   $this->expand->render($data);
         $data   =   $this->affix->render($data);
         return $this->formatting->render($data);
+    }
+
+    /**
+     * Apply the additional options.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function applyOptions($data)
+    {
+        if (isset($this->options) == true) {
+            return $this->options->apply($data);
+        }
+
+        return $data;
     }
 }
