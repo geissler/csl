@@ -133,6 +133,11 @@ class Container
         throw new \ErrorException('No citation defined!');
     }
 
+    /**
+     * Set the bibliography object.
+     *
+     * @param \Geissler\CSL\Style\Bibliography $bibliography
+     */
     public static function setBibliography(Bibliography $bibliography)
     {
         self::$bibliography =   $bibliography;
@@ -184,12 +189,18 @@ class Container
         return self::$data;
     }
 
+    /**
+     * Set the abbreviations.
+     *
+     * @param \Geissler\CSL\Data\Abbreviation $abbreviation
+     */
     public static function setAbbreviation(Abbreviation $abbreviation)
     {
         self::$abbreviation =   $abbreviation;
     }
 
     /**
+     * Retrieve the abbreviations.
      *
      * @return \Geissler\CSL\Data\Abbreviation
      */
@@ -211,7 +222,7 @@ class Container
     /**
      * Access the citation items.
      *
-     * @return \Geissler\CSL\Data\CitationAbstract|boolean
+     * @return bool|\Geissler\CSL\Data\CitationAbstract
      */
     public static function getCitationItem()
     {
@@ -237,6 +248,11 @@ class Container
         return self::$rendered;
     }
 
+    /**
+     * Retrieve the id at the actual rendering position.
+     *
+     * @return int|string
+     */
     public static function getActualId()
     {
         if (self::$context->getName() == 'citation'
@@ -254,14 +270,15 @@ class Container
      */
     public static function clear()
     {
-        self::$context = new Context();
-        self::$macros = array();
+        self::$context      = new Context();
+        self::$macros       = array();
         self::$citationItem = false;
-        self::$context = new Context();
-        self::$rendered = new Rendered();
+        self::$context      = new Context();
+        self::$rendered     = new Rendered();
+        self::$bibliography = null;
+        self::$citation     = null;
+
         self::setLocale(Factory::locale());
         self::$locale->readFile();
-        self::$bibliography = null;
-        self::$citation = null;
     }
 }

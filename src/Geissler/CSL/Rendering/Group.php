@@ -176,9 +176,7 @@ class Group implements Groupable, Parental
      */
     public function hasAccessEmptyVariable()
     {
-        if ($this->renderGroup() !== '') {
-            return false;
-        }
+        $this->renderGroup();
 
         $variables  =   0;
         foreach ($this->children as $element) {
@@ -191,6 +189,10 @@ class Group implements Groupable, Parental
 
         if ($variables > 0) {
             return true;
+        }
+
+        if ($this->renderedGroup !== '') {
+            return false;
         }
 
         return null;
@@ -211,20 +213,20 @@ class Group implements Groupable, Parental
             }
         }
 
-        $return =   implode($this->delimiter, $result);
-        $return =   preg_replace(
+        $this->renderedGroup =   implode($this->delimiter, $result);
+        $this->renderedGroup =   preg_replace(
             '/[' . preg_quote($this->delimiter, '/') . '][' . preg_quote($this->delimiter, '/') . ']+/',
             $this->delimiter,
-            $return
+            $this->renderedGroup
         );
 
         if (Container::getContext()->in('sort') == true) {
-            return $return;
+            return $this->renderedGroup;
         }
 
-        $return =   $this->display->render($return);
-        $return =   $this->formatting->render($return);
-        $this->renderedGroup    =   $this->affix->render($return);
+        $this->renderedGroup    =   $this->display->render($this->renderedGroup);
+        $this->renderedGroup    =   $this->formatting->render($this->renderedGroup);
+        $this->renderedGroup    =   $this->affix->render($this->renderedGroup);
         return $this->renderedGroup;
     }
 }

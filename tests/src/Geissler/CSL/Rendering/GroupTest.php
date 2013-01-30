@@ -86,7 +86,7 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         Container::getLocale()->readFile();
 
         $this->assertEquals('(retrieved from)', $this->object->render(''));
-        $this->assertNull($this->object->hasAccessEmptyVariable());
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
     /**
@@ -159,7 +159,9 @@ class GroupTest extends \PHPUnit_Framework_TestCase
                             disambiguate-add-year-suffix="true"
                             et-al-min="2"
                             et-al-use-first="1"
-                            givenname-disambiguation-rule="by-cite" />';
+                            givenname-disambiguation-rule="by-cite">
+                            <layout></layout>
+                            </citation>';
         Container::setCitation(new Citation(new \SimpleXMLElement($citation)));
         Container::getContext()->setName('citation');
 
@@ -176,7 +178,7 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         $layout =   '<group delimiter=": ">
                         <text variable="title"/>
                         <number variable="edition" form="ordinal"/>
-                        <label variable="page"/>
+                        <label variable="edition"/>
                       </group>';
         $json   =   '[
                         {
@@ -187,7 +189,7 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
         Container::getLocale()->readFile();
 
-        $this->assertEquals('Book A: 1st: page', $this->object->render(''));
+        $this->assertEquals('Book A: 1st: edition', $this->object->render(''));
     }
 
     /**
@@ -208,6 +210,28 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         $this->initElement($layout, $json);
         $this->assertEquals('', $this->object->render(''));
         $this->assertTrue($this->object->hasAccessEmptyVariable());
+    }
+
+    /**
+     * @covers Geissler\CSL\Rendering\Group::__construct
+     * @covers Geissler\CSL\Rendering\Group::render
+     * @covers Geissler\CSL\Rendering\Group::hasAccessEmptyVariable
+     * @covers Geissler\CSL\Rendering\Group::renderGroup
+     */
+    public function testRenderGroupInGroup()
+    {
+        $layout =   '<group delimiter=" ">
+                        <text variable="title"/>
+                        <group>
+                            <text value="does not have title-short"/>
+                        </group>
+                    </group>';
+        $json   =   '[{
+                "no-URL": "http://aem.asm.org/content/74/9/2766"
+            }]';
+        $this->initElement($layout, $json);
+        $this->assertEquals('does not have title-short', $this->object->render(''));
+        $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
 

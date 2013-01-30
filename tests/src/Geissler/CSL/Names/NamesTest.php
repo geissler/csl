@@ -110,9 +110,9 @@ class NamesTest extends \PHPUnit_Framework_TestCase
     public function testRenderEditorAndTranslator()
     {
         $layout =   '
-    <names variable="editor translator" delimiter="; ">
-  <label prefix=" (" suffix=")"/>
-</names>';
+            <names variable="editor translator" delimiter="; ">
+                <label prefix=" (" suffix=")" />
+            </names>';
         $json = '[
     {
         "editor": [
@@ -174,7 +174,7 @@ class NamesTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->object->hasAccessEmptyVariable());
     }
 
-    protected function initElement($layout, $json, $context = '<citation />', $language = 'en-US')
+    protected function initElement($layout, $json, $context = '<citation><layout></layout></citation>', $language = 'en-US')
     {
         Container::clear();
         $locale = Factory::locale();

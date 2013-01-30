@@ -15,14 +15,17 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $object;
     protected $dir = '/citeproc-test/processor-tests/humans';
     protected $style = '/citeproc-test/styles';
-    protected $testJustSelected = false;
+    protected $testJustSelected = true;
     protected $selectedTests = array(
+        'condition_',
+        // fails
         //'sort_WithAndInOneEntry.txt',
 
+        /*
         'collapse_',
         'disambiguate_',
         'sort_'
-
+        */
     );
     /**
      * Tests which should not be run
@@ -33,6 +36,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'affix_WithCommas.txt',
         'number_PlainHyphenOrEnDashAlwaysPlural.txt',
         'magic_ImplicitYearSuffixExplicitDelimiter.txt',
+
 
         // Input and Input2 set, don't know how to handle that
         'sort_ChangeInNameSort.txt',

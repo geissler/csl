@@ -152,10 +152,6 @@ class Layout implements Renderable, Parental
             $return =   $this->bibliography($data);
         }
 
-        /*
-        var_dump($return);
-        */
-
         Container::getContext()->leave();
         return $return;
     }
@@ -364,12 +360,13 @@ class Layout implements Renderable, Parental
      * Apply the additional options.
      *
      * @param array $data
+     * @param bool $whitespaceOnly
      * @return array
      */
-    private function applyOptions($data)
+    private function applyOptions($data, $whitespaceOnly = false)
     {
         if (isset($this->options) == true) {
-            return $this->options->apply($data);
+            return $this->options->apply($data, $whitespaceOnly);
         }
 
         return $data;

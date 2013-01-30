@@ -28,7 +28,7 @@ class EtAlTest extends \PHPUnit_Framework_TestCase
         $layout =   '<et-al />';
         $this->initElement($layout);
 
-        $this->assertEquals('et-al', $this->object->render(''));
+        $this->assertEquals(' et al.', $this->object->render(''));
     }
 
     /**
@@ -40,11 +40,12 @@ class EtAlTest extends \PHPUnit_Framework_TestCase
         $layout =   '<et-al term="and others" font-style="italic"/>';
         $this->initElement($layout);
 
-        $this->assertEquals('<font style="font-style:italic">and others</font>', $this->object->render(''));
+        $this->assertEquals('<font style="font-style:italic"> and others</font>', $this->object->render(''));
     }
 
     protected function initElement($layout)
     {
+        \Geissler\CSL\Container::clear();
         $xml = new \SimpleXMLElement($layout);
         $this->object   =   new EtAl($xml);
     }

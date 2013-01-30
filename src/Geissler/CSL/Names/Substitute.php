@@ -75,6 +75,7 @@ class Substitute implements Groupable, Modifiable
 
             if ($return != '') {
                 Container::getContext()->getSubstitute()->setValue($return);
+
                 if (($rendering instanceof Names) == true) {
                     $variables  =   $rendering->getVariables();
                     Container::getContext()->getSubstitute()->setVariable($variables[0]);

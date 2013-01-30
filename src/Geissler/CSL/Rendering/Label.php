@@ -25,7 +25,7 @@ class Label implements Groupable
     /** @var Affix **/
     private $affix;
     /** @var Formatting **/
-    private $formating;
+    private $formatting;
     /** @var TextCase **/
     private $textCase;
     /** @var StripPeriods **/
@@ -42,7 +42,7 @@ class Label implements Groupable
         $this->plural   =   'contextual';
 
         $this->affix        =   new Affix($xml);
-        $this->formating    =   new Formatting($xml);
+        $this->formatting   =   new Formatting($xml);
         $this->textCase     =   new TextCase($xml);
         $this->stripPeriods =   new StripPeriods($xml);
 
@@ -112,7 +112,8 @@ class Label implements Groupable
 
         // The term is only rendered if the selected variable is non-empty.
         $content    =   Container::getData()->getVariable($variable);
-        if ($content == '') {
+        if ($content == ''
+            && $variable !== 'editortranslator') {
             return '';
         }
 
@@ -145,7 +146,7 @@ class Label implements Groupable
 
         $return =   Container::getLocale()->getTerms($variable, $form, $plural);
         if ($return !== '') {
-            $return =   $this->formating->render($return);
+            $return =   $this->formatting->render($return);
             $return =   $this->textCase->render($return);
             $return =   $this->stripPeriods->render($return);
             $return =   $this->affix->render($return);

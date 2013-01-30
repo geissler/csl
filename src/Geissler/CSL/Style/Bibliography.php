@@ -113,6 +113,9 @@ class Bibliography implements Renderable
             Container::getData()->moveToFirst();
             Container::getCitation()->render($data);
             Container::getContext()->setName('bibliography');
+
+            // re-sort with bibliography keys
+            $this->sort();
         }
 
         // render
@@ -130,28 +133,5 @@ class Bibliography implements Renderable
         }
 
         return $return . '</div></div>';
-    }
-
-    /**
-     * Add additional options for displaying a bibliography.
-     *
-     * @param array $result
-     * @return array
-     */
-    private function addOptions($result)
-    {
-        $length =   count($result);
-
-        for ($i = 0; $i < $length; $i++) {
-            if (Container::getContext()->getValue('hangingIndent', 'bibliography') == true) {
-
-            } elseif (Container::getContext()->getValue('secondFieldAlign', 'bibliography') == 'flush') {
-                $result[$i] =   '<div class="csl-left-margin">'
-                    . preg_replace('/( )/', ' </div><div class="csl-right-inline">', $result[$i], 1)
-                    . '</div>';
-            }
-        }
-
-        return $result;
     }
 }

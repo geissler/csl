@@ -180,7 +180,9 @@ class Names implements Groupable, Modifiable
                 $content    =   $this->etAl->render($content);
             }
 
-            $compare[$variable] =   $content;
+            if ($content !== '') {
+                $compare[$variable] =   $content;
+            }
 
             // use substitute
             if ($content == ''
@@ -192,26 +194,30 @@ class Names implements Groupable, Modifiable
                 }
             }
 
-            if ($content != ''
-                && isset($this->label) == true
+            if ($content !== ''
+                &&isset($this->label) == true
                 && Container::getContext()->in('sort') == false) {
                 $this->label->setVariable($variable);
                 $content    .=   $this->label->render($content);
             }
 
-            $returns[]  =   $content;
+            if ($content !== '') {
+                $returns[]  =   $content;
+            }
         }
 
         // The one exception: when the selection consists of "editor" and "translator", and when the contents
         // of these two name variables is identical, then the contents of only one name variable is rendered.
         if (in_array('editor', $this->variables) == true
             && in_array('translator', $this->variables) == true
+            && isset($compare['editor']) == true
             && $compare['editor'] == $compare['translator']) {
-
             $editorTrans    =   $compare['translator'];
+
             if (isset($this->label) == true) {
                 $plural =   'singular';
-                if (count($this->variables) > 1) {
+                if (count(Container::getData()->getVariable('editor')) > 1
+                    || count(Container::getData()->getVariable('translator')) > 1) {
                     $plural = 'multiple';
                 }
 
