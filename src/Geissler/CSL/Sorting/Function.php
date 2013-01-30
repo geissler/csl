@@ -68,6 +68,14 @@ function multiCompare($first, $second)
                 } else {
                     $return =   1;
                 }
+            } elseif ($first[$position][0] == ''
+                || $second[$position][0] == '') {
+                // put empty variables always at the end
+                if ($first[$position][0] == '') {
+                    return 1;
+                } else {
+                    return -1;
+                }
             } else {
                 $return =   strnatcmp(
                     mb_strtolower($first[$position][0]),

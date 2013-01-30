@@ -13,6 +13,7 @@ use Geissler\CSL\Rendering\Variable;
 use Geissler\CSL\Macro\Call;
 use Geissler\CSL\Rendering\Term;
 use Geissler\CSL\Rendering\Value;
+use Geissler\CSL\Container;
 
 /**
  * Text.
@@ -140,6 +141,11 @@ class Text implements Groupable, Parental
     public function render($data)
     {
         $data   =   $this->render->render($data);
+
+        // no formatting while sorting
+        if (Container::getContext()->in('sort') == true) {
+            return $data;
+        }
 
         if ($data !== '') {
             $data   =   $this->textCase->render($data);

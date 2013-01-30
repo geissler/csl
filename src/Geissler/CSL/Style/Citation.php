@@ -80,7 +80,7 @@ class Citation implements Renderable
         if (Container::hasBibliography() == true
             && Container::getBibliography()->sort() == true) {
             Container::getRendered()->clear();
-            $result =   $this->layout->render($data);
+            //$result =   $this->layout->render($data);
         }
 
         if (Container::getCitationItem() !== false) {

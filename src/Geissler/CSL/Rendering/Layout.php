@@ -358,8 +358,8 @@ class Layout implements Renderable, Parental
         $data   =   preg_replace('/[\.][\.]+/', ' ', $data);
         $data   =   preg_replace('/( ,)/', ',', $data);
         $data   =   preg_replace('/\.(<\/[a-z]+>)\./', '.$1', $data);
-        $data   =   $this->formatting->render($data);
         $data   =   $this->expand->render($data);
-        return $this->affix->render($data);
+        $data   =   $this->affix->render($data);
+        return $this->formatting->render($data);
     }
 }

@@ -19,7 +19,6 @@ class Format
      *
      * @param string $variable Variable name
      * @return boolean
-     * @todo raw field support
      */
     public function format($variable)
     {
@@ -30,26 +29,12 @@ class Format
             $this->data =   array();
 
             foreach ($data['date-parts'] as $values) {
-                $date   =   array(
-                    'year'  =>  '',
-                    'month' =>  '',
-                    'day'   =>  '');
-
-                if (isset($values[0]) == true) {
-                    $date['year']   =   $values[0];
-                }
-
-                if (isset($values[1]) == true) {
-                    $date['month']   =   $values[1];
-                }
-
-                if (isset($values[2]) == true) {
-                    $date['day']   =   $values[2];
-                }
-
-                $this->data[]   =   $date;
+                $this->data[]   =   $this->extractDate($values);
             }
 
+            return true;
+        } elseif (is_array($data) == true) {
+            $this->data =   array($this->extractDate($data));
             return true;
         }
 
@@ -64,5 +49,40 @@ class Format
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * Extract the date values into an array.
+     *
+     * @param array $values
+     * @return array
+     */
+    private function extractDate($values)
+    {
+        $date   =   array(
+            'year'  =>  '',
+            'month' =>  '',
+            'day'   =>  ''
+        );
+
+        if (isset($values[0]) == true) {
+            $date['year']   =   $values[0];
+        } elseif (isset($values['year']) == true) {
+            $date['year']   =   $values['year'];
+        }
+
+        if (isset($values[1]) == true) {
+            $date['month']   =   $values[1];
+        } elseif (isset($values['month']) == true) {
+            $date['month']   =   $values['month'];
+        }
+
+        if (isset($values[2]) == true) {
+            $date['day']   =   $values[2];
+        } elseif (isset($values['day']) == true) {
+            $date['day']   =   $values['day'];
+        }
+
+        return $date;
     }
 }

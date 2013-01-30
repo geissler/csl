@@ -127,26 +127,31 @@ class CiteCollapsing implements Optional
     private function citationNumber(array $data)
     {
         $length     =   count($data);
-        $last       =   $data[0]['value'];
+        preg_match('/([0-9]+)/', $data[0]['value'], $match);
+        $last       =   $match[1];
         $position   =   0;
         $remove     =   array();
 
         for ($i = 1; $i < $length; $i++) {
-            if ($last + 1 == $data[$i]['value']) {
+            preg_match('/([0-9]+)/', $data[$i]['value'], $match);
+            $actual =   $match[1];
+
+            if ($last + 1 == $actual) {
                 $remove[]   =   $i;
                 $last++;
             } else {
                 if ($position !== $i -1) {
-                    $data[$position]['value']       .=  '-' . $data[$i - 1]['value'];
-                    $data[$position]['position']    =   $this->afterCollapseDelimiter;
+                    $data[$position]['value']       .=  '–' . $data[$i - 1]['value'];
+                    $data[$position]['delimiter']   =   $this->afterCollapseDelimiter;
                 }
-                $last       =   $data[$i]['value'];
+                $last       =   $actual;
                 $position   =   $i;
             }
         }
 
         if ($position < $length - 1) {
-            $data[$position]['value']    .=  '-' . $last;
+            $data[$position]['value']       .=  '–' . $data[$length - 1]['value'];
+            $data[$position]['delimiter']    =   '';
         }
 
         foreach ($remove as $i) {
@@ -164,16 +169,46 @@ class CiteCollapsing implements Optional
      */
     private function year(array $data)
     {
-        // determine first value
-        preg_match('/^(.*)([0-9]{4})([a-z]{0,2})$/', $data[0]['value'], $match);
-        $actual =   preg_quote($match[1], '/');
+        $missingYear    =   array();
 
-        $length =   count($data);
+        // determine first value
+        $actual = '';
+        if (preg_match('/^(.*)([0-9]{4})([a-z]{0,2})$/', $data[0]['value'], $match) == 1) {
+            $actual =   preg_quote($match[1], '/');
+        } else {
+            $missingYear[]  =   0;
+        }
+
+        $length         =   count($data);
+        $lastCollapsed  =   0;
         for ($i = 1; $i < $length; $i++) {
-            if (preg_match('/^' . $actual . '([0-9]{4})([a-z]{0,2})$/', $data[$i]['value'], $match) == 1) {
-                $data[$i]['value']  =   str_replace($actual, '', $data[$i]['value']);
+            if ($actual !== ''
+                && preg_match('/^' . $actual . '([0-9]{4})([a-z]{0,2})$/', $data[$i]['value'], $match) == 1) {
+                $data[$i]['value']  =   preg_replace('/^' . $actual . '/', '', $data[$i]['value']);
+                $lastCollapsed      =   $i;
             } elseif (preg_match('/^(.*)([0-9]{4})([a-z]{0,2})$/', $data[$i]['value'], $match) == 1) {
                 $actual     =   preg_quote($match[1], '/');
+                // use after collapse delimiter
+                $data[$lastCollapsed]['delimiter']  =   $this->afterCollapseDelimiter;
+            } else {
+                $missingYear[]  =   $i;
+            }
+        }
+
+        if (count($missingYear) > 0) {
+            // collapse authors where year is missing and add delimiter
+            $delimiter  =   Container::getContext()->get('delimiter', 'layout');
+            foreach ($missingYear as $position) {
+                if (isset($data[$position + 1]) == true) {
+                    if (preg_match('/^' . $data[$position]['value'] . '/', $data[$position + 1]['value']) == 1) {
+                        $data[$position + 1]['value']   =   str_replace(
+                            $data[$position]['value'],
+                            $data[$position]['value'] . $delimiter,
+                            $data[$position + 1]['value']
+                        );
+                        unset($data[$position]);
+                    }
+                }
             }
         }
 
@@ -212,126 +247,61 @@ class CiteCollapsing implements Optional
         $data       =   $this->yearSuffix($data);
         $length     =   count($data);
         $remove     =   array();
-        $position   =   0;
-        $last       =   false;
+        $position   =   -1;
 
-        for ($i = 1; $i < $length; $i++) {
-            if (preg_match('/^(' . $this->yearSuffixDelimiter . '){0,1}([a-z]){1,2}/', $data[$i], $match) == 1) {
-                $actual =   $match[2];
+        for ($i = 0; $i < $length; $i++) {
+            if (preg_match('/([0-9]{4})([a-z]){0,2}$/', $data[$i]['value'], $match) == 1) {
+                if ($position > -1) {
+                    // a new year group has started
+                    $data[$position]['value']       .=  '–';
+                    $data[$position]['delimiter']   =   '';
 
-                if ($last == false) {
-                    // first collapsed entry
-                    $last       =   $actual;
+                    // update previous delimiter
+                    $data[$i - 1]['delimiter']  =   $this->afterCollapseDelimiter;
 
-                    if (preg_match('/([0-9]{4})([a-z]{1,2})/', $data[$i - 1], $match) == 1
-                        || preg_match('/^(([a-z]{1,2}))/', $data[$i - 1], $match) == 1) {
-                        $first  =   $match[2];
-                        $first++;
-
-                        if (strcmp($first, $last) == 0) {
-                            // collapsing starts with first entry
-                            $position   =   $i - 1;
-                            $remove[]   =   $i;
-                        } else {
-                            $position   =   $i;
-                        }
-                    } else {
-                        $position   =   $i;
+                    // remove
+                    for ($j = $position + 1; $j < $i - 1; $j++) {
+                        $remove[]   =   $j;
                     }
+                }
 
+                if (isset($match[2]) == true) {
+                    // full year with suffix
+                    $lastYearSuffix =   $match[2];
+                    $position       =   $i;
                 } else {
-                    $test   =   $last;
-                    $test++;
-                    if (strcmp($test, $actual) == 0) {
-                        $remove[]   =   $i;
-                        $last       =   $test;
-                    } else {
-                        $data[$position]    =   $this->addSuffixRange($data[$position], $last);
-                        $position   =   $i;
-                        $last   =   $actual;
-                    }
+                    unset($lastYearSuffix);
+                    $position   =   -1;
                 }
-            } elseif ($last !== false) {
-                // add to last if not identical
-                preg_match('/^[' . $this->yearSuffixDelimiter . ']{0,1}([a-z]){1,2}/', $data[$position], $match);
-                if (in_array($position, $remove) == false) {
-                    if (isset($match[1]) == false
-                        || $last !== $match[1]) {
-                        $data[$position]    =   $this->addSuffixRange($data[$position], $last);
+            } elseif (isset($lastYearSuffix) == true) {
+                $actualSuffix   =   $data[$i]['value'];
+                $lastYearSuffix++;
+
+                if (strcmp($lastYearSuffix, $actualSuffix) != 0) {
+                    // not corresponding suffix
+                    if ($position < $i - 1) {
+                        // suffix range
+                        $data[$position]['value']       .=  '–';
+                        $data[$position]['delimiter']   =   '';
+
+                        // remove
+                        for ($j = $position + 1; $j < $i - $position; $j++) {
+                            $remove[]   =   $j;
+                        }
                     }
 
-                    $data[$position]    .=  $this->afterCollapseDelimiter;
+                    $position   =   $i;
                 }
-                $last   =   false;
+
+                $lastYearSuffix =   $data[$i]['value'];
             }
         }
 
-        if ($last !== false
-            && $position !== $length - 1) {
-            $data[$position]    =   $this->addSuffixRange($data[$position], $last);
-            $remove[]   =   $length - 1;
-        }
-
+        // remove unnecessary suffixes
         foreach ($remove as $i) {
             unset($data[$i]);
         }
 
         return array_values($data);
-    }
-
-    /**
-     * Add collapsed range to previous range.
-     *
-     * @param string $value
-     * @param string $suffix
-     * @return string
-     */
-    private function addSuffixRange($value, $suffix)
-    {
-        if (preg_match('/([0-9]{4})([a-z]{1,2})/', $value) == 1) {
-            return preg_replace('/([0-9]{4})([a-z]{1,2})/', '$1$2–' . $suffix, $value);
-        } else {
-            return preg_replace('/([a-z]{1,2})/', '$1–' . $suffix, $value);
-        }
-
-    }
-
-    /**
-     * Collapses the entries and removes duplicated and wrong delimiters.
-     *
-     * @param array $data
-     * @param string $delimiter
-     * @return string
-     */
-    private function implode($data, $delimiter)
-    {
-        $return =   implode($delimiter, $data);
-        $return =   str_replace(
-            array(
-                $this->yearSuffixDelimiter . $delimiter,
-                $delimiter. $this->yearSuffixDelimiter,
-                $delimiter . $delimiter,
-                $this->yearSuffixDelimiter . $this->yearSuffixDelimiter,
-                $this->afterCollapseDelimiter . $this->afterCollapseDelimiter,
-                $delimiter . $this->afterCollapseDelimiter,
-                $this->afterCollapseDelimiter . $delimiter,
-            ),
-            array(
-                $this->yearSuffixDelimiter,
-                $this->yearSuffixDelimiter,
-                $delimiter,
-                $this->yearSuffixDelimiter,
-                $this->afterCollapseDelimiter,
-                $this->afterCollapseDelimiter,
-                $this->afterCollapseDelimiter,
-            ),
-            $return
-        );
-
-        $return =   preg_replace('/([,|;]) ([,|;])/', '$1', $return);
-        $return =   preg_replace('/[,][,]+/', ',', $return);
-        $return =   preg_replace('/[;][;]+/', ';', $return);
-        $return =   preg_replace('/[ ][ ]+/', ' ', $return);
-        return preg_replace('/([,|;| ]+)$/', '', $return);
     }
 }

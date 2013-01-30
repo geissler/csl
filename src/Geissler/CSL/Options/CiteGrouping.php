@@ -70,9 +70,11 @@ class CiteGrouping implements Optional
         for ($i = 0; $i < $length; $i++) {
             // get all names in citation group
             $namesAsArray   =   array();
+            $namesFull      =   array();
             do {
                 Container::getData()->moveToId(Container::getActualId());
                 $namesAsArray[] =   $names->renderAsArray('');
+                $namesFull[]    =   $names->render('');
             } while (Container::getCitationItem()->nextInGroup() == true);
 
             $newData[$i]    =   array();
@@ -86,7 +88,8 @@ class CiteGrouping implements Optional
                     $groupPosition  =   0;
 
                     for ($k = $j + 1; $k < $citeLength; $k++) {
-                        if ($actualName == $namesAsArray[$k][0]) {
+                        if ($actualName == $namesAsArray[$k][0]
+                            && $namesFull[$j] == $namesFull[$k]) {
                             // replace delimiter in previous group entry with cite group delimiter
                             $actualGroup[$groupPosition]['delimiter']   =   $this->citeGroupDelimiter;
                             $actualGroup[]          =   $data[$i][$k];

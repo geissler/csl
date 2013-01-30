@@ -162,19 +162,19 @@ class Name implements Renderable, Modifiable, Contextualize
     public function getOptions()
     {
         $return = array(
-            'and' => $this->and,
-            'delimiter' => $this->delimiter,
-            'delimiter-precedes-et-al' => $this->delimiterPrecedesEtAl,
-            'delimiter-precedes-last' => $this->delimiterPrecedesLast,
-            'et-al-min' => $this->etAlMin,
-            'et-al-use-first' => $this->etAlUseFirst,
-            'et-al-subsequent-min' => $this->etAlSubsequentMin,
-            'et-al-subsequent-use-first' => $this->etAlSubsequentUseFirst,
-            'et-al-use-last' => $this->etAlUseLast,
-            'form' => $this->form,
-            'initialize' => $this->initialize,
-            'name-as-sort-order' => $this->nameAsSortOrder,
-            'sort-separator' => $this->sortSeparator
+            'and'                           =>  $this->and,
+            'delimiter'                     =>  $this->delimiter,
+            'delimiter-precedes-et-al'      =>  $this->delimiterPrecedesEtAl,
+            'delimiter-precedes-last'       =>  $this->delimiterPrecedesLast,
+            'et-al-min'                     =>  $this->etAlMin,
+            'et-al-use-first'               =>  $this->etAlUseFirst,
+            'et-al-subsequent-min'          =>  $this->etAlSubsequentMin,
+            'et-al-subsequent-use-first'    =>  $this->etAlSubsequentUseFirst,
+            'et-al-use-last'                =>  $this->etAlUseLast,
+            'form'                          =>  $this->form,
+            'initialize'                    =>  $this->initialize,
+            'name-as-sort-order'            =>  $this->nameAsSortOrder,
+            'sort-separator'                =>  $this->sortSeparator
         );
 
         if ($this->initializeWith !== false) {
@@ -245,8 +245,8 @@ class Name implements Renderable, Modifiable, Contextualize
     public function render($data)
     {
         $this->apply();
-        $names  =   array();
-        $length =   count($data);
+        $names  = array();
+        $length = count($data);
 
         if ($length == 0) {
             return '';
@@ -366,6 +366,11 @@ class Name implements Renderable, Modifiable, Contextualize
             $return =   str_replace(Container::getLocale()->getTerms('et-al'), ' … ' . end($names), $return);
         }
 
+        // no formatting in while sorting
+        if (Container::getContext()->in('sort') == true) {
+            return $return;
+        }
+
         $return =   $this->formatting->render($return);
         return $this->affix->render($return);
     }
@@ -475,13 +480,20 @@ class Name implements Renderable, Modifiable, Contextualize
 
                     $return['switched'] =   true;
 
-                    if ($demoteNonDroppingParticle == 'never'
+                    if ($demoteNonDroppingParticle == 'sort-only'
+                        && Container::getContext()->in('sort') == true) {
+                        $return['display'][]    =   'family';
+                        $return['display'][]    =   'non-dropping-particle';
+                        $return['display'][]    =   'given';
+                        $return['display'][]    =   'dropping-particle';
+                        $return['display'][]    =   'suffix';
+                    } elseif ($demoteNonDroppingParticle == 'never'
                         || $demoteNonDroppingParticle == 'sort-only') {
-                            $return['display'][]    =   'non-dropping-particle';
-                            $return['display'][]    =   'family';
-                            $return['display'][]    =   'given';
-                            $return['display'][]    =   'dropping-particle';
-                            $return['display'][]    =   'suffix';
+                        $return['display'][]    =   'non-dropping-particle';
+                        $return['display'][]    =   'family';
+                        $return['display'][]    =   'given';
+                        $return['display'][]    =   'dropping-particle';
+                        $return['display'][]    =   'suffix';
                     } else {
                         $return['display'][]    =   'family';
                         $return['display'][]    =   'given';

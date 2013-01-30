@@ -13,9 +13,17 @@ use Geissler\CSL\Container;
  */
 class Locator extends ChooseableAbstract implements Chooseable
 {
+    /**
+     * Test if label is equal to the variable.
+     *
+     * @param string $variable
+     * @return bool
+     */
     protected function validateVariable($variable)
     {
-        if (Container::getData()->getVariable('label') == $variable) {
+        if (Container::getData()->getVariable('label') == $variable
+            || (is_object(Container::getCitationItem()) == true
+                && Container::getCitationItem()->get('label') == $variable)) {
             return true;
         }
 

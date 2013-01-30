@@ -3,6 +3,7 @@ namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Rendering\Formatting;
+use Geissler\CSL\Container;
 
 /**
  * Et-Al as children of a Names object.
@@ -42,6 +43,9 @@ class EtAl implements Renderable
      */
     public function render($data)
     {
-        return $this->formatting->render($this->term);
+        $data   =   str_replace(' ' . Container::getLocale()->getTerms('et-al'), '', $data);
+        $data   .=  ' ' . Container::getLocale()->getTerms($this->term);
+
+        return $this->formatting->render($data);
     }
 }

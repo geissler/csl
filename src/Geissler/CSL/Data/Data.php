@@ -194,9 +194,4 @@ class Data
 
         return $this;
     }
-
-    public function dump()
-    {
-        var_dump($this->data);
-    }
 }

@@ -97,6 +97,10 @@ class Citations extends CitationAbstract
      */
     protected function getGroupLength()
     {
-        return count($this->data[$this->position][0]['citationItems']);
+        if (isset($this->data[$this->position]) == true) {
+            return count($this->data[$this->position][0]['citationItems']);
+        }
+
+        return 0;
     }
 }

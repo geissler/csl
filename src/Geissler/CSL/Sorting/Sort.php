@@ -118,7 +118,7 @@ class Sort
                 }
 
                 $sort[$id][]  =   array(
-                    trim($this->keys[$i]['generate']->render(Container::getData()->get())),
+                    $this->removeFormatting($this->keys[$i]['generate']->render(Container::getData()->get())),
                     $position++,
                     $this->keys[$i]['sort'] == 'ascending' ? 'asc' : 'desc',
                     $id
@@ -163,7 +163,7 @@ class Sort
                 }
 
                 $sort[$id][]  =   array(
-                    trim($this->keys[$i]['generate']->render(Container::getData()->get())),
+                    $this->removeFormatting($this->keys[$i]['generate']->render(Container::getData()->get())),
                     $position++,
                     $this->keys[$i]['sort'] == 'ascending' ? 'asc' : 'desc',
                     $id
@@ -193,7 +193,7 @@ class Sort
 
         // sort
         uasort($sort, 'multiCompare');
-        //var_dump($sort);
+
         // get keys in order
         $keys   =   array();
         foreach ($sort as $entry) {
@@ -241,5 +241,16 @@ class Sort
         }
 
         return $sort;
+    }
+
+    /**
+     * Remove not sortable values.
+     *
+     * @param string $value
+     * @return string
+     */
+    private function removeFormatting($value)
+    {
+        return trim(str_replace(array('[', ']', '(', ')', '{', '}', ',', ';'), '', $value));
     }
 }

@@ -177,7 +177,7 @@ class Names implements Groupable, Modifiable
             if (isset($this->etAl) == true
                 && Container::getContext()->getValue('etAlMin', Container::getContext()->getName()) !== null
                 && Container::getContext()->getValue('etAlMin', Container::getContext()->getName()) <= count($names)) {
-                $content    .=   $this->etAl->render($content);
+                $content    =   $this->etAl->render($content);
             }
 
             $compare[$variable] =   $content;

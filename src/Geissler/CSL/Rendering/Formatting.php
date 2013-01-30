@@ -40,7 +40,7 @@ class Formatting implements Renderable, Modifiable
     }
 
     /**
-     * Modifys the configuration.
+     * Modifies the configuration.
      *
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Rendering\Formatting
