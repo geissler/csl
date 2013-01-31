@@ -38,6 +38,7 @@ class Names implements Groupable, Modifiable
     private $substitute;
     /** @var Label **/
     private $label;
+    private $labelBeforeName    =   false;
 
     /**
      * Parses the Names configuration.
@@ -46,13 +47,14 @@ class Names implements Groupable, Modifiable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->variables    =   array();
-        $this->delimiter    =   '';
-        $this->name         =   new Name(new \SimpleXMLElement('<name form="long" />'));
+        $this->variables        =   array();
+        $this->delimiter        =   '';
 
-        $this->affix        =   new Affix($xml);
-        $this->display      =   new Display($xml);
-        $this->formatting   =   new Formatting($xml);
+        $this->labelBeforeName  =   false;
+
+        $this->affix            =   new Affix($xml);
+        $this->display          =   new Display($xml);
+        $this->formatting       =   new Formatting($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
@@ -78,8 +80,18 @@ class Names implements Groupable, Modifiable
                     break;
                 case 'label':
                     $this->label        =   new Label($child);
+
+                    if (isset($this->name) == false) {
+                        $this->labelBeforeName  =   true;
+                    }
                     break;
             }
+        }
+
+        // use standard name
+        if (isset($this->name) == false) {
+            $this->name             =   new Name(new \SimpleXMLElement('<name form="long" />'));
+            $this->labelBeforeName  =   false;
         }
 
         // modify substitute child by passing all options
@@ -198,7 +210,12 @@ class Names implements Groupable, Modifiable
                 &&isset($this->label) == true
                 && Container::getContext()->in('sort') == false) {
                 $this->label->setVariable($variable);
-                $content    .=   $this->label->render($content);
+
+                if ($this->labelBeforeName == false) {
+                    $content    .=   $this->label->render($content);
+                } else {
+                    $content    =   $this->label->render($content) . $content;
+                }
             }
 
             if ($content !== '') {

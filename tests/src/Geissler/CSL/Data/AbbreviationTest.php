@@ -68,8 +68,6 @@ class AbbreviationTest extends \PHPUnit_Framework_TestCase
     }
 }';
         $this->assertInstanceOf($this->class, $this->object->set($json));
-        $this->assertEquals('J. Irrep. Res.', $this->object->get('container-title'));
-        $this->assertEquals('Journal of Irreproducible Results', $this->object->get('container-title', 'long'));
-        $this->assertNull($this->object->get('title', 'long'));
+        $this->assertEquals('J. Irrep. Res.', $this->object->get('container-title', 'Journal of Irreproducible Results'));
     }
 }

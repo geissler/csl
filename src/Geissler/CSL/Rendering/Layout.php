@@ -282,23 +282,45 @@ class Layout implements Renderable, Parental
         $data   =   $this->applyOptions($data);
 
         if (is_array($data) == true) {
-            $length =   count($data);
+            $length     =   count($data);
+            $delimiters =   array();
             for ($i = 0; $i < $length; $i++) {
                 if (isset($data[$i][0]) == true) {
                     $innerLength    =   count($data[$i]);
                     $innerData      =   array();
 
                     for ($j = 0; $j < $innerLength; $j++) {
+                        if ($data[$i][$j]['delimiter'] != '') {
+                            $delimiters[]   =   $data[$i][$j]['delimiter'];
+                        }
+
                         $innerData[]    =   $data[$i][$j]['value'] . $data[$i][$j]['delimiter'];
                     }
 
                     $data[$i]   =   $this->format(implode('', $innerData));
                 } else {
-                    $data[$i]   =   $data[$i]['value'] . $data[$i]['delimiter'];
+                    if ($data[$i]['delimiter'] != '') {
+                        $delimiters[]   =   $data[$i]['delimiter'];
+                    }
+
+                    $data[$i]       =   $data[$i]['value'] . $data[$i]['delimiter'];
                 }
             }
 
-            $return =   implode($delimiter, $data);
+            // Add delimiter where no other exists
+            if (count($delimiters) > 0) {
+                $regExp =   '/(' . implode('|', array_unique($delimiters)) . ')$/';
+                for ($i = 0; $i < $length - 1; $i++) {
+                    if (preg_match($regExp, $data[$i]) == 0) {
+                        $data[$i]   .=  $delimiter;
+                    }
+                }
+
+                $return =   implode('', $data);
+            } else {
+                $return =   implode($delimiter, $data);
+            }
+
             $return =   str_replace('. ' . $this->delimiter, '. ', $return);
             $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
             return $this->format($return);

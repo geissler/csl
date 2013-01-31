@@ -158,6 +158,11 @@ class Container
         throw new \ErrorException('No bibliography defined!');
     }
 
+    /**
+     * Test if a bibliography render object is injected.
+     *
+     * @return bool
+     */
     public static function hasBibliography()
     {
         if (isset(self::$bibliography) == true
@@ -202,11 +207,15 @@ class Container
     /**
      * Retrieve the abbreviations.
      *
-     * @return \Geissler\CSL\Data\Abbreviation
+     * @return \Geissler\CSL\Data\Abbreviation|bool
      */
     public static function getAbbreviation()
     {
-        return self::$abbreviation;
+        if (isset(self::$abbreviation) == true) {
+            return self::$abbreviation;
+        }
+
+        return false;
     }
 
     /**

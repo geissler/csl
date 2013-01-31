@@ -34,8 +34,24 @@ class Format
 
             return true;
         } elseif (is_array($data) == true) {
-            $this->data =   array($this->extractDate($data));
-            return true;
+            if (isset($data['literal']) == true) {
+                $this->data =   array($data);
+                return true;
+            } elseif (isset($data['raw']) == false) {
+                $this->data =   array($this->extractDate($data));
+                return true;
+            } elseif (strtotime($data['raw']) !== false) {
+                $date = new \DateTime($data['raw']);
+                $this->data =   array(
+                    array(
+                        'year'  =>  $date->format('Y'),
+                        'month' =>  $date->format('m'),
+                        'day'   =>  $date->format('d')
+                    )
+                );
+
+                return true;
+            }
         }
 
         return false;

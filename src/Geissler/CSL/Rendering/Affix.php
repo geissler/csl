@@ -76,18 +76,19 @@ class Affix implements Renderable, Modifiable
                 || $this->suffix !== '')) {
             $data   =   $this->addPrefix($this->addSuffix($data));
 
-            // remove duplicated pre- and suffixes
-            if ($this->prefix !== '') {
-                $prefix =   preg_replace('/([\.|\[|\]|\(|\)|\+|\/])/', '#$1', $this->prefix . $this->prefix);
-                $prefix =   str_replace('#', '\\', $prefix);
-                $data   =   preg_replace('/^' . $prefix . '/', $this->prefix, $data);
+            // masc \n to get preg_replace working under Windows
+            $data   =   str_replace("\n", '###', $data);
+            // remove duplicated braces
+            $regExp =   '/^' . preg_quote($this->prefix . $this->prefix) . '(.*)'
+                . preg_quote($this->suffix . $this->suffix) . '$/';
+            if (($this->prefix == '(')
+                    && $this->suffix == ')'
+                || ($this->prefix == '['
+                    && $this->suffix == ']')) {
+                $data   =   preg_replace($regExp, $this->prefix . '$1' . $this->suffix, $data);
             }
 
-            if ($this->suffix !== '') {
-                $suffix =   preg_replace('/([\.|\[|\]|\(|\)|\+|\/])/', '#$1', $this->suffix . $this->suffix);
-                $suffix =   str_replace('#', '\\', $suffix);
-                $data   =   preg_replace('/' . $suffix . '$/', $this->suffix, $data);
-            }
+            $data   =   str_replace('###', "\n", $data);
         }
 
         return $data;

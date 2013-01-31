@@ -14,8 +14,8 @@ function multiCompare($first, $second)
 
     do {
         if (isset($first[$position]) == true) {
-            if (preg_match('/^[1-9][0-9]*$/', $first[$position][0]) == 1
-                && preg_match('/^[1-9][0-9]*$/', $second[$position][0]) == 1) {
+            if (preg_match('/^\-?[1-9][0-9]*$/', $first[$position][0]) == 1
+                && preg_match('/^\-?[1-9][0-9]*$/', $second[$position][0]) == 1) {
                 // compare as numbers
                 $firstNumber   =   $first[$position][0] * 1;
                 $secondNumber  =   $second[$position][0] * 1;

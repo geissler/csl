@@ -1,6 +1,6 @@
 This project is still in an early alpha state, nearly the half of the tests is failing. The goal is to implement a
 parser which is 100% compatible with the [CSL 1.0.1](http://citationstyles.org/downloads/specification.html "CSL")
-standard, is 100% OOP and follows the
+standard, 100% clean OOP and follows the
 [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md "PSR-2") coding
 standard.
 
@@ -21,7 +21,7 @@ compatible autoloader.
 Render a single bibliography entry.
 ```php
     // include the composer autoloader
-    require 'vendor/autoload.php';
+    require __DIR__ . '/vendor/autoload.php';
 
     use Geissler\CSL\CSL;
 
@@ -71,6 +71,14 @@ As HTML
 ```
 
 ## Configuration
+The following options can be configured via the `configuration.ini`:
+
+* locale-group
+    * dir = Path to the locales files relative to the configuration.ini (standard: locale)
+    * file = Filename of the language files, where LANGUAGE represents *de-DE*, *en-US* (standard: locales-LANGUAGE.xml)
+    * dialects = A JSON array with the main dialects for languages spoken in more than one country.
+* styles-group
+    * dir = Path to the styles dir relative to the configuration.ini (standard: styles)
 
 ## Tests and Comments
 [![Build Status](https://travis-ci.org/geissler/csl.png)](https://travis-ci.org/geissler/csl)

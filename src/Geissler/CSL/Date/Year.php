@@ -19,7 +19,7 @@ class Year implements Renderable, Modifiable
     /**
      * Parses the year configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
@@ -28,7 +28,7 @@ class Year implements Renderable, Modifiable
     }
 
     /**
-     * Modifys the actual year configuration.
+     * Modifies the actual year configuration.
      * 
      * @param \SimpleXMLElement $xml
      * @return \Geissler\CSL\Date\Year
@@ -58,6 +58,10 @@ class Year implements Renderable, Modifiable
         }
 
         $data   =   (int) $data;
+        if (Container::getContext()->in('sort') == true) {
+            return $data;
+        }
+
         if ($data < 0) {
             // The "bc" term (Before Christ) is automatically appended to negative years
             return -1 * $data . Container::getLocale()->getTerms('bc');

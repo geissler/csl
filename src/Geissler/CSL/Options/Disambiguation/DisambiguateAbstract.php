@@ -163,6 +163,10 @@ abstract class DisambiguateAbstract implements Disambiguate
     protected function renderNames($data, $asArray = false)
     {
         $names  =   Container::getContext()->get('layout', 'layout')->getChildElement('\Geissler\CSL\Names\Names');
+        if (is_object($names) == false) {
+            return array();
+        }
+
         $ids    =   array_keys($data);
         $length =   count($ids);
         $values =   array();

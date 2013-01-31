@@ -10,6 +10,7 @@ use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Date\DatePart;
 use Geissler\CSL\Date\Format;
+use Geissler\CSL\Sorting\Variable;
 
 /**
  * Renders dates.
@@ -37,6 +38,8 @@ class Date implements Groupable, Modifiable
     private $data;
     /** @var bool */
     private $addYearSuffix;
+    /** @var string */
+    private $delimiter;
 
     /**
      * Parses the affix configuration.
@@ -49,6 +52,7 @@ class Date implements Groupable, Modifiable
         $this->form             =   '';
         $this->dateParts        =   array();
         $this->addYearSuffix    =   false;
+        $this->delimiter        =   '';
 
         $this->affix        =   new Affix($date);
         $this->display      =   new Display($date);
@@ -151,6 +155,9 @@ class Date implements Groupable, Modifiable
                 case 'add-year-suffix':
                     $this->addYearSuffix    =   isBoolean($value);
                     break;
+                case 'delimiter':
+                    $this->delimiter    =   (string) $value;
+                    break;
                 case 'date-parts':
                     if ($this->form !== '') {
                         $dateParts      =   explode('-', (string) $value);
@@ -183,6 +190,17 @@ class Date implements Groupable, Modifiable
     {
         if ($this->formatDate() == false) {
             return '';
+        }
+
+        // for sorting use numeric date
+        if (Container::getContext()->in('sort') == true) {
+            $return =   array();
+            foreach ($this->dateParts as $datePart) {
+                $object     =   $datePart['datepart'];
+                $return[]   =   $object->render($this->data[0]);
+            }
+
+            return implode('', $return);
         }
 
         if (count($this->data) == 2) {
@@ -221,8 +239,8 @@ class Date implements Groupable, Modifiable
                 }
             }
 
-            $result[0]  = implode('', $result[0]);
-            $result[1]  = implode('', $result[1]);
+            $result[0]  = implode($this->delimiter, $result[0]);
+            $result[1]  = implode($this->delimiter, $result[1]);
 
             $value  =   implode($delimiter, $result);
         } else {
@@ -232,7 +250,13 @@ class Date implements Groupable, Modifiable
                 $return[]   =   $object->render($this->data[0]);
             }
 
-            $value =   implode('', $return);
+            $value =   implode($this->delimiter, $return);
+
+            // catch non-date dates
+            if ($value == ''
+                && isset($this->data[0]['literal']) == true) {
+                $value  =   $this->data[0]['literal'];
+            }
         }
 
         if ($value == '') {

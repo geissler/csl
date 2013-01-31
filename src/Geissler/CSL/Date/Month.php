@@ -66,6 +66,20 @@ class Month implements Renderable, Modifiable
             $data   =   $this->getMonthNumber($data);
         }
 
+        // use always numeric value for sorting
+        if (Container::getContext()->in('sort') == true) {
+            if ($data !== '') {
+                $data = (int) $data;
+
+                if ($data < 10) {
+                    return '0' . $data;
+                }
+                return $data;
+            }
+
+            return 00;
+        }
+
         if ($data !== '') {
             switch ($this->form) {
                 case 'long':

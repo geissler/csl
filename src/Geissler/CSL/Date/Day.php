@@ -54,10 +54,21 @@ class Day implements Renderable, Modifiable
      */
     public function render($data)
     {
+        // use always numeric value for sorting
+        if (Container::getContext()->in('sort') == true) {
+            if ($data !== '') {
+                $data = (int) $data;
+
+                if ($data < 10) {
+                    return '0' . $data;
+                }
+                return $data;
+            }
+
+            return 00;
+        }
+
         switch ($this->form) {
-            case 'numeric':
-                return (int) $data;
-                break;
             case 'numeric-leading-zeros':
                 if ((int) $data < 10) {
                     return '0' . (int) $data;
@@ -67,6 +78,10 @@ class Day implements Renderable, Modifiable
                 break;
             case 'ordinal':
                 return Ordinal::render($data, true);
+                break;
+            case 'numeric':
+            default:
+                return (int) $data;
                 break;
         }
     }
