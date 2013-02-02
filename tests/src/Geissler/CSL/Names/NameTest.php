@@ -185,7 +185,7 @@ class NameTest extends \PHPUnit_Framework_TestCase
 
         $this->initElement($layout);
 
-        $this->assertEquals('Ράις Μυρτώ', $this->object->render($data));
+        $this->assertEquals('Μυρτώ Ράις', $this->object->render($data));
     }
 
     /**

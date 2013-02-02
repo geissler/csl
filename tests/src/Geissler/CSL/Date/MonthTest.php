@@ -144,11 +144,11 @@ class MonthTest extends \PHPUnit_Framework_TestCase
      * @covers Geissler\CSL\Date\Month::__construct
      * @covers Geissler\CSL\Date\Month::render
      */
-    public function testRenderNumericGermanFromFrench()
+    public function testRenderNumericGermanFromFrenchAsRaw()
     {
         $layout =   '<date-part name="month" form="numeric"/>';
         $this->initElement($layout, 'de');
-        $this->assertEquals('', $this->object->render('févr.'));
+        $this->assertEquals('févr.', $this->object->render('févr.'));
     }
 
     /**
