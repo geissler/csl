@@ -3,6 +3,7 @@ namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
+use Geissler\CSL\Date\DatePartAbstract;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Ordinal;
 
@@ -12,7 +13,7 @@ use Geissler\CSL\Rendering\Ordinal;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Day implements Renderable, Modifiable
+class Day extends DatePartAbstract implements Renderable, Modifiable
 {
     /** @var string **/
     private $form;
@@ -24,6 +25,7 @@ class Day implements Renderable, Modifiable
      */
     public function __construct(\SimpleXMLElement $day)
     {
+        parent::__construct($day);
         $this->form =   'numeric';
         $this->modify($day);
     }
@@ -74,14 +76,14 @@ class Day implements Renderable, Modifiable
                     return '0' . (int) $data;
                 }
 
-                return $data;
+                return $this->format($data);
                 break;
             case 'ordinal':
-                return Ordinal::render($data, true);
+                return $this->format(Ordinal::render($data, true));
                 break;
             case 'numeric':
             default:
-                return (int) $data;
+                return $this->format((int) $data);
                 break;
         }
     }

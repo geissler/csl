@@ -1,8 +1,6 @@
 <?php
 namespace Geissler\CSL\Data;
 
-use Geissler\CSL\Container;
-
 /**
  * Storage for the rendered citations and bibliographies entries.
  *
@@ -174,10 +172,5 @@ class Rendered
 
         $this->rendered[$id][$type]    =   $value;
         return $this;
-    }
-
-    public function dump()
-    {
-        var_dump($this->rendered);
     }
 }

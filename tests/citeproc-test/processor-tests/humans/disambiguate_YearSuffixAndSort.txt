@@ -3,7 +3,7 @@
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
- * Attribution License Version 1.0 (the “License”); you may not use
+ * Attribution License Version 1.0 (the â€œLicenseâ€); you may not use
  * this file except in compliance with the License. You may obtain a
  * copy of the License at:
  *
@@ -15,7 +15,7 @@
  * Original Developer. In addition, Exhibit A has been modified to be
  * consistent with Exhibit B.
  *
- * Software distributed under the License is distributed on an “AS IS”
+ * Software distributed under the License is distributed on an â€œAS ISâ€
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
  * the License for the specific language governing rights and limitations
  * under the License.
@@ -43,7 +43,7 @@
  * replace them with the notice and other provisions required by the
  * [AGPLv3] License. If you do not delete the provisions above, a
  * recipient may use your version of this file under either the CPAL
- * or the [AGPLv3] License.”
+ * or the [AGPLv3] License.â€
  */
 
 >>===== MODE =====>>
@@ -120,16 +120,15 @@ citation
   </macro>
   <citation 
          disambiguate-add-year-suffix="true">
-         <sort>
-      <key variable="issued" />
-      <key variable="title" />
-    </sort>
     <layout delimiter="; ">
       <text macro="date" />
     </layout>
   </citation>
   <bibliography>
-    
+    <sort>
+      <key variable="issued" />
+      <key variable="title" />
+    </sort>
     <layout>
       <text value="Ignore me" />
     </layout>

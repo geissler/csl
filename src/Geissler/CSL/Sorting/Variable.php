@@ -89,6 +89,11 @@ class Variable implements Sortable
                     return $first . $second;
                 }
 
+                // put empty dates in bibliographies at the end
+                if (Container::getContext()->getName() == 'bibliography') {
+                    return '';
+                }
+
                 return '0000000000000000';
                 break;
             case 'chapter-number':

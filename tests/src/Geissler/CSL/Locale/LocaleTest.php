@@ -125,6 +125,15 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Geissler\CSL\Locale\Locale::getTerms
      */
+    public function testGetTerms2()
+    {
+        $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->readFile('en-US'));
+        $this->assertEquals('accessed', $this->object->getTerms('accessed'));
+    }
+
+    /**
+     * @covers Geissler\CSL\Locale\Locale::getTerms
+     */
     public function testGetTermsWithAdditional()
     {
         $this->assertInstanceOf('\Geissler\CSL\Locale\Locale', $this->object->readFile('fr'));

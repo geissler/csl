@@ -372,7 +372,7 @@ class Name implements Renderable, Modifiable, Contextualize
         }
 
         $return =   $this->formatting->render($return);
-        return $this->affix->render($return);
+        return $this->affix->render($return, true);
     }
 
     /**
@@ -469,7 +469,7 @@ class Name implements Renderable, Modifiable, Contextualize
             return $return;
         }
 
-        if (preg_match('/\p{Cyrillic}+|\p{Latin}+/u', $data['family']) == 1) {
+        if (preg_match('/\p{Cyrillic}+|\p{Latin}|\p{Greek}+/u', $data['family']) == 1) {
             // Display order of latin/Cyrillic names
             $demoteNonDroppingParticle  =   Container::getContext()->getValue('demoteNonDroppingParticle');
 

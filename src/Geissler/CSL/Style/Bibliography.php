@@ -6,7 +6,6 @@ use Geissler\CSL\Sorting\Sort;
 use Geissler\CSL\Rendering\Layout;
 use Geissler\CSL\Container;
 use Geissler\CSL\Context\Options;
-use Geissler\CSL\Options\ReferenceGrouping;
 use Geissler\CSL\Options\Bibliography as BibliographyOptions;
 
 /**

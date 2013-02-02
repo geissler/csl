@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Interfaces\Parental;
 use Geissler\CSL\Rendering\Affix;
@@ -21,7 +22,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Text implements Groupable, Parental
+class Text implements Renderable, Groupable, Parental
 {
     /** @var Affix **/
     private $affix;
@@ -35,7 +36,7 @@ class Text implements Groupable, Parental
     private $stripPeriods;
     /** @var TextCase **/
     private $textCase;
-    /** @var Renderable **/
+    /** @var \Geissler\CSL\Interfaces\Renderable **/
     private $render;
 
     /**
@@ -100,7 +101,6 @@ class Text implements Groupable, Parental
      */
     public function modifyChildElement($class, \SimpleXMLElement $xml)
     {
-
         if (($this->render instanceof $class) == true
             && ($this->render instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
             $this->render->modify($xml);

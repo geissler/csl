@@ -2,7 +2,6 @@
 namespace Geissler\CSL\Choose;
 
 use Geissler\CSL\Interfaces\Chooseable;
-use Geissler\CSL\Choose\ChooseableAbstract;
 use Geissler\CSL\Container;
 
 /**

@@ -81,14 +81,17 @@ class Citation implements Renderable
         // render citation
         $result =   $this->layout->render($data);
 
-        // sort bibliography and re-render citations
-        /* wrong test file (?)
+        // The assignment of the year-suffixes follows the order of the bibliographies entries,
+        // so sort by the bibliography and re-render citations
         if (Container::hasBibliography() == true
-            && Container::getBibliography()->sort() == true) {
+            && Container::getBibliography()->sort() == true
+            && Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true) {
             Container::getRendered()->clear();
+            $this->layout->render($data);
+
+            // re-render citation
             $result =   $this->layout->render($data);
         }
-        */
 
         if (Container::getCitationItem() !== false) {
             // apply additional citation formatting options

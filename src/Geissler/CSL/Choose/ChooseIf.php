@@ -98,10 +98,8 @@ class ChooseIf implements Renderable, Groupable, Chooseable, Parental
      */
     public function hasAccessEmptyVariable()
     {
-        foreach ($this->children as $child) {
-            if ($child->hasAccessEmptyVariable() == true) {
-                return true;
-            }
+        if ($this->render('') == '') {
+            return true;
         }
 
         return false;

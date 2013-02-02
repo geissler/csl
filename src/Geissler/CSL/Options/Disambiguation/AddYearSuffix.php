@@ -18,6 +18,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
     private $tmpAmbiguous;
     /** @var array */
     private $tmpDisambiguate;
+    private $regExp;
 
     /**
      * Try to disambiguate the ambiguous values. If not possible, pass the values to the successor and try to
@@ -30,9 +31,18 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
         $this->tmpAmbiguous     =   $this->getAmbiguous();
         $firstDifferent         =   false;
 
+        // disambiguate years and missing years
+        $this->regExp   =  '/([0-9]{2,4}';
+        if (Container::getLocale()->getTerms('do date', 'short') !== null) {
+            $this->regExp   .=  '|' . Container::getLocale()->getTerms('do date', 'short');
+        } elseif (Container::getLocale()->getTerms('do date', 'short') !== null) {
+            $this->regExp   .=  '|' . Container::getLocale()->getTerms('do date');
+        }
+        $this->regExp   .=  ')/';
+
         // disambiguate only where names and year are identical
         foreach ($this->tmpAmbiguous as $id => $name) {
-            if (preg_match('/[0-9]{2,4}/', $name) == 0) {
+            if (preg_match($this->regExp, $name) == 0) {
                 $rendered   =   Container::getRendered()->getById($id);
                 $citation   =   '';
 
@@ -43,7 +53,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
                     $citation   =   $rendered['citation'];
                 }
 
-                if (preg_match('/[0-9]{2,4}/', $citation) == 1) {
+                if (preg_match($this->regExp, $citation) == 1) {
                     $this->tmpAmbiguous[$id] =  $citation;
                 }
             }
@@ -75,7 +85,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
     {
         // test if year is rendered, if not try if year is rendered through choose disambiguate
         $layout =   Container::getContext()->get('layout', 'layout');
-        if (preg_match('/([0-9]{2,4})/', current($this->tmpAmbiguous)) == 0
+        if (preg_match($this->regExp, current($this->tmpAmbiguous)) == 0
             && Container::getContext()->isChooseDisambiguationActive() == true) {
             Container::getContext()->setChooseDisambiguateValue(true);
 
@@ -107,7 +117,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
                     $this->tmpDisambiguate[$id]    =   $layout->renderById($id, '');
                     unset($this->tmpAmbiguous[$id]);
                 } else {
-                    $withYearSuffix =   preg_replace('/([0-9]{2,4})/', '$1' . $actualSuffix, $this->tmpAmbiguous[$id]);
+                    $withYearSuffix =   preg_replace($this->regExp, '$1' . $actualSuffix, $this->tmpAmbiguous[$id]);
                     $withYearSuffix =   str_replace('&#38' . $actualSuffix . ';', '&#38;', $withYearSuffix);
                     $this->tmpDisambiguate[$id]    =   $withYearSuffix;
                     unset($this->tmpAmbiguous[$id]);

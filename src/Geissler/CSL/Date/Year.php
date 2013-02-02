@@ -3,6 +3,7 @@ namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
+use Geissler\CSL\Date\DatePartAbstract;
 use Geissler\CSL\Container;
 
 /**
@@ -11,7 +12,7 @@ use Geissler\CSL\Container;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Year implements Renderable, Modifiable
+class Year extends DatePartAbstract implements Renderable, Modifiable
 {
     /** @var string **/
     private $form;
@@ -23,6 +24,7 @@ class Year implements Renderable, Modifiable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
+        parent::__construct($xml);
         $this->form =   'long';
         $this->modify($xml);
     }
@@ -64,18 +66,18 @@ class Year implements Renderable, Modifiable
 
         if ($data < 0) {
             // The "bc" term (Before Christ) is automatically appended to negative years
-            return -1 * $data . Container::getLocale()->getTerms('bc');
+            return $this->format(-1 * $data . Container::getLocale()->getTerms('bc'));
         }
 
         if ($data < 1000) {
             // The "ad" term (Anno Domini) is automatically appended to positive years of less than four digits
-            return $data . Container::getLocale()->getTerms('ad');
+            return $this->format($data . Container::getLocale()->getTerms('ad'));
         }
 
         if ($this->form == 'short') {
-            return mb_substr($data, 2);
+            return $this->format(mb_substr($data, 2));
         }
 
-        return $data;
+        return $this->format($data);
     }
 }

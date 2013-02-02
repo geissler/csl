@@ -149,7 +149,7 @@ class Label implements Groupable
             $return =   $this->formatting->render($return);
             $return =   $this->textCase->render($return);
             $return =   $this->stripPeriods->render($return);
-            $return =   $this->affix->render($return);
+            $return =   $this->affix->render($return, true);
         }
 
         return $return;

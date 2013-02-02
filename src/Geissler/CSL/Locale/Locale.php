@@ -28,7 +28,7 @@ class Locale
      * Specifies the path where the locales- files are located.
      *
      * @param string $dir
-     * @return \Geissler\CSL\Locale
+     * @return \Geissler\CSL\Locale\Locale
      */
     public function setDir($dir)
     {
@@ -40,7 +40,7 @@ class Locale
      * Specifies the format of the locales files.
      *
      * @param type $file
-     * @return \Geissler\CSL\Locale
+     * @return \Geissler\CSL\Locale\Locale
      */
     public function setFile($file)
     {
@@ -52,7 +52,7 @@ class Locale
      * Specifies the mapping of the primary dialects to the main language file.
      *
      * @param string $primaryDialect JSON array
-     * @return \Geissler\CSL\Locale
+     * @return \Geissler\CSL\Locale\Locale
      */
     public function setPrimaryDialect($primaryDialect)
     {
@@ -64,7 +64,7 @@ class Locale
      * Parses the language file.
      *
      * @param string $language
-     * @return \Geissler\CSL\Locale
+     * @return \Geissler\CSL\Locale\Locale
      * @throws \ErrorException  When the file is missing
      */
     public function readFile($language = 'en-US')
@@ -88,7 +88,7 @@ class Locale
      * Parses the language options from the xml element.
      *
      * @param \SimpleXMLElement $xml
-     * @return \Geissler\CSL\Locale
+     * @return \Geissler\CSL\Locale\Locale
      */
     public function addXml(\SimpleXMLElement $xml)
     {
@@ -160,7 +160,7 @@ class Locale
     {
         $length =   count($this->terms);
 
-        for ($i = $length - 1; $i > 0; $i--) {
+        for ($i = $length - 1; $i >= 0; $i--) {
             if ($this->terms[$i]['name'] == $name
                 && $this->terms[$i]['form'] == $form) {
 

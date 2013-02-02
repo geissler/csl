@@ -17,11 +17,11 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $style = '/citeproc-test/styles';
     protected $testJustSelected = false;
     protected $selectedTests = array(
-        //'date_',
-        // fails
-        //'sort_WithAndInOneEntry.txt',
 
+
+        // working, excluding errors
         /*
+        'date_',
         'collapse_',
         'disambiguate_',
         'sort_',
@@ -42,8 +42,15 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         // unclear
         'bugreports_ContainerTitleShort.txt', // not clear how to remove the dots in journalAbbreviation
 
-        // sort by bibliography while in citation mode
-        'disambiguate_YearSuffixAndSort.txt',
+        // don't know how to figure out what is part of a cite
+        'date_YearSuffixImplicitWithNoDate.txt',
+        'date_YearSuffixWithNoDate.txt',
+
+        // don't know how to handle and terms while sorting names
+        'sort_WithAndInOneEntry.txt',
+
+        // don't know why use form numeric on date and not text
+        'date_YearSuffixImplicitWithNoDateOneOnly.txt',
 
         // don't know how to determine the year delimiter
         'disambiguate_InitializeWithButNoDisambiguation.txt',
@@ -59,12 +66,20 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'disambiguate_YearCollapseWithInstitution.txt',
         'disambiguate_YearSuffixWithEtAlSubequent.txt',
 
+        // equivalent to zero unclear
+        'date_SortEmptyDatesCitation.txt',
+
         // wrong citeproctest or wrong specification
         'disambiguate_ByCiteDisambiguateCondition.txt',
-        'condition_SingletonIfMatchNone.txt',
+
+        // wrong sorting
+        'date_NonexistentSortReverseCitation.txt',
 
         // i'm not sure if this possible in php
         'date_LoneJapaneseMonth.txt',
+
+        // language (?)
+        'date_LocalizedDateFormats-kh-KH.txt',
 
         // troubles
         //'sort_GroupedByAuthorstring.txt', // needs citeGroupDelimiter set to ', '

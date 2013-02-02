@@ -4,6 +4,7 @@ namespace Geissler\CSL\Date;
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
 use Geissler\CSL\Factory;
+use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Rendering\Affix;
@@ -119,6 +120,12 @@ class DatePart implements Renderable, Modifiable
         $value   =   $this->render->render($data[$this->name]);
         $value   =   $this->formatting->render($value);
         $value   =   $this->textCase->render($value);
-        return $this->affix->render($value);
+
+        // Attributes for affixes are allowed, unless cs:date calls a localized date format
+        if (Container::getContext()->get('form', 'date') !== '') {
+            $value  =   $this->affix->render($value);
+        }
+
+        return $value;
     }
 }

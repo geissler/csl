@@ -66,29 +66,32 @@ class Affix implements Renderable, Modifiable
      * Adds the affixes.
      *
      * @param string $data
+     * @param bool $removeDuplicates
      * @return string
      */
-    public function render($data)
+    public function render($data, $removeDuplicates = false)
     {
         if ($data !== ''
             && $data !== null
             && ($this->prefix !== ''
                 || $this->suffix !== '')) {
             $data   =   $this->addPrefix($this->addSuffix($data));
+            $data   =   $this->removeDuplicatedBraces($data);
 
-            // masc \n to get preg_replace working under Windows
-            $data   =   str_replace("\n", '###', $data);
-            // remove duplicated braces
-            $regExp =   '/^' . preg_quote($this->prefix . $this->prefix) . '(.*)'
-                . preg_quote($this->suffix . $this->suffix) . '$/';
-            if (($this->prefix == '(')
-                    && $this->suffix == ')'
-                || ($this->prefix == '['
-                    && $this->suffix == ']')) {
-                $data   =   preg_replace($regExp, $this->prefix . '$1' . $this->suffix, $data);
+            if ($removeDuplicates == true
+                && in_array($this->prefix, array('(', ')', '[', ']')) == false
+                && in_array($this->suffix, array('(', ')', '[', ']')) == false) {
+                $data   =   preg_replace(
+                    '/^(' . preg_quote($this->prefix . $this->prefix, '/') . ')/',
+                    $this->prefix,
+                    $data
+                );
+                $data   =   preg_replace(
+                    '/(' . preg_quote($this->suffix . $this->suffix, '/') . ')$/',
+                    $this->suffix,
+                    $data
+                );
             }
-
-            $data   =   str_replace('###', "\n", $data);
         }
 
         return $data;
@@ -122,5 +125,29 @@ class Affix implements Renderable, Modifiable
         }
 
         return $data . $this->suffix;
+    }
+
+    /**
+     * Remove duplicated braces at the beginning and end.
+     *
+     * @param string $data
+     * @return string
+     */
+    private function removeDuplicatedBraces($data)
+    {
+        // masc \n to get preg_replace working under Windows
+        $data   =   str_replace("\n", '###', $data);
+
+        $regExp =   '/^' . preg_quote($this->prefix . $this->prefix) . '(.*)'
+            . preg_quote($this->suffix . $this->suffix) . '$/';
+
+        if (($this->prefix == '(')
+            && $this->suffix == ')'
+            || ($this->prefix == '['
+                && $this->suffix == ']')) {
+            $data   =   preg_replace($regExp, $this->prefix . '$1' . $this->suffix, $data);
+        }
+
+        return str_replace('###', "\n", $data);
     }
 }

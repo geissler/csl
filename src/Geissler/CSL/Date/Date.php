@@ -10,7 +10,6 @@ use Geissler\CSL\Rendering\Formatting;
 use Geissler\CSL\Rendering\TextCase;
 use Geissler\CSL\Date\DatePart;
 use Geissler\CSL\Date\Format;
-use Geissler\CSL\Sorting\Variable;
 
 /**
  * Renders dates.
@@ -203,6 +202,9 @@ class Date implements Groupable, Modifiable
             return implode('', $return);
         }
 
+        // enter date context
+        Container::getContext()->enter('date', array('form' => $this->form));
+
         if (count($this->data) == 2) {
             // date range
             $result         =   array();
@@ -231,18 +233,16 @@ class Date implements Groupable, Modifiable
             for ($i = 0; $i < $length; $i++) {
                 if ($result[0][$i] == $result[1][$i]) {
                     $result[0][$i] = '';
-
-                    // trim previous date-parts
-                    for ($j = 0; $j < $i; $j++) {
-                        $result[0][$j]  = trim($result[0][$j]);
-                    }
                 }
             }
 
-            $result[0]  = implode($this->delimiter, $result[0]);
-            $result[1]  = implode($this->delimiter, $result[1]);
+            $result[0]  = trim(implode($this->delimiter, $result[0]));
+            $result[1]  = trim(implode($this->delimiter, $result[1]));
 
-            $value  =   implode($delimiter, $result);
+            $value      =   implode($delimiter, $result);
+        } elseif (isset($this->data[0]['raw']) == true) {
+            // prefer raw date over full date
+            $value  =   $this->data[0]['raw'];
         } else {
             $return =   array();
             foreach ($this->dateParts as $datePart) {
@@ -268,15 +268,13 @@ class Date implements Groupable, Modifiable
             $value  .=  Container::getData()->getVariable('year-suffix');
         }
 
-        // no formatting while sorting
-        if (Container::getContext()->in('sort') == true) {
-            return$value;
-        }
+        $value  =   $this->affix->render($value);
+        $value  =   $this->display->render($value);
+        $value  =   $this->formatting->render($value);
+        $value  =   $this->textCase->render($value);
 
-        $value =   $this->affix->render($value);
-        $value =   $this->display->render($value);
-        $value =   $this->formatting->render($value);
-        return $this->textCase->render($value);
+        Container::getContext()->leave();
+        return $value;
     }
 
     /**

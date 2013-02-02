@@ -3,6 +3,7 @@ namespace Geissler\CSL\Date;
 
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Modifiable;
+use Geissler\CSL\Date\DatePartAbstract;
 use Geissler\CSL\Rendering\StripPeriods;
 use Geissler\CSL\Container;
 
@@ -13,7 +14,7 @@ use Geissler\CSL\Container;
  * @license MIT
  * @todo implement support for seasons http://citationstyles.org/downloads/specification.html#seasons
  */
-class Month implements Renderable, Modifiable
+class Month extends DatePartAbstract implements Renderable, Modifiable
 {
     /** @var string **/
     private $form;
@@ -23,10 +24,11 @@ class Month implements Renderable, Modifiable
     /**
      * Parses the Month configuration.
      *
-     * @param \SimpleXMLElement $date
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {
+        parent::__construct($xml);
         $this->form         =   'long';
         $this->stripPeriods =   new StripPeriods($xml);
         $this->modify($xml);
@@ -66,6 +68,11 @@ class Month implements Renderable, Modifiable
             $data   =   $this->getMonthNumber($data);
         }
 
+        // return season name, if set as month name
+        if (preg_match('/^([1-9]|0[1-9]|1[0-2])$/', $data) == 0) {
+            return $this->format($data);
+        }
+
         // use always numeric value for sorting
         if (Container::getContext()->in('sort') == true) {
             if ($data !== '') {
@@ -89,15 +96,15 @@ class Month implements Renderable, Modifiable
                     return $this->getLocale($data, 'short');
                     break;
                 case 'numeric':
-                    return (int) $data;
+                    return $this->format((int) $data);
                     break;
                 case 'numeric-leading-zeros':
                     $data = (int) $data;
 
                     if ($data < 10) {
-                        return '0' . $data;
+                        return $this->format('0' . $data);
                     }
-                    return $data;
+                    return $this->format($data);
                     break;
             }
         }
@@ -123,11 +130,11 @@ class Month implements Renderable, Modifiable
             return $short;
         }
 
-        return '';
+        return $value;
     }
 
     /**
-     * Compares all locale month entrys with the value.
+     * Compares all locale month entries with the value.
      *
      * @param string $value
      * @param string $form Short or empty
@@ -160,6 +167,6 @@ class Month implements Renderable, Modifiable
             $name .= '0';
         }
 
-        return Container::getLocale()->getTerms($name . (int) $number, $form);
+        return $this->format(Container::getLocale()->getTerms($name . (int) $number, $form));
     }
 }

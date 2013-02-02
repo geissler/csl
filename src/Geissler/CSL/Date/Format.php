@@ -32,6 +32,15 @@ class Format
                 $this->data[]   =   $this->extractDate($values);
             }
 
+            // use season as month
+            if (isset($data['season']) == true) {
+                $this->data[0]['month'] =   $this->extractSeason($data['season']);
+            }
+
+            if (isset($data['raw']) == true) {
+                $this->data[0]['raw']   =   $this->formatRaw($data['raw']);
+            }
+
             return true;
         } elseif (is_array($data) == true) {
             if (isset($data['literal']) == true) {
@@ -51,6 +60,11 @@ class Format
                 );
 
                 return true;
+            } else {
+                $this->data =   array(
+                    array('raw' => $data['raw'])
+                );
+                return  true;
             }
         }
 
@@ -87,10 +101,16 @@ class Format
             $date['year']   =   $values['year'];
         }
 
-        if (isset($values[1]) == true) {
-            $date['month']   =   $values[1];
-        } elseif (isset($values['month']) == true) {
-            $date['month']   =   $values['month'];
+        if (isset($values[1]) == true
+            || isset($values['month']) == true) {
+            $month  =   isset($values['month']) == true ? $values['month'] : $values[1];
+
+            if (in_array($month, array(1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10, 11, 12)) == true) {
+                $date['month']   =   $month;
+            } elseif ($month > 12
+                && $month <= 17) {
+                $date['month']  =   $this->extractSeason(1);
+            }
         }
 
         if (isset($values[2]) == true) {
@@ -100,5 +120,36 @@ class Format
         }
 
         return $date;
+    }
+
+    /**
+     * Return locale season name.
+     *
+     * @param integer $date
+     * @return null|string
+     */
+    private function extractSeason($date)
+    {
+        return Container::getLocale()->getTerms('season-0' . $date);
+    }
+
+    /**
+     * Format a raw date with season(s) and year(s).
+     *
+     * @param string $date
+     * @return string
+     */
+    private function formatRaw($date)
+    {
+        preg_match_all('/([0-9]{4})/', $date, $years);
+        $years  =   array_unique($years[0]);
+        preg_match_all('/([A-z]+)/', $date, $seasons);
+        $seasons    =   array_unique($seasons[0]);
+
+        if (count($years) > 1) {
+            return $seasons[0] . ' ' . $years[0] . '–' . $seasons[1] . ' ' . $years[1];
+        }
+
+        return $seasons[0] . '–' . $seasons[1] . ' ' . $years[0];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Geissler\CSL\Rendering;
 
+use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Date\Format;
@@ -11,7 +12,7 @@ use Geissler\CSL\Date\Format;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Variable implements Groupable
+class Variable implements Renderable, Groupable
 {
     /** @var string * */
     private $name;

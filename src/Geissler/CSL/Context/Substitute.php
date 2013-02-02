@@ -1,8 +1,6 @@
 <?php
 namespace Geissler\CSL\Context;
 
-use Geissler\CSL\Container;
-
 /**
  * Store the values used for the last substitute rendering.
  *

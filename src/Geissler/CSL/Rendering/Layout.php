@@ -370,11 +370,11 @@ class Layout implements Renderable, Parental
     private function format($data)
     {
         $data   =   preg_replace('/[ ][ ]+/', ' ', $data);
-        $data   =   preg_replace('/[\.][\.]+/', ' ', $data);
+        $data   =   preg_replace('/[\.][\.]+/', '.', $data);
         $data   =   preg_replace('/( ,)/', ',', $data);
         $data   =   preg_replace('/\.(<\/[a-z]+>)\./', '.$1', $data);
         $data   =   $this->expand->render($data);
-        $data   =   $this->affix->render($data);
+        $data   =   $this->affix->render($data, true);
         return $this->formatting->render($data);
     }
 

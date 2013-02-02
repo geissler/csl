@@ -65,6 +65,12 @@ class Term implements Renderable
         $return = Container::getLocale()->getTerms($this->name, $this->form, $this->plural, $this->additional);
 
         if ($return == null) {
+            if ($this->name == 'year-suffix'
+                && (Container::getContext()->in('sort') == true
+                    || Container::getContext()->in('disambiguation') == true)) {
+                return '';
+            }
+
             switch ($this->form) {
                 case 'verb-short':
                     $return = Container::getLocale()->getTerms($this->name, 'verb', $this->plural, $this->additional);
@@ -89,6 +95,10 @@ class Term implements Renderable
                         $return = Container::getLocale()->getTerms($this->name, 'long');
                         break;
                 }
+            }
+
+            if ($return == null) {
+                $return =   Container::getLocale()->getTerms($this->name);
             }
 
             if ($return == null) {
