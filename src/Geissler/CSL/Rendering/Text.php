@@ -140,6 +140,13 @@ class Text implements Renderable, Groupable, Parental
      */
     public function render($data)
     {
+        // if part of macro in sorting context, test if text should be rendered
+        if (Container::getContext()->get('renderJust', 'sort') !== null
+            && in_array('', Container::getContext()->get('renderJust', 'sort')) == false) {
+            return '';
+        }
+
+
         $data   =   $this->render->render($data);
 
         // no formatting while sorting

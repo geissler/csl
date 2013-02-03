@@ -5,6 +5,7 @@ use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Chooseable;
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Interfaces\Parental;
+use Geissler\CSL\Container;
 use Geissler\CSL\Choose\Disambiguate;
 use Geissler\CSL\Choose\IsNumeric;
 use Geissler\CSL\Choose\IsUncertainDate;
@@ -82,9 +83,23 @@ class ChooseIf implements Renderable, Groupable, Chooseable, Parental
      */
     public function render($data)
     {
+        // render just child elements of a given class (@see Macro)
+        $renderJustSelectedClass    =   false;
+        $renderJustClass            =   array();
+        if (Container::getContext()->in('sort') == true
+            && Container::getContext()->get('renderJust', 'sort') !== null) {
+            $renderJustClass            =   Container::getContext()->get('renderJust', 'sort');
+            $renderJustSelectedClass    =   true;
+        }
+
         $result =   array();
         foreach ($this->children as $child) {
-            $result[]   =   $child->render($data);
+            $rendered   =   $child->render('');
+
+            if ($renderJustSelectedClass == false
+                || in_array(get_class($child), $renderJustClass) == true) {
+                $result[] =   $rendered;
+            }
         }
 
         return implode('', $result);

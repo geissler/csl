@@ -205,10 +205,24 @@ class Group implements Groupable, Parental
      */
     private function renderGroup()
     {
+        // render just child elements of a given class (@see Macro)
+        $renderJustSelectedClass    =   false;
+        $renderJustClass            =   array();
+        if (Container::getContext()->in('sort') == true
+            && Container::getContext()->get('renderJust', 'sort') !== null) {
+            $renderJustClass            =   Container::getContext()->get('renderJust', 'sort');
+            $renderJustSelectedClass    =   true;
+        }
+
         $result =   array();
         foreach ($this->children as $element) {
             $rendered   =   $element->render('');
-            if ($rendered !== '') {
+
+            if ($rendered !== ''
+                && ($renderJustSelectedClass == false
+                    || in_array(get_class($element), $renderJustClass) == true
+                    || ($element instanceof Parental) == true)
+            ) {
                 $result[] =   $rendered;
             }
         }

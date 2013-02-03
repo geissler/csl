@@ -82,10 +82,12 @@ class Citation implements Renderable
         $result =   $this->layout->render($data);
 
         // The assignment of the year-suffixes follows the order of the bibliographies entries,
-        // so sort by the bibliography and re-render citations
+        // so sort if disambiguation by year-suffixes is needed, sort the data by the bibliography
+        // and re-render citations
         if (Container::hasBibliography() == true
-            && Container::getBibliography()->sort() == true
-            && Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true) {
+            && Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
+            && Container::getContext()->getLastDisambiguation() == 'Geissler\CSL\Options\Disambiguation\AddYearSuffix'
+            && Container::getBibliography()->sort() == true) {
             Container::getRendered()->clear();
             $this->layout->render($data);
 

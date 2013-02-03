@@ -125,6 +125,7 @@ abstract class DisambiguateAbstract implements Disambiguate
         }
 
         $this->getStore()->store($this);
+        Container::getContext()->setLastDisambiguation(get_class($this));
     }
 
     /**

@@ -15,10 +15,10 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $object;
     protected $dir = '/citeproc-test/processor-tests/humans';
     protected $style = '/citeproc-test/styles';
-    protected $testJustSelected = false;
+    protected $testJustSelected = true;
     protected $selectedTests = array(
 
-
+        'decorations_'
         // working, excluding errors
         /*
         'date_',
@@ -58,9 +58,6 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         // UN DESA 2011c should be the first value not the last, if sorted by bibliography keys
         'disambiguate_YearSuffixMidInsert.txt',
 
-        // <text variable="title"/> has to be removed from the macro
-        'sort_ConditionalMacroDates.txt',
-
         // unclear when to use group citing
         'sort_GroupedByAuthorstring.txt',
         'disambiguate_YearCollapseWithInstitution.txt',
@@ -69,7 +66,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         // equivalent to zero unclear
         'date_SortEmptyDatesCitation.txt',
 
-        // wrong citeproctest or wrong specification
+        // wrong citeproctest or wrong specification => add year suffix will always succeed
         'disambiguate_ByCiteDisambiguateCondition.txt',
 
         // wrong sorting

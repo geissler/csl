@@ -25,9 +25,13 @@ class Context
     private $disambiguation;
     /** @var bool */
     private $ignoreEtAlSubsequent;
+    /** @var bool */
     private $chooseDisambiguation;
+    /** @var bool */
     private $chooseDisambiguateValue;
+    /** @var \Geissler\CSL\Context\Substitute */
     private $substitute;
+    private $lastDisambiguation;
 
     /**
      * Init's the arrays.
@@ -43,6 +47,7 @@ class Context
         $this->chooseDisambiguation     =   false;
         $this->chooseDisambiguateValue  =   false;
         $this->substitute               =   new Substitute();
+        $this->lastDisambiguation       =   '';
     }
 
     /**
@@ -119,6 +124,28 @@ class Context
     public function getChooseDisambiguateValue()
     {
         return $this->chooseDisambiguateValue;
+    }
+
+    /**
+     * Store last disambiguation method used to disambiguate ambiguous cites.
+     *
+     * @param string $lastDisambiguation class name
+     * @return Context
+     */
+    public function setLastDisambiguation($lastDisambiguation)
+    {
+        $this->lastDisambiguation = $lastDisambiguation;
+        return $this;
+    }
+
+    /**
+     * Retrieve the last called disambiguation class.
+     *
+     * @return string
+     */
+    public function getLastDisambiguation()
+    {
+        return $this->lastDisambiguation;
     }
 
     /**
@@ -255,6 +282,28 @@ class Context
         }
 
         return false;
+    }
+
+    /**
+     * Remove an additional option for a specific position.
+     *
+     * @param string $name
+     * @param string $option
+     * @return Context
+     */
+    public function removeOption($name, $option)
+    {
+        $length =   count($this->context);
+
+        for ($i = 0; $i < $length; $i++) {
+            if ($this->context[$i]['name'] == $name
+                && isset($this->context[$i]['option'][$option]) == true) {
+                unset($this->context[$i]['option'][$option]);
+                break;
+            }
+        }
+
+        return $this;
     }
 
     /**

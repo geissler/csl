@@ -258,7 +258,7 @@ class Name implements Renderable, Modifiable, Contextualize
 
         $etAl           =   false;
         $etAlUseFirst   =   $this->etAlUseFirst;
-        $etAlMin        =   $this->etAlMin;
+        $etAlMin        =   $this->etAlMin        ;
 
         // If used, the values of these attributes replace those of respectively et-al-min and et-al-use-first
         // for subsequent cites (cites referencing earlier cited items)

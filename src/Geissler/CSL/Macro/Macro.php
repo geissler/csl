@@ -4,6 +4,7 @@ namespace Geissler\CSL\Macro;
 use Geissler\CSL\Interfaces\Renderable;
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Interfaces\Parental;
+use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Children;
 
 /**
@@ -104,9 +105,48 @@ class Macro implements Renderable, Groupable, Parental
      */
     public function render($data)
     {
-        $result =   array();
+        $result     =   array();
+        $sort       =   Container::getContext()->in('sort');
+        $hasDate    =   false;
+
+        // drop all non-date values if macro is used in sorting context and macro access one date entry
+        if (Container::getContext()->in('sort') == true) {
+            foreach ($this->children as $child) {
+                if (($child instanceof \Geissler\CSL\Date\Date) == true
+                    || ($child instanceof \Geissler\CSL\Date\DatePart) == true) {
+                    Container::getContext()->addOption(
+                        'sort',
+                        'renderJust',
+                        array('Geissler\CSL\Date\Date', 'Geissler\CSL\Date\DatePart')
+                    );
+                    $hasDate    =   true;
+                    break;
+                } elseif (($child instanceof Parental) == true
+                    && ($child->getChildElement('\Geissler\CSL\Date\Date') !== false
+                        || $child->getChildElement('\Geissler\CSL\Date\DatePart') !== false)) {
+                    Container::getContext()->addOption(
+                        'sort',
+                        'renderJust',
+                        array('Geissler\CSL\Date\Date', 'Geissler\CSL\Date\DatePart')
+                    );
+                    $hasDate    =   true;
+                    break;
+                }
+            }
+        }
+
         foreach ($this->children as $child) {
-            $result[]   =   $child->render($data);
+            if ($hasDate == false) {
+                $result[]   =   $child->render($data);
+            } elseif (($child instanceof \Geissler\CSL\Date\Date) == true
+                || ($child instanceof \Geissler\CSL\Date\DatePart) == true
+                || ($child instanceof Parental) == true) {
+                $result[]   =   $child->render($data);
+            }
+        }
+
+        if ($sort == true) {
+            Container::getContext()->removeOption('sort', 'renderJust');
         }
 
         return implode('', $result);

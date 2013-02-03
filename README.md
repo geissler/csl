@@ -80,6 +80,12 @@ The following options can be configured via the `configuration.ini`:
 * styles-group
     * dir = Path to the styles dir relative to the configuration.ini (standard: styles)
 
+## Styles and Locales
+The files under *styles* are taken from the
+[CSL styles repository](https://github.com/citation-style-language/styles "CSL styles repository") and the files
+under *locales* are taken from the
+[CSL locales repository](https://github.com/citation-style-language/locales "CSL locales repository").
+
 ## Tests and Comments
 [![Build Status](https://travis-ci.org/geissler/csl.png)](https://travis-ci.org/geissler/csl)
 
