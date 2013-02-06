@@ -67,4 +67,12 @@ class ExpandedTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('1321–1328', $this->object->format('1321–8'));
     }
+
+    /**
+     * @covers Geissler\CSL\Options\PageRange\Expanded::format
+     */
+    public function testFormat5()
+    {
+        $this->assertEquals('121–160', $this->object->format('121-160'));
+    }
 }

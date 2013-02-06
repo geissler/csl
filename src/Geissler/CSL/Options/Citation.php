@@ -88,6 +88,7 @@ class Citation implements Option
     public function apply(array $data)
     {
         // step 1: disambiguation
+        var_dump($data);
         $data   =   $this->disambiguation->apply($data);
 
         // step 2: create array from rendered by replacing item-ids

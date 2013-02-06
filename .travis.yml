@@ -13,11 +13,11 @@ before_script:
   - composer install
 
 script:
-  - phpunit --coverage-text --bootstrap tests/bootstrap.php tests/
   - pyrus install http://phptal.org/latest.tar.gz
   - pear install pear/PHP_CodeSniffer 
   - phpenv rehash
   - phpcs --standard=PSR2 src
+  - phpunit --coverage-text --bootstrap tests/bootstrap.php tests/
 
 notifications:
   email:

@@ -50,11 +50,7 @@ class Disambiguation implements Optional
 
         // if "et-al-subsequent-min" or "et-al-subsequent-use-first" are used, use the first citation
         // to disambiguate the values (see disambiguate_BasedOnEtAlSubsequent.txt)
-        if (Container::getRendered()->getUseDifferentCitations() == true) {
-            $citations      =   Container::getRendered()->getAllByType('firstCitation');
-        } else {
-            $citations      =   Container::getRendered()->getAllByType('citation');
-        }
+        $citations  =   Container::getRendered()->getAll();
 
         if (is_object($this->names) == true) {
             $this->sorted   =   array_keys($citations);

@@ -40,6 +40,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
         }
         $this->regExp   .=  ')/';
 
+
         // disambiguate only where names and year are identical
         foreach ($this->tmpAmbiguous as $id => $name) {
             if (preg_match($this->regExp, $name) == 0) {

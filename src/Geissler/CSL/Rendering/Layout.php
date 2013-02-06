@@ -152,6 +152,7 @@ class Layout implements Renderable, Parental
             $return =   $this->bibliography($data);
         }
 
+        $return =   $this->removeUnnecessaryFormatting($return);
         Container::getContext()->leave();
         return $return;
     }
@@ -170,8 +171,14 @@ class Layout implements Renderable, Parental
         if (Container::getCitationItem() !== false) {
             // prefix for citation item
             if (Container::getCitationItem()->get('prefix') !== null) {
-                $entry[]    =   Container::getCitationItem()->get('prefix');
-                $entry[]    =   ' ';
+                Container::getRendered()->addWithCitationId(
+                    Container::getActualId(),
+                    Container::getActualCitationId(),
+                    'prefix',
+                    Container::getCitationItem()->get('prefix') . ' '
+                );
+                //$entry[]    =   Container::getCitationItem()->get('prefix');
+                //$entry[]    =   ' ';
             }
 
             foreach ($this->children as $child) {
@@ -180,8 +187,14 @@ class Layout implements Renderable, Parental
 
             // suffix for citation item
             if (Container::getCitationItem()->get('suffix') !== null) {
-                $entry[]    =   ' ';
-                $entry[]    =   Container::getCitationItem()->get('suffix');
+                Container::getRendered()->addWithCitationId(
+                    Container::getActualId(),
+                    Container::getActualCitationId(),
+                    'suffix',
+                    ' ' . Container::getCitationItem()->get('suffix')
+                );
+                //$entry[]    =   ' ';
+                //$entry[]    =   Container::getCitationItem()->get('suffix');
             }
         } else {
             foreach ($this->children as $child) {
@@ -267,7 +280,7 @@ class Layout implements Renderable, Parental
             $result[]   =   $id;
         } while (Container::getData()->next() == true);
 
-        return array($this->applyCitationOptions($result, $this->delimiter));
+        return explode("\n", $this->applyCitationOptions($result, $this->delimiter));
     }
 
     /**
@@ -294,7 +307,14 @@ class Layout implements Renderable, Parental
                             $delimiters[]   =   $data[$i][$j]['delimiter'];
                         }
 
-                        $innerData[]    =   $data[$i][$j]['value'] . $data[$i][$j]['delimiter'];
+                        if (preg_match('/[,|;|\.]$/', $data[$i][$j]['value']) == 0) {
+                            $innerData[]    =   $data[$i][$j]['value'] . $data[$i][$j]['delimiter'];
+                        } else {
+                            $innerData[]    =   $data[$i][$j]['value'];
+                            if (preg_match('/[ ]$/', $data[$i][$j]['delimiter']) == 1) {
+                                $innerData[]    =   ' ';
+                            }
+                        }
                     }
 
                     $data[$i]   =   $this->format(implode('', $innerData));
@@ -303,7 +323,14 @@ class Layout implements Renderable, Parental
                         $delimiters[]   =   $data[$i]['delimiter'];
                     }
 
-                    $data[$i]       =   $data[$i]['value'] . $data[$i]['delimiter'];
+                    if (preg_match('/[,|;|\.]$/', $data[$i]['value']) == 0) {
+                        $data[$i]    =   $data[$i]['value'] . $data[$i]['delimiter'];
+                    } else {
+                        $data[$i]    =   $data[$i]['value'];
+                        if (preg_match('/[ ]$/', $data[$i]['delimiter']) == 1) {
+                            $data[$i]    =   ' ';
+                        }
+                    }
                 }
             }
 
@@ -372,10 +399,31 @@ class Layout implements Renderable, Parental
         $data   =   preg_replace('/[ ][ ]+/', ' ', $data);
         $data   =   preg_replace('/[\.][\.]+/', '.', $data);
         $data   =   preg_replace('/( ,)/', ',', $data);
+        $data   =   preg_replace('/[;|,]([;|,])/', '$1', $data);
         $data   =   preg_replace('/\.(<\/[a-z]+>)\./', '.$1', $data);
         $data   =   $this->expand->render($data);
         $data   =   $this->affix->render($data, true);
         return $this->formatting->render($data);
+    }
+
+    /**
+     * Remove unnecessary <span style="font-style:normal;"> tags.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function removeUnnecessaryFormatting($data)
+    {
+        $length =   count($data);
+
+        for ($i = 0; $i < $length; $i++) {
+            if (preg_match('/^\<span style="font\-style:normal;">(.*)<\/span>$/', $data[$i]) == 1) {
+                $data[$i]   =   preg_replace('/^\<span style="font\-style:normal;"\>/', '', $data[$i]);
+                $data[$i]   =   preg_replace('/<\/span>$/', '', $data[$i]);
+            }
+        }
+
+        return $data;
     }
 
     /**

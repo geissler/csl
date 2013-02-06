@@ -21,7 +21,7 @@ class CitationItems extends CitationAbstract
      */
     public function getAtPosition($variable, $position, $groupPosition = false)
     {
-        if ($groupPosition == false) {
+        if ($groupPosition === false) {
             $groupPosition  =   $this->groupPosition;
         }
 
@@ -33,6 +33,29 @@ class CitationItems extends CitationAbstract
 
         return null;
     }
+
+    /**
+     * Set a variable.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @param integer $position
+     * @return bool
+     */
+    public function setVariable($name, $value, $position)
+    {
+        if (isset($this->data[$position]) == true) {
+            $length =   count($this->data[$position]);
+            for ($i = 0; $i < $length; $i++) {
+                $this->data[$position][$i][$name] =   $value;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
 
     /**
      * Order the values in the actual group by the given order.

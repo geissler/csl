@@ -18,9 +18,14 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $testJustSelected = true;
     protected $selectedTests = array(
 
-        'decorations_'
+        'affix_WithCommas.txt',
+        'disambiguate_BasedOnSubsequentFormWithBackref.txt',
+        'disambiguate_BasedOnSubsequentFormWithLocator.txt'
+
         // working, excluding errors
         /*
+        'affix_',
+        'decorations_',
         'date_',
         'collapse_',
         'disambiguate_',
@@ -72,6 +77,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         // wrong sorting
         'date_NonexistentSortReverseCitation.txt',
 
+
         // i'm not sure if this possible in php
         'date_LoneJapaneseMonth.txt',
 
@@ -107,8 +113,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $modifyResult = array(
-        'textcase_TitleCapitalization.txt' => 'This IS a Pen That Is a <span class="nocase">smith</span> Pencil',
-        'affix_WithCommas.txt'  =>  'John Smith, <font style="font-style:italic">Book C</font>, 2000, and David Jones, <font style="font-style:italic">Book D</font>, 2000; John Smith, <font style="font-style:italic">Book C</font>, 2000 is one source, David Jones, <font style="font-style:italic">Book D</font>, 2000 is another; John Smith, <font style="font-style:italic">Book C</font>, 2000, 23 is one source, David Jones, <font style="font-style:italic">Book D</font>, 2000 is another.',
+        //'affix_WithCommas.txt'  =>  'John Smith, <font style="font-style:italic">Book C</font>, 2000, and David Jones, <font style="font-style:italic">Book D</font>, 2000; John Smith, <font style="font-style:italic">Book C</font>, 2000 is one source, David Jones, <font style="font-style:italic">Book D</font>, 2000 is another; John Smith, <font style="font-style:italic">Book C</font>, 2000, 23 is one source, David Jones, <font style="font-style:italic">Book D</font>, 2000 is another.',
         'textcase_Uppercase.txt' => 'SMITH, John: THIS IS A PEN THAT IS A <span class="nocase">Smith</span> PENCIL',
         'affix_WordProcessorAffixNoSpace.txt' => "..[0] <i>My Prefix</i> My Title My Suffix\n..[1] My Prefix. My Title, My Suffix\n>>[2] My Prefix My Title My Suffix",
         'disambiguate_YearSuffixMacroSameYearImplicit.txt'  => "..[0] A Smith 2001\n>>[1] B Smith 2001",
@@ -119,7 +124,7 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'disambiguate_LastOnlyFailWithByCite.txt' => "..[0] Organisation 2010a\n>>[1] Organisation 2010b",
         'disambiguate_DisambiguateTrueAndYearSuffixTwo.txt' => "..[0] Pollock, 1979a\n>>[1] Pollock, 1979b",
         'bugreports_BadCitationUpdate.txt'  =>  "..[0] C. Grignon, C. Sentenac 2000a\n>>[1] C. Grignon, C. Sentenac 2000b",
-        'sort_SubstituteTitle.txt'  =>  '<div class="csl-bib-body"><div class="csl-entry">Brooker, C. (2011, July 24). The news coverage of the Norway mass-killings was fact-free conjecture. <font style="font-style:italic">The Guardian</font>. London. Retrieved from http://www.guardian.co.uk/commentisfree/2011/jul/24/charlie-brooker-norway-mass-killings</div><div class="csl-entry">Brooker, C. (2011, July 31). Let\'s think outside the box here: maybe blue-sky thinking is nonsense. <font style="font-style:italic">The Guardian</font>. London. Retrieved from http://www.guardian.co.uk/commentisfree/2011/jul/31/blue-sky-thinking</div></div>'
+        //'sort_SubstituteTitle.txt'  =>  '<div class="csl-bib-body"><div class="csl-entry">Brooker, C. (2011, July 24). The news coverage of the Norway mass-killings was fact-free conjecture. <font style="font-style:italic">The Guardian</font>. London. Retrieved from http://www.guardian.co.uk/commentisfree/2011/jul/24/charlie-brooker-norway-mass-killings</div><div class="csl-entry">Brooker, C. (2011, July 31). Let\'s think outside the box here: maybe blue-sky thinking is nonsense. <font style="font-style:italic">The Guardian</font>. London. Retrieved from http://www.guardian.co.uk/commentisfree/2011/jul/31/blue-sky-thinking</div></div>'
     );
 
     /**
@@ -186,27 +191,8 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
      */
     public function testCiteProc($result, $rendered, $file)
     {
-        // use font-style instead of i etc.
-        $result = str_replace('<i>', '<font style="font-style:italic">', $result);
-        $result = str_replace('</i>', '</font>', $result);
-        $result = str_replace('<b>', '<font style="font-weight:bold">', $result);
-        $result = str_replace('</b>', '</font>', $result);
         $result = str_replace('&#38;', '&', $result);
         $rendered = str_replace('&#38;', '&', $rendered);
-        $result = str_replace('<sup>a</sup>', 'ª', $result);
-        $result = str_replace(
-            '<span style="font-variant:small-caps;">',
-            '<font style="font-variant:small-caps">',
-            $result
-        );
-        $result = str_replace(
-            '<span style="font-variant:small-caps">',
-            '<font style="font-variant:small-caps">',
-            $result
-        );
-        $result = str_replace('</span>', '</font>', $result);
-        $result = str_replace('“', '"', $result);
-        $result = str_replace('”', '"', $result);
 
         if (array_key_exists($file, $this->modifyResult) == true) {
             $this->assertEquals(

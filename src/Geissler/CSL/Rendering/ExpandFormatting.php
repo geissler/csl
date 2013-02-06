@@ -13,8 +13,8 @@ class ExpandFormatting implements Renderable
 {
     /** @var array */
     private $formatting = array(
-        '<sc>'  =>  '<font style="font-variant:small-caps">',
-        '</sc>' =>  '</font>'
+        '<sc>'  =>  '<span style="font-variant:small-caps;">',
+        '</sc>' =>  '</span>'
     );
 
     /**

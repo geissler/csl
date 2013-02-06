@@ -266,10 +266,20 @@ class Container
     {
         if (self::$context->getName() == 'citation'
             && self::getCitationItem()!== false) {
-                return self::getCitationItem()->get('id');
+            return self::getCitationItem()->get('id');
         }
 
         return self::getData()->getVariable('id');
+    }
+
+    public static function getActualCitationId()
+    {
+        if (self::$context->getName() == 'citation'
+            && self::getCitationItem()!== false) {
+            return self::getCitationItem()->get('citationID');
+        }
+
+        return '';
     }
 
     /**

@@ -38,6 +38,7 @@ class Names implements Groupable, Modifiable
     private $substitute;
     /** @var Label **/
     private $label;
+    /** @var bool */
     private $labelBeforeName    =   false;
 
     /**
@@ -49,7 +50,6 @@ class Names implements Groupable, Modifiable
     {
         $this->variables        =   array();
         $this->delimiter        =   '';
-
         $this->labelBeforeName  =   false;
 
         $this->affix            =   new Affix($xml);

@@ -39,14 +39,26 @@ class RenderFromIds implements Optional
             if (is_array($data[$i]) == true) {
                 $innerLength    =   count($data[$i]);
                 for ($j = 0; $j < $innerLength; $j++) {
+                    $id =   $data[$i][$j];
+                    // add existing prefix and/or suffixes to the rendered value
+                    $actualCitation =
+                        Container::getRendered()->getWithCitationId($id, Container::getActualCitationId(), 'prefix')
+                        . Container::getRendered()->getCitationById($id)
+                        . Container::getRendered()->getWithCitationId($id, Container::getActualCitationId(), 'suffix');
+
                     // re-render citation if missing
-                    $actualCitation =   Container::getRendered()->getCitationById($data[$i][$j]);
                     if ($actualCitation == false) {
                         Container::getContext()->enter('disambiguation');
-                        $data[$i][$j]   =   array('value' => $layout->renderJustActualEntry(''), 'delimiter' => '');
+                        $data[$i][$j]   =   array(
+                            'value'     =>  $layout->renderJustActualEntry(''),
+                            'delimiter' =>  ''
+                        );
                         Container::getContext()->leave();
                     } else {
-                        $data[$i][$j]   =   array('value' => $actualCitation, 'delimiter' => '');
+                        $data[$i][$j]   =   array(
+                            'value'     =>  $actualCitation,
+                            'delimiter' =>  ''
+                        );
                     }
 
                     // Add delimiter at end if not ending with a dot
@@ -69,10 +81,16 @@ class RenderFromIds implements Optional
                 $actualCitation =   Container::getRendered()->getCitationById($data[$i]);
                 if ($actualCitation == false) {
                     Container::getContext()->enter('disambiguation');
-                    $data[$i]   =   array('value' => $layout->renderJustActualEntry(''), 'delimiter' => '');
+                    $data[$i]   =   array(
+                        'value'     => $layout->renderJustActualEntry(''),
+                        'delimiter' => ''
+                    );
                     Container::getContext()->leave();
                 } else {
-                    $data[$i]   =   array('value' => $actualCitation, 'delimiter' => '');
+                    $data[$i]   =   array(
+                        'value'     => $actualCitation,
+                        'delimiter' => ''
+                    );
                 }
             }
 
@@ -80,7 +98,7 @@ class RenderFromIds implements Optional
                 Container::getCitationItem()->next();
             }
         }
-
+        var_dump($data);
         return $data;
     }
 }

@@ -152,6 +152,7 @@ class Data
      */
     public function moveToId($id)
     {
+        $id =   preg_replace('/(#[0-9]+$)/', '', $id);
         Container::getContext()->getSubstitute()->clear();
         for ($i = 0; $i < $this->length; $i++) {
             if (isset($this->data[$i]['id']) == true

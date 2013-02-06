@@ -2,6 +2,7 @@
 namespace Geissler\CSL\Rendering;
 
 use Geissler\CSL\Interfaces\Renderable;
+use Geissler\CSL\Container;
 
 /**
  * Display quotes.
@@ -41,7 +42,37 @@ class Quotes implements Renderable
     public function render($data)
     {
         if ($this->quote == true) {
-            return '"' . $data . '"';
+            if (strpos($data, Container::getLocale()->getTerms('open-quote')) !== false
+                && strpos($data, Container::getLocale()->getTerms('close-quote')) !== false) {
+
+                $masked =   false;
+                if (strpos($data, Container::getLocale()->getTerms('open-inner-quote')) !== false
+                    && strpos($data, Container::getLocale()->getTerms('close-inner-quote')) !== false) {
+                    // masc inner quotes
+                    $data   =   str_replace(Container::getLocale()->getTerms('open-inner-quote'), '##', $data);
+                    $data   =   str_replace(Container::getLocale()->getTerms('close-inner-quote'), '#', $data);
+                    $masked =   true;
+                }
+
+                $data   =   str_replace(
+                    Container::getLocale()->getTerms('open-quote'),
+                    Container::getLocale()->getTerms('open-inner-quote'),
+                    $data
+                );
+                $data   =   str_replace(
+                    Container::getLocale()->getTerms('close-quote'),
+                    Container::getLocale()->getTerms('close-inner-quote'),
+                    $data
+                );
+
+                if ($masked == true) {
+                    $data   =   str_replace('##', Container::getLocale()->getTerms('open-quote'), $data);
+                    $data   =   str_replace('#', Container::getLocale()->getTerms('close-quote'), $data);
+                }
+            }
+
+            return Container::getLocale()->getTerms('open-quote')
+                . $data . Container::getLocale()->getTerms('close-quote');
         }
 
         return $data;

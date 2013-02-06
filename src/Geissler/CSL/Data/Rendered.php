@@ -90,6 +90,39 @@ class Rendered
     }
 
     /**
+     * Add a value for a type (prefix, suffix) for the given pair of id and citationId.
+     *
+     * @param string|integer $id
+     * @param string|integer $citationId
+     * @param string $type prefix or suffix
+     * @param string $value
+     * @return Rendered
+     */
+    public function addWithCitationId($id, $citationId, $type, $value)
+    {
+        return $this->store($id . '#' . $citationId, $value, $type);
+    }
+
+    /**
+     * Retrieve an additional value for a pair of id and citationId.
+     *
+     * @param string|integer $id
+     * @param string|integer $citationId
+     * @param string $type
+     * @return string
+     */
+    public function getWithCitationId($id, $citationId, $type)
+    {
+        $return =   $this->getById($id . '#' . $citationId);
+        if ($return !== false
+            && isset($return[$type]) == true) {
+            return $return[$type];
+        }
+
+        return '';
+    }
+
+    /**
      * Retrieve all rendered values for the id.
      *
      * @param integer $id
@@ -113,6 +146,7 @@ class Rendered
     public function getCitationById($id)
     {
         $return =   $this->getById($id);
+
         if ($return !== false) {
             if (isset($return['firstCitation']) == true
                 && $return['firstCitation'] !== '') {
@@ -127,14 +161,17 @@ class Rendered
     }
 
     /**
-     * Retrieve all rendered entries of a given type (citation, firstCitation etc.)
+     * Retrieve all rendered entries with the first type to use.
      *
-     * @param string $type
      * @return array
      */
-    public function getAllByType($type)
+    public function getAll()
     {
         $return =   array();
+        $type   =   'citation';
+        if ($this->useDifferentCitations == true) {
+            $type = 'firstCitation';
+        }
 
         foreach ($this->rendered as $id => $entry) {
             if (isset($entry[$type]) == true) {

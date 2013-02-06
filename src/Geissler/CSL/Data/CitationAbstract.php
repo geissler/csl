@@ -39,11 +39,36 @@ abstract class CitationAbstract
             $this->position         =   0;
             $this->groupPosition    =   0;
             $this->groupLength      =   $this->getGroupLength();
-
+            $this->createCitationIds();
             return $this;
         }
 
         throw new \ErrorException('No citation data set! Correct json object?');
+    }
+
+    /**
+     * Set a variable.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @param integer $position
+     * @return bool
+     */
+    abstract public function setVariable($name, $value, $position);
+
+    /**
+     * Create citationIDs if missing to separate identical items in different citations.
+     *
+     * @return void
+     */
+    public function createCitationIds()
+    {
+        if ($this->getAtPosition('citationID', 0, 0) === null) {
+            $length =   $this->getLength();
+            for ($i = 0; $i < $length; $i++) {
+                $this->setVariable('citationID', $i, $i, 0);
+            }
+        }
     }
 
     /**

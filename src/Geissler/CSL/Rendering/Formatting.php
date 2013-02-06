@@ -78,34 +78,78 @@ class Formatting implements Renderable, Modifiable
      */
     public function render($data)
     {
-        $style = array();
+        $style  =   array();
 
-        if ($this->style == 'italic'
-            || $this->style == 'oblique') {
-                $style[] = 'font-style:' . $this->style;
+        if ($this->style !== '') {
+            $style[] = 'font-style:' . $this->style . ';';
         }
 
         if ($this->variant == 'small-caps') {
-            $style[] = 'font-variant:small-caps';
+            $style[] = 'font-variant:small-caps;';
         }
 
         if ($this->weight == 'bold'
             || $this->weight == 'light') {
-                $style[] = 'font-weight:' . $this->weight;
+            $style[] = 'font-weight:' . $this->weight . ';';
         }
 
         if ($this->decoration == 'underline') {
-            $style[] = 'text-decoration:underline';
+            $style[] = 'text-decoration:underline;';
         }
 
-        if ($this->align == 'sub') {
-            $style[] = 'vertical-align:sub';
-        } elseif ($this->align == 'sup') {
-            $style[] = 'vertical-align:super';
+        switch ($this->align) {
+            case 'sub':
+                $style[] = 'vertical-align:sub';
+                break;
+            case 'sup':
+                $style[] = 'vertical-align:super';
+                break;
+            case 'baseline':
+                $style[]    =   'baseline';
+                break;
         }
 
         if (count($style) > 0) {
-            $data = '<font style="' . implode(';', $style) . '">' . $data . '</font>';
+            if (count($style) == 1) {
+                switch ($style[0]) {
+                    case 'vertical-align:super':
+                        $data   =   '<sup>' . $data . '</sup>';
+                        break;
+                    case 'font-style:italic;':
+                        $data   =   '<i>' . $this->flipInnerFormatting($data, '<i>', '</i>') . '</i>';
+                        break;
+                    case 'font-weight:bold;':
+                        $data   =   '<b>' . $this->flipInnerFormatting($data, '<b>', '</b>') . '</b>';
+                        break;
+                    case 'font-weight:normal;':
+                    case 'font-style:normal;':
+                        $data = '<span style="' . implode('', $style) . '">' . $data . '</span>';
+                        break;
+                    default:
+                        $data = '<span style="' . implode('', $style) . '">' . $data . '</span>';
+                        break;
+                }
+            } else {
+                $data = '<span style="' . implode('', $style) . '">' . $data . '</span>';
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Change the inner identical formatting to <span style="font-style:normal;">.
+     *
+     * @param string $data
+     * @param string $start
+     * @param string $end
+     * @return string
+     */
+    private function flipInnerFormatting($data, $start, $end)
+    {
+        if (preg_match('/' . preg_quote($start, '/') . '/', $data) == 1
+            && preg_match('/' . preg_quote($end, '/') . '/', $data) == 1) {
+            return str_replace($start, '<span style="font-style:normal;">', str_replace($end, '</span>', $data));
         }
 
         return $data;

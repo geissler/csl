@@ -20,7 +20,7 @@ class Expanded
      */
     public function format($value)
     {
-        if (preg_match('/^([0-9]+).+([0-9]+)$/', $value, $match) == 1) {
+        if (preg_match('/^([0-9]+)[\-| |–]+([0-9]+)$/', $value, $match) == 1) {
             if (strlen($match[2]) < strlen($match[1])) {
                 $missing    =   strlen($match[1]) - strlen($match[2]);
 
