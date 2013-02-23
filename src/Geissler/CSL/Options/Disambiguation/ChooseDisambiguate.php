@@ -22,12 +22,12 @@ class ChooseDisambiguate extends DisambiguateAbstract implements Disambiguate
         Container::getContext()->removeDisambiguationOptions('Geissler\CSL\Names\Name');
         Container::getContext()->setChooseDisambiguateValue(true);
         $layout     =   Container::getContext()->get('layout', 'layout');
-        $ambiguous  =   $this->getAmbiguous();
+        $secondary  =   Container::getCitationItem()->getWithIds(array_keys($this->getAmbiguous()));
 
-        foreach (array_keys($ambiguous) as $id) {
-            $ambiguous[$id] =   $layout->renderById($id, '');
+        foreach ($secondary as $entry) {
+            Container::getCitationItem()->moveTo($entry['id'], $entry['citationID']);
+            Container::getData()->moveToId($entry['id']);
+            Container::getRendered()->set($entry['id'], $entry['citationID'], $layout->renderById($entry['id'], ''));
         }
-
-        $this->store($this->getDisambiguate(), $ambiguous);
     }
 }

@@ -18,6 +18,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
     private $tmpAmbiguous;
     /** @var array */
     private $tmpDisambiguate;
+    /** @var string */
     private $regExp;
 
     /**
@@ -40,21 +41,13 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
         }
         $this->regExp   .=  ')/';
 
-
         // disambiguate only where names and year are identical
         foreach ($this->tmpAmbiguous as $id => $name) {
             if (preg_match($this->regExp, $name) == 0) {
-                $rendered   =   Container::getRendered()->getById($id);
-                $citation   =   '';
+                $citation   =   Container::getRendered()->getFirstById($id);
 
-                if (isset($rendered['firstCitation']) == true) {
-                    $citation       =   $rendered['firstCitation'];
-                    $firstDifferent =   true;
-                } elseif (isset($rendered['citation']) == true) {
-                    $citation   =   $rendered['citation'];
-                }
-
-                if (preg_match($this->regExp, $citation) == 1) {
+                if (preg_match($this->regExp, $citation) == 1
+                    && preg_match('/^' . $this->tmpAmbiguous[$id] . '/', $citation) == 1) {
                     $this->tmpAmbiguous[$id] =  $citation;
                 }
             }
@@ -74,7 +67,14 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
             $this->tmpDisambiguate  =   $this->getAmbiguous();
         }
 
-        $this->store($this->tmpDisambiguate, $this->tmpAmbiguous);
+        if (count($ambiguous) > 0) {
+            // store already disambiguated values
+            $succeedAmbiguous    =   array();
+            if ($this->getAmbiguous() == $ambiguous) {
+                $succeedAmbiguous    =   $ambiguous;
+            }
+            $this->succeed($this->getDisambiguate(), $succeedAmbiguous);
+        }
     }
 
     /**
@@ -114,18 +114,55 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
                     $actualSuffix   =   $suffix;
                 }
 
-                if ($useYearSuffix == true) {
-                    $this->tmpDisambiguate[$id]    =   $layout->renderById($id, '');
-                    unset($this->tmpAmbiguous[$id]);
+                if (Container::getCitationItem() !== false) {
+                    $cites  =   Container::getCitationItem()->getWithIds(array($id));
+                    foreach ($cites as $entry) {
+                        Container::getCitationItem()->moveTo($id, $entry['citationID']);
+
+                        if ($useYearSuffix == true) {
+                            Container::getRendered()->clearById($id);
+                            Container::getRendered()->set($id, $entry['citationID'], $layout->renderById($id, ''));
+                        } else {
+                            Container::getRendered()->set(
+                                $id,
+                                $entry['citationID'],
+                                $this->addYearSuffixToValue($this->tmpAmbiguous[$id], $actualSuffix)
+                            );
+                        }
+                    }
                 } else {
-                    $withYearSuffix =   preg_replace($this->regExp, '$1' . $actualSuffix, $this->tmpAmbiguous[$id]);
-                    $withYearSuffix =   str_replace('&#38' . $actualSuffix . ';', '&#38;', $withYearSuffix);
-                    $this->tmpDisambiguate[$id]    =   $withYearSuffix;
-                    unset($this->tmpAmbiguous[$id]);
+                    $cites = Container::getRendered()->getAllById();
+                    foreach ($cites as $itemId => $value) {
+                        if ($itemId == $id) {
+                            if ($useYearSuffix == true) {
+                                Container::getRendered()->clearById($id);
+                                Container::getRendered()->set($id, 0, $layout->renderById($id, ''));
+                            } else {
+                                $newValue   =   $this->addYearSuffixToValue($value, $actualSuffix);
+                                Container::getRendered()->set($id, 0, $newValue);
+                                $this->tmpDisambiguate[$id] =   $newValue;
+                            }
+                        }
+                    }
                 }
 
+                unset($this->tmpAmbiguous[$id]);
                 $suffix++;
             }
         }
+
+    }
+
+    /**
+     * Add a suffix to a rendered year.
+     *
+     * @param string $value
+     * @param string $suffix
+     * @return string
+     */
+    private function addYearSuffixToValue($value, $suffix)
+    {
+        $value = preg_replace($this->regExp, '$1' . $suffix, $value);
+        return str_replace('&#38' . $suffix . ';', '&#38;', $value);
     }
 }

@@ -77,6 +77,16 @@ class CitationItems extends CitationAbstract
             $newOrder[] =   array('id' => $id);
         }
 
+        foreach ($order as $id) {
+            $this->moveToFirstInGroup();
+            do {
+                if ($id == $this->get('id')) {
+                    $newOrder[]   = $this->data[$this->position][$this->groupPosition];
+                    break;
+                }
+            } while ($this->nextInGroup() == true);
+        }
+
         $this->data[$this->position]    =   $newOrder;
         $this->groupPosition            =   0;
         return $this;

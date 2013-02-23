@@ -89,7 +89,6 @@ class Citation implements Renderable
             && Container::getContext()->getLastDisambiguation() == 'Geissler\CSL\Options\Disambiguation\AddYearSuffix'
             && Container::getBibliography()->sort() == true) {
             Container::getRendered()->clear();
-            $this->layout->render($data);
 
             // re-render citation
             $result =   $this->layout->render($data);

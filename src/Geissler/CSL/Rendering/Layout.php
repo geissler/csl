@@ -171,14 +171,8 @@ class Layout implements Renderable, Parental
         if (Container::getCitationItem() !== false) {
             // prefix for citation item
             if (Container::getCitationItem()->get('prefix') !== null) {
-                Container::getRendered()->addWithCitationId(
-                    Container::getActualId(),
-                    Container::getActualCitationId(),
-                    'prefix',
-                    Container::getCitationItem()->get('prefix') . ' '
-                );
-                //$entry[]    =   Container::getCitationItem()->get('prefix');
-                //$entry[]    =   ' ';
+                $entry[]    =   Container::getCitationItem()->get('prefix');
+                $entry[]    =   ' ';
             }
 
             foreach ($this->children as $child) {
@@ -187,14 +181,8 @@ class Layout implements Renderable, Parental
 
             // suffix for citation item
             if (Container::getCitationItem()->get('suffix') !== null) {
-                Container::getRendered()->addWithCitationId(
-                    Container::getActualId(),
-                    Container::getActualCitationId(),
-                    'suffix',
-                    ' ' . Container::getCitationItem()->get('suffix')
-                );
-                //$entry[]    =   ' ';
-                //$entry[]    =   Container::getCitationItem()->get('suffix');
+                $entry[]    =   ' ';
+                $entry[]    =   Container::getCitationItem()->get('suffix');
             }
         } else {
             foreach ($this->children as $child) {
@@ -228,6 +216,25 @@ class Layout implements Renderable, Parental
         return $return;
     }
 
+    public function renderFirstId($id)
+    {
+        if (Container::getCitationItem() !== false) {
+            Container::getCitationItem()->moveToFirst();
+
+            $found =    false;
+            do {
+                do {
+                    if (Container::getCitationItem()->get('id') == $id) {
+                        $found  =   true;
+                        break;
+                    }
+                } while (Container::getCitationItem()->nextInGroup() == true);
+            } while (Container::getCitationItem()->next() == true && $found == false);
+        }
+
+        return $this->renderById($id, '');
+    }
+
     /**
      * Render citations with citations or citation-items data.
      *
@@ -243,14 +250,16 @@ class Layout implements Renderable, Parental
         do {
             $group = array();
             do {
-                $id =   Container::getActualId();
+                $id         =   Container::getActualId();
+                $citationId =   Container::getActualCitationId();
 
-                if ($id !== null) {
+                if ($id !== null
+                    && $citationId !== null) {
                     Container::getData()->moveToId($id);
 
                     // store rendered citation
-                    Container::getRendered()->addCitation($id, $this->renderJustActualEntry($data));
-                    $group[] = $id;
+                    Container::getRendered()->set($id, $citationId, $this->renderJustActualEntry($data));
+                    $group[] = $id . '#' . $citationId;
                 }
             } while (Container::getCitationItem()->nextInGroup() == true);
 
@@ -276,8 +285,8 @@ class Layout implements Renderable, Parental
         do {
             // store rendered citation
             $id =   Container::getData()->getVariable('id');
-            Container::getRendered()->addCitation($id, $this->renderJustActualEntry($data));
-            $result[]   =   $id;
+            Container::getRendered()->set($id, 0, $this->renderJustActualEntry($data));
+            $result[]   =   $id . '#0';
         } while (Container::getData()->next() == true);
 
         return explode("\n", $this->applyCitationOptions($result, $this->delimiter));
@@ -327,7 +336,8 @@ class Layout implements Renderable, Parental
                         $data[$i]    =   $data[$i]['value'] . $data[$i]['delimiter'];
                     } else {
                         $data[$i]    =   $data[$i]['value'];
-                        if (preg_match('/[ ]$/', $data[$i]['delimiter']) == 1) {
+                        if (isset($data[$i]['delimiter']) == true
+                            && preg_match('/[ ]$/', $data[$i]['delimiter']) == 1) {
                             $data[$i]    =   ' ';
                         }
                     }

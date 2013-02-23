@@ -88,11 +88,12 @@ class Citation implements Option
     public function apply(array $data)
     {
         // step 1: disambiguation
-        var_dump($data);
+        // Container::getRendered()->dump();
         $data   =   $this->disambiguation->apply($data);
 
         // step 2: create array from rendered by replacing item-ids
         $data   =   $this->renderFromIds->apply($data);
+        // Container::getRendered()->dump();
 
         // step 3: cite grouping
         $data   =   $this->citeGrouping->apply($data);

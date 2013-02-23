@@ -66,7 +66,6 @@ class CiteGrouping implements Optional
 
         $length     =   count($data);
         $newData    =   array();
-
         for ($i = 0; $i < $length; $i++) {
             // get all names in citation group
             $namesAsArray   =   array();
@@ -83,13 +82,15 @@ class CiteGrouping implements Optional
                 $actualName =   $namesAsArray[$j][0];
 
                 // check if name already used
-                if ($actualName !== '') {
+                if ($actualName !== ''
+                    && isset($data[$i][$j]) == true) {
                     $actualGroup    =   array($data[$i][$j]);
                     $groupPosition  =   0;
 
                     for ($k = $j + 1; $k < $citeLength; $k++) {
                         if ($actualName == $namesAsArray[$k][0]
-                            && $namesFull[$j] == $namesFull[$k]) {
+                            && $namesFull[$j] == $namesFull[$k]
+                            && isset($data[$i][$k]) == true) {
                             // replace delimiter in previous group entry with cite group delimiter
                             $actualGroup[$groupPosition]['delimiter']   =   $this->citeGroupDelimiter;
                             $actualGroup[]          =   $data[$i][$k];

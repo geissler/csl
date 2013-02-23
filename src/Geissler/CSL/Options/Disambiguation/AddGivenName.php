@@ -31,7 +31,8 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
         $this->tmpAmbiguous     =   $this->getAmbiguous();
         $this->tmpDisambiguate  =   $this->getDisambiguate();
 
-        if ($this->addGivenName($this->getAmbiguous()) == true) {
+        if (is_array($this->getAmbiguous()) == true
+            && $this->addGivenName($this->getAmbiguous()) == true) {
             $this->store($this->tmpDisambiguate, $this->tmpAmbiguous);
         } else {
             $this->succeed($this->tmpDisambiguate, $this->tmpAmbiguous);
@@ -44,7 +45,7 @@ class AddGivenName extends DisambiguateAbstract implements Disambiguate
      * @param $ambiguous
      * @return bool
      */
-    protected function addGivenName($ambiguous)
+    protected function addGivenName(array $ambiguous)
     {
         $layout         =   Container::getContext()->get('layout', 'layout');
         $originalFull   =   array();

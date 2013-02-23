@@ -52,7 +52,6 @@ class Position extends ChooseableAbstract implements Chooseable
 
                 return true;
                 break;
-            /*
             case 'subsequent':
                 $length =   Container::getCitationItem()->getPosition();
                 $actual =   Container::getCitationItem()->get('id');
@@ -63,10 +62,8 @@ class Position extends ChooseableAbstract implements Chooseable
                     }
                 }
                 break;
-            */
             case 'ibid':
             case 'ibid-with-locator':
-            case 'subsequent':
                 $position       =   Container::getCitationItem()->getPosition();
                 $groupPosition  =   Container::getCitationItem()->getGroupPosition();
 

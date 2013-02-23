@@ -115,7 +115,8 @@ abstract class DisambiguateAbstract implements Disambiguate
     protected function store($disambiguated, $ambiguous = array())
     {
         if (is_array($ambiguous) == true
-            && count($ambiguous) > 0) {
+            && count($ambiguous) > 0
+            && $this->getAmbiguous() !== $ambiguous) {
             $this->setAmbiguous($ambiguous);
         }
 

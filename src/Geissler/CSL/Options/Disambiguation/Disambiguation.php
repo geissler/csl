@@ -50,7 +50,7 @@ class Disambiguation implements Optional
 
         // if "et-al-subsequent-min" or "et-al-subsequent-use-first" are used, use the first citation
         // to disambiguate the values (see disambiguate_BasedOnEtAlSubsequent.txt)
-        $citations  =   Container::getRendered()->getAll();
+        $citations  =   Container::getRendered()->getAllById();
 
         if (is_object($this->names) == true) {
             $this->sorted   =   array_keys($citations);
@@ -162,41 +162,46 @@ class Disambiguation implements Optional
         // run through disambiguation chain
         new Chain($rePositioned);
 
-        if (Container::getRendered()->getUseDifferentCitations() == true) {
-            if (Container::getContext()->isChooseDisambiguationActive() == true) {
-                // re-render citation with choose disambiguate validates to true
-                foreach (array_keys($rePositioned) as $id) {
-                    $rendered    =   Container::getRendered()->getById($id);
-                    Container::getRendered()->updateCitation($id, false, $rendered['citation']);
-                }
-            } elseif ($reRender == true) {
-                // if entries are disambiguated by the names, the full first cite must be re-rendered
-                Container::getContext()->setIgnoreEtAlSubsequent(true);
+        /*
+        if (Container::getContext()->isChooseDisambiguationActive() == true) {
+            // re-render citation with choose disambiguate validates to true
 
-                foreach (array_keys($rePositioned) as $id) {
-                    $rendered    =   Container::getRendered()->getById($id);
+            foreach (array_keys($rePositioned) as $id) {
+                $rendered    =   Container::getRendered()->getById($id);
+                //Container::getRendered()->updateCitation($id, false, $rendered['citation']);
+            }
+
+        } elseif ($reRender == true) {
+            // if entries are disambiguated by the names, the full first cite must be re-rendered
+            Container::getContext()->setIgnoreEtAlSubsequent(true);
+
+            foreach (array_keys($rePositioned) as $id) {
+                //$rendered    =   Container::getRendered()->getById($id);
+                Container::getRendered()->updateFirst($id, $this->layout->renderFirstId($id));
+                Container::getRendered()->updateCitation(
+                    $id,
+                    $this->layout->renderById($id, ''),
+                    $rendered['firstCitation']
+                );
+
+            }
+
+            Container::getContext()->setIgnoreEtAlSubsequent(false);
+        } else {
+            // if firstCitation and citation in ambiguous mode are identical, copy first citation to citation
+
+            foreach (array_keys($rePositioned) as $id) {
+                $rendered    =   Container::getRendered()->getById($id);
+                if (isset($rendered['citation']) == true) {
                     Container::getRendered()->updateCitation(
                         $id,
-                        $this->layout->renderById($id, ''),
-                        $rendered['firstCitation']
+                        $rendered['firstCitation'],
+                        $rendered['citation']
                     );
-                }
-
-                Container::getContext()->setIgnoreEtAlSubsequent(false);
-            } else {
-                // if firstCitation and citation in ambiguous mode are identical, copy first citation to citation
-                foreach (array_keys($rePositioned) as $id) {
-                    $rendered    =   Container::getRendered()->getById($id);
-                    if (isset($rendered['citation']) == true) {
-                        Container::getRendered()->updateCitation(
-                            $id,
-                            $rendered['firstCitation'],
-                            $rendered['citation']
-                        );
-                    }
                 }
             }
         }
+        */
     }
 
     /**

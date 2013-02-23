@@ -28,23 +28,31 @@ class Store
     }
 
     /**
-     * Store the values form the object.
+     * Store the values from the object.
      * @param \Geissler\CSL\Interfaces\Disambiguate $disambiguation
      */
     public function store(Disambiguate $disambiguation)
     {
-        if (count($disambiguation->getDisambiguate()) > 0) {
-            foreach ($disambiguation->getDisambiguate() as $id => $citation) {
+        $disambiguated  =   $disambiguation->getDisambiguate();
+        if ($disambiguated === null) {
+            $disambiguated  =   array();
+        }
+
+        if (count($disambiguated) > 0) {
+            foreach ($disambiguated as $id => $citation) {
                 if (isset($this->ambiguous[$id]) == true) {
-                    Container::getRendered()->updateCitation($id, $citation, $this->ambiguous[$id], true);
+                    Container::getRendered()->update($id, $this->ambiguous[$id], $citation);
                 }
             }
         }
 
-        if (count($disambiguation->getAmbiguous()) > 0) {
+        // use modified ambiguous values
+        if (count($disambiguation->getAmbiguous()) > 0
+            && $this->ambiguous !== $disambiguation->getAmbiguous()) {
             foreach ($disambiguation->getAmbiguous() as $id => $citation) {
-                if (isset($this->ambiguous[$id]) == true) {
-                    Container::getRendered()->updateCitation($id, $citation, $this->ambiguous[$id]);
+                if (isset($this->ambiguous[$id]) == true
+                    && array_key_exists($id, $disambiguated) == false) {
+                    Container::getRendered()->update($id, $this->ambiguous[$id], $citation);
                 }
             }
         }

@@ -2,7 +2,7 @@
 namespace Geissler\CSL\Data;
 
 /**
- * Storage for the rendered citations and bibliographies entries.
+ * Storage for the rendered citations until they are disambiguated.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -11,175 +11,178 @@ class Rendered
 {
     /** @var array */
     private $rendered;
-    /** @var array */
-    private $replace;
     /** @var bool */
-    private $useDifferentCitations;
+    private $differentCitations;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->rendered                 =   array();
-        $this->replace                  =   array();
-        $this->useDifferentCitations    =   false;
+        $this->rendered             =   array();
+        $this->differentCitations   =   false;
     }
 
     /**
-     * Set if the first cite is different from the following.
+     * De-/Activate the usage of different citations.
      *
-     * @param boolean $useDifferentCitations
+     * @param boolean $value
      * @return Rendered
      */
-    public function setUseDifferentCitations($useDifferentCitations)
+    public function setUseDifferentCitations($value)
     {
-        $this->useDifferentCitations = $useDifferentCitations;
+        $this->differentCitations   =   $value;
         return $this;
     }
 
     /**
-     * Retrieve the configuration of the different citation usage.
+     * Retrieve the different citation usage.
      *
      * @return bool
      */
     public function getUseDifferentCitations()
     {
-        return $this->useDifferentCitations;
+        return $this->differentCitations;
     }
 
     /**
-     * Store a rendered citation under its id.
+     * Store a rendered value under its item-id and citationID.
      *
-     * @param string $id
+     * @param string|int $id
+     * @param string|int $citationId
      * @param string $value
-     * @return \Geissler\CSL\Data\Rendered
-     */
-    public function addCitation($id, $value)
-    {
-        if ($this->useDifferentCitations == false
-            || isset($this->rendered[$id]['firstCitation']) == true) {
-            return $this->store($id, $value, 'citation');
-        } else {
-            return $this->store($id, $value, 'firstCitation');
-        }
-    }
-
-    /**
-     * Update a already rendered citation or the first citation by comparison of the entries.
-     *
-     * @param string $id
-     * @param string $value
-     * @param string $valueToUpdate old value, which should be replaced
-     * @param bool $force
      * @return Rendered
      */
-    public function updateCitation($id, $value, $valueToUpdate, $force = false)
+    public function set($id, $citationId, $value)
     {
-        if ($this->getUseDifferentCitations() == true
-            && isset($this->rendered[$id]['firstCitation']) == true
-            && $this->rendered[$id]['firstCitation'] == $valueToUpdate) {
-            return $this->store($id, $value, 'firstCitation');
-        } elseif ($force == true
-            || isset($this->rendered[$id]['citation']) == false
-            || $this->rendered[$id]['citation'] == $valueToUpdate) {
-            return $this->store($id, $value, 'citation');
+        $key    =   $this->find($id, $citationId);
+        if ($key !== false) {
+            $this->rendered[$key]['value']  =   $value;
+        } else {
+            $this->rendered[]   =   array(
+                'id'            =>  $id,
+                'citationId'    =>  $citationId,
+                'value'         =>  $value
+            );
         }
 
         return $this;
     }
 
     /**
-     * Add a value for a type (prefix, suffix) for the given pair of id and citationId.
-     *
-     * @param string|integer $id
-     * @param string|integer $citationId
-     * @param string $type prefix or suffix
-     * @param string $value
-     * @return Rendered
+     * Retrieve a rendered value based on the item-id and citationID.
+     * @param string|int $id
+     * @param bool|string|int  $citationId
+     * @return bool|string
      */
-    public function addWithCitationId($id, $citationId, $type, $value)
+    public function get($id, $citationId = false)
     {
-        return $this->store($id . '#' . $citationId, $value, $type);
+        if ($citationId === false) {
+            if (strpos($id, '#') === false) {
+                return false;
+            }
+
+            $ids        =   explode('#', $id);
+            $id         =   $ids[0];
+            $citationId =   $ids[1];
+        }
+
+        $key    =   $this->find($id, $citationId);
+        if ($key !== false) {
+            return $this->rendered[$key]['value'];
+        }
+
+        return false;
     }
 
     /**
-     * Retrieve an additional value for a pair of id and citationId.
+     * Replace the rendered value for a item-id by a new value.
      *
-     * @param string|integer $id
-     * @param string|integer $citationId
-     * @param string $type
+     * @param string|int $id
+     * @param string $oldValue
+     * @param string $newValue
+     * @return Rendered
+     */
+    public function update($id, $oldValue, $newValue)
+    {
+        $length     =   count($this->rendered);
+        $updated    =   array();
+
+        for ($i = 0; $i < $length; $i++) {
+            if (isset($this->rendered[$i]) == true
+                && $this->rendered[$i]['id'] == $id
+                && ($this->rendered[$i]['value'] == $oldValue
+                    || preg_match('/^' . $oldValue . '/', $this->rendered[$i]['value']) == 1)
+                && ($this->differentCitations == false
+                    || in_array($id, $updated) == false)) {
+
+                $this->rendered[$i]['value']    =   $newValue;
+                $updated[]                      =   $id;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retrieve all rendered values based on there item-id.
+     *
+     * @return array Array with item-ids as keys and rendered value as value
+     */
+    public function getAllById()
+    {
+        $return =   array();
+        foreach ($this->rendered as $values) {
+            if (array_key_exists($values['id'], $return) == false) {
+                $return[$values['id']]  =   $values['value'];
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * Retrieve the rendered value of the first cite using the given bibliography entry.
+     *
+     * @param string $id
      * @return string
      */
-    public function getWithCitationId($id, $citationId, $type)
+    public function getFirstById($id)
     {
-        $return =   $this->getById($id . '#' . $citationId);
-        if ($return !== false
-            && isset($return[$type]) == true) {
-            return $return[$type];
+        $length =   count($this->rendered);
+
+        for ($i = 0; $i < $length; $i++) {
+            if (isset($this->rendered[$i]) == true
+                && $this->rendered[$i]['id'] == $id) {
+                return $this->rendered[$i]['value'];
+            }
         }
 
         return '';
     }
 
     /**
-     * Retrieve all rendered values for the id.
+     * Retrieve the position of the first usage of a bibliography entry.
      *
-     * @param integer $id
-     * @return array|bool
+     * @param string $id
+     * @return int
      */
-    public function getById($id)
+    public function getPositionOfFirstId($id)
     {
-        if (isset($this->rendered[$id]) == true) {
-            return $this->rendered[$id];
-        }
+        $length =   count($this->rendered);
 
-        return false;
-    }
-
-    /**
-     * Retrieve the actual citation, first if first access and first citation is used.
-     *
-     * @param integer $id
-     * @return string|bool
-     */
-    public function getCitationById($id)
-    {
-        $return =   $this->getById($id);
-
-        if ($return !== false) {
-            if (isset($return['firstCitation']) == true
-                && $return['firstCitation'] !== '') {
-                $this->store($id, '', 'firstCitation');
-                return $return['firstCitation'];
-            } elseif (isset($return['citation']) == true) {
-                return $return['citation'];
+        for ($i = 0; $i < $length; $i++) {
+            if ($this->rendered[$i]['id'] == $id) {
+                return $i + 1;
             }
         }
 
-        return false;
+        return 0;
     }
 
-    /**
-     * Retrieve all rendered entries with the first type to use.
-     *
-     * @return array
-     */
-    public function getAll()
+    public function dump()
     {
-        $return =   array();
-        $type   =   'citation';
-        if ($this->useDifferentCitations == true) {
-            $type = 'firstCitation';
-        }
-
-        foreach ($this->rendered as $id => $entry) {
-            if (isset($entry[$type]) == true) {
-                $return[$id]    =   $entry[$type];
-            }
-        }
-
-        return $return;
+        var_dump($this->rendered);
     }
 
     /**
@@ -194,20 +197,41 @@ class Rendered
     }
 
     /**
-     * Store the rendered value.
+     * Remove all rendered values with a given item-id.
      *
-     * @param integer $id
-     * @param string $value
-     * @param string $type
-     * @return Rendered
+     * @param int|string $id
+     * @return \Geissler\CSL\Data\Rendered
      */
-    private function store($id, $value, $type)
+    public function clearById($id)
     {
-        if (isset($this->rendered[$id]) == false) {
-            $this->rendered[$id]    =   array('id' => $id);
+        $length =   count($this->rendered);
+
+        for ($i = 0; $i < $length; $i++) {
+            if (isset($this->rendered[$i]) == true
+                && $this->rendered[$i]['id'] == $id) {
+                unset($this->rendered[$i]);
+            }
         }
 
-        $this->rendered[$id][$type]    =   $value;
         return $this;
+    }
+
+    /**
+     * Find the position of a rendered value by its item-id and citationID.
+     *
+     * @param int|string $id
+     * @param int|string $citationId
+     * @return bool|int|string
+     */
+    private function find($id, $citationId)
+    {
+        foreach ($this->rendered as $key => $values) {
+            if ($values['id'] == $id
+                && $values['citationId'] == $citationId) {
+                return $key;
+            }
+        }
+
+        return false;
     }
 }

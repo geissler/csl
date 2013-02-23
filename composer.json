@@ -1,7 +1,8 @@
 {
     "name": "geissler/csl",
-    "description": "A php processor for the citation style language (http://citationstyles.org)",
+    "description": "A php processor for the citation style language CSL (http://citationstyles.org)",
     "keywords": ["csl", "citation"],
+    "type": "library",
     "license": "MIT",
     "authors": [
         {

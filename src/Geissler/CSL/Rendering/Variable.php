@@ -130,6 +130,13 @@ class Variable implements Renderable, Groupable
                     return $format->format(Container::getData()->getVariable($this->name));
                 }
                 break;
+            case 'first-reference-note-number':
+                // number of a preceding note containing the first reference to the item
+                if (Container::getCitationItem()->get('noteIndex') !== null
+                    || Container::getCitationItem()->get('index') !== null) {
+                    return Container::getRendered()->getPositionOfFirstId(Container::getActualId());
+                }
+                break;
         }
 
         $return =   Container::getData()->getVariable($this->name);

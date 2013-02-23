@@ -52,7 +52,7 @@ abstract class CitationAbstract
      * @param string $name
      * @param mixed $value
      * @param integer $position
-     * @return bool
+     * @return mixed
      */
     abstract public function setVariable($name, $value, $position);
 
@@ -91,6 +91,34 @@ abstract class CitationAbstract
      * @return string|integer|null
      */
     abstract public function getAtPosition($variable, $position, $groupPosition = false);
+
+    /**
+     * Retrieve all usages of item-ids with the corresponding citationID.
+     *
+     * @param array $ids item-ids
+     * @return array
+     */
+    public function getWithIds(array $ids)
+    {
+        $result =   array();
+        $this->moveToFirst();
+
+        do {
+            do {
+                $id =   $this->get('id');
+                if (in_array($id, $ids) == true) {
+
+                        $result[]   =   array(
+                            'id'            =>  $id,
+                            'citationID'    =>  $this->get('citationID')
+                        );
+
+                }
+            } while ($this->nextInGroup() == true);
+        } while ($this->next() == true);
+
+        return $result;
+    }
 
     /**
      * Move to the next citation item in the actual citation group.
@@ -152,6 +180,27 @@ abstract class CitationAbstract
         Container::getContext()->getSubstitute()->clear();
         $this->groupPosition    =   0;
         return $this;
+    }
+
+    /**
+     * Move to a cite.
+     * @param string $id item-id
+     * @param string|integer $citationId citationID
+     * @return bool
+     */
+    public function moveTo($id, $citationId)
+    {
+        $this->moveToFirst();
+        do {
+            do {
+                if ($this->get('id') == $id
+                    && $this->get('citationID') == $citationId) {
+                    return true;
+                }
+            } while ($this->nextInGroup() == true);
+        } while ($this->next() == true);
+
+        return false;
     }
 
     /**

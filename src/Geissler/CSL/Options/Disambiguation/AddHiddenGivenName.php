@@ -23,23 +23,25 @@ class AddHiddenGivenName extends AddGivenName implements Disambiguate
         $maxNames       =   Container::getContext()->get('layout', 'layout')
             ->getChildElement('\Geissler\CSL\Names\Names')
             ->getMaxNumberOfNames();
-        $disambiguated  =   false;
 
+        $disambiguated          =   false;
         $this->tmpDisambiguate  =   $this->getDisambiguate();
         $this->tmpAmbiguous     =   $this->getAmbiguous();
 
-        do {
-            Container::getContext()->removeDisambiguationOptions('Geissler\CSL\Names\Name');
-            $etAl++;
-            Container::getContext()->setDisambiguationOptions(
-                'Geissler\CSL\Names\Name',
-                array(
-                    'etAlUseFirst' => $etAl
-                )
-            );
+        if (is_array($this->getAmbiguous()) == true) {
+            do {
+                Container::getContext()->removeDisambiguationOptions('Geissler\CSL\Names\Name');
+                $etAl++;
+                Container::getContext()->setDisambiguationOptions(
+                    'Geissler\CSL\Names\Name',
+                    array(
+                        'etAlUseFirst' => $etAl
+                    )
+                );
 
-            $disambiguated  =   $this->addGivenName($this->tmpAmbiguous);
-        } while ($disambiguated == false && $etAl <= $maxNames);
+                $disambiguated  =   $this->addGivenName($this->tmpAmbiguous);
+            } while ($disambiguated == false && $etAl <= $maxNames);
+        }
 
         if ($disambiguated == true) {
             $this->store($this->tmpDisambiguate, $this->tmpAmbiguous);

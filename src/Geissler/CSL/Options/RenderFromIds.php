@@ -39,12 +39,8 @@ class RenderFromIds implements Optional
             if (is_array($data[$i]) == true) {
                 $innerLength    =   count($data[$i]);
                 for ($j = 0; $j < $innerLength; $j++) {
-                    $id =   $data[$i][$j];
                     // add existing prefix and/or suffixes to the rendered value
-                    $actualCitation =
-                        Container::getRendered()->getWithCitationId($id, Container::getActualCitationId(), 'prefix')
-                        . Container::getRendered()->getCitationById($id)
-                        . Container::getRendered()->getWithCitationId($id, Container::getActualCitationId(), 'suffix');
+                    $actualCitation =   Container::getRendered()->get($data[$i][$j]);
 
                     // re-render citation if missing
                     if ($actualCitation == false) {
@@ -78,7 +74,8 @@ class RenderFromIds implements Optional
                 }
             } else {
                 // re-render citation if missing
-                $actualCitation =   Container::getRendered()->getCitationById($data[$i]);
+                $actualCitation =   Container::getRendered()->get($data[$i]);
+
                 if ($actualCitation == false) {
                     Container::getContext()->enter('disambiguation');
                     $data[$i]   =   array(
@@ -98,7 +95,7 @@ class RenderFromIds implements Optional
                 Container::getCitationItem()->next();
             }
         }
-        var_dump($data);
+
         return $data;
     }
 }

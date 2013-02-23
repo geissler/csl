@@ -41,6 +41,11 @@ class Chain
         if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true) {
             $addYear    =   new AddYearSuffix();
             $addYear->setStore($store);
+
+            if ($chain !== false) {
+                $addYear->setSuccessor($chain);
+            }
+
             $chain  =   $addYear;
         }
 
@@ -84,7 +89,8 @@ class Chain
         }
 
         if ($chain !== false) {
-            $chain->setAmbiguous($ambiguous)
+            $chain
+                ->setAmbiguous($ambiguous)
                 ->setDisambiguate(array())
                 ->disambiguate();
         }

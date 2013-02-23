@@ -272,6 +272,11 @@ class Container
         return self::getData()->getVariable('id');
     }
 
+    /**
+     * Retrieve the citationID at the actual rendering position.
+     *
+     * @return int|string
+     */
     public static function getActualCitationId()
     {
         if (self::$context->getName() == 'citation'

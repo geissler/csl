@@ -262,7 +262,7 @@ class Name implements Renderable, Modifiable, Contextualize
 
         // If used, the values of these attributes replace those of respectively et-al-min and et-al-use-first
         // for subsequent cites (cites referencing earlier cited items)
-        if (Container::getRendered()->getById(Container::getActualId()) !== false) {
+        if (Container::getRendered()->get(Container::getActualId(), Container::getActualCitationId()) !== false) {
             if ($this->etAlSubsequentMin > 0) {
                 $etAlMin    =   $this->etAlSubsequentMin;
             }
