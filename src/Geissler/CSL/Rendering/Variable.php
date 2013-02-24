@@ -31,9 +31,9 @@ class Variable implements Renderable, Groupable
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'variable') {
-                $this->name = (string) $value;
+                $this->name = (string)$value;
             } elseif ($name == 'form') {
-                $this->form = (string) $value;
+                $this->form = (string)$value;
             }
         }
     }
@@ -88,44 +88,45 @@ class Variable implements Renderable, Groupable
                 }
                 break;
             case 'citation-label':
-                $return =   Container::getData()->getVariable($this->name);
+                $return = Container::getData()->getVariable($this->name);
                 if ($return !== null) {
                     return $return;
                 }
 
                 // first 4 letters from the first two author family names and last to year digits
-                $authors    =   Container::getData()->getVariable('author');
-                $format     =   new Format();
+                $authors = Container::getData()->getVariable('author');
+                $format = new Format();
 
                 if (isset($authors[0]['family']) == true
-                    && $format->format('issued') == true) {
-                    $year   =   $format->getData();
+                    && $format->format('issued') == true
+                ) {
+                    $year = $format->getData();
 
                     if (isset($year[0]['year']) == true) {
                         switch (count($authors)) {
                             case 1:
-                                $author =   substr($authors[0]['family'], 0, 4);
+                                $author = substr($authors[0]['family'], 0, 4);
                                 break;
                             case 2:
-                                $author =   substr($authors[0]['family'], 0, 2) . substr($authors[1]['family'], 0, 2);
+                                $author = substr($authors[0]['family'], 0, 2) . substr($authors[1]['family'], 0, 2);
                                 break;
                             default:
-                                $author =   '';
+                                $author = '';
                                 for ($i = 0; $i < 4; $i++) {
                                     if (preg_match('/[A-Z]/', $authors[$i]['family'], $match) == 1) {
-                                        $author .=  $match[0];
+                                        $author .= $match[0];
                                     }
                                 }
                                 break;
                         }
 
-                        $length =   strlen($year[0]['year']);
-                        return  $author . substr($year[0]['year'], $length - 2, $length);
+                        $length = strlen($year[0]['year']);
+                        return $author . substr($year[0]['year'], $length - 2, $length);
                     }
                 }
                 break;
             case 'page':
-                $format =   Container::getContext()->getValue('pageRangeFormat');
+                $format = Container::getContext()->getValue('pageRangeFormat');
                 if (is_object($format) == true) {
                     return $format->format(Container::getData()->getVariable($this->name));
                 }
@@ -133,22 +134,30 @@ class Variable implements Renderable, Groupable
             case 'first-reference-note-number':
                 // number of a preceding note containing the first reference to the item
                 if (Container::getCitationItem()->get('noteIndex') !== null
-                    || Container::getCitationItem()->get('index') !== null) {
-                    return Container::getRendered()->getPositionOfFirstId(Container::getActualId());
+                    || Container::getCitationItem()->get('index') !== null
+                ) {
+                    $first = Container::getRendered()->getPositionOfFirstId(Container::getActualId());
+
+                    if ($first !== null
+                        && $first < Container::getRendered()->getLength()
+                    ) {
+                        return $first;
+                    }
                 }
                 break;
         }
 
-        $return =   Container::getData()->getVariable($this->name);
+        $return = Container::getData()->getVariable($this->name);
         if ($return !== null) {
             return $return;
         }
 
         // retrieve variables form citations
         if (Container::getContext()->getName() == 'citation'
-            && Container::getCitationItem() !== false) {
+            && Container::getCitationItem() !== false
+        ) {
 
-            $return =   Container::getCitationItem()->get($this->name);
+            $return = Container::getCitationItem()->get($this->name);
             if ($return !== null) {
                 return $return;
             }

@@ -27,15 +27,15 @@ class ReferenceGrouping implements Optional
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->rule =   'complete-all';
+        $this->rule = 'complete-all';
 
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'subsequent-author-substitute':
-                    $this->value    =   (string) $value;
+                    $this->value = (string)$value;
                     break;
                 case 'subsequent-author-substitute-rule':
-                    $this->rule     =   (string) $value;
+                    $this->rule = (string)$value;
                     break;
             }
         }
@@ -50,12 +50,13 @@ class ReferenceGrouping implements Optional
     public function apply(array $data)
     {
         Container::getData()->moveToFirst();
-        $this->names    =   Container::getContext()
+        $this->names = Container::getContext()
             ->get('layout', 'layout')
             ->getChildElement('\Geissler\CSL\Names\Names');
 
         if (isset($this->value) == false
-            || is_object($this->names) == false) {
+            || is_object($this->names) == false
+        ) {
             return $data;
         }
 
@@ -87,16 +88,23 @@ class ReferenceGrouping implements Optional
      */
     private function completeAll($bibliography)
     {
-        $delimiter  =   '(' . preg_quote($this->names->getDelimiter(), '/') . '|\.|;|,)';
-        $previous   =   preg_quote($this->names->render(''), '/');
-        $length     =   count($bibliography);
+        $delimiter = '(' . preg_quote($this->names->getDelimiter(), '/') . '|\.|;|,)';
+        $previous = preg_quote($this->names->render(''), '/');
+        $length = count($bibliography);
 
         for ($i = 1; $i < $length; $i++) {
             Container::getData()->next();
             if (preg_match('/^' . $previous . $delimiter . '/', $bibliography[$i]) == 1) {
-                $bibliography[$i]   =   preg_replace('/^' . $previous . '/', $this->value, $bibliography[$i]);
+                $bibliography[$i] = preg_replace('/^' . $previous . '/', $this->value, $bibliography[$i]);
+            } elseif (preg_match(
+                '/^(<div class="[a-z|-]+">' . $previous . '<\/div>)/',
+                $bibliography[$i],
+                $match
+            ) == 1
+            ) {
+                $bibliography[$i] = str_replace($match[0], $this->value, $bibliography[$i]);
             } else {
-                $previous   =   preg_quote($this->names->render(''), '/');
+                $previous = preg_quote($this->names->render(''), '/');
             }
         }
 
@@ -112,21 +120,21 @@ class ReferenceGrouping implements Optional
      */
     private function completeEach($bibliography)
     {
-        $delimiter  =   '(' . preg_quote($this->names->getDelimiter(), '/') . '|\.|;|,)';
-        $previous   =   preg_quote($this->names->render(''), '/');
-        $length     =   count($bibliography);
+        $delimiter = '(' . preg_quote($this->names->getDelimiter(), '/') . '|\.|;|,)';
+        $previous = preg_quote($this->names->render(''), '/');
+        $length = count($bibliography);
 
         for ($i = 1; $i < $length; $i++) {
             if (preg_match('/^' . $previous . $delimiter . '/', $bibliography[$i]) == 1) {
-                $names  =   $this->names->renderAsArray('');
-                $values =   array_fill(0, count($names), $this->value);
-                $value  =   str_replace($names, $values, $previous);
+                $names = $this->names->renderAsArray('');
+                $values = array_fill(0, count($names), $this->value);
+                $value = str_replace($names, $values, $previous);
 
-                $bibliography[$i]   =   preg_replace('/^' . $previous . '/', $value, $bibliography[$i]);
+                $bibliography[$i] = preg_replace('/^' . $previous . '/', $value, $bibliography[$i]);
                 Container::getData()->next();
             } else {
                 Container::getData()->next();
-                $previous   =   preg_quote($this->names->render(''), '/');
+                $previous = preg_quote($this->names->render(''), '/');
             }
         }
 
@@ -143,15 +151,15 @@ class ReferenceGrouping implements Optional
      */
     private function partialEach($bibliography)
     {
-        $previous   =   $this->names->renderAsArray('');
-        $length     =   count($bibliography);
+        $previous = $this->names->renderAsArray('');
+        $length = count($bibliography);
 
         for ($i = 1; $i < $length; $i++) {
             Container::getData()->next();
-            $names  =   $this->names->renderAsArray('');
+            $names = $this->names->renderAsArray('');
             foreach ($names as $name) {
                 if (in_array($name, $previous) == true) {
-                    $bibliography[$i]   =   preg_replace(
+                    $bibliography[$i] = preg_replace(
                         '/' . preg_quote($name, '/') . '/',
                         $this->value,
                         $bibliography[$i]
@@ -161,7 +169,7 @@ class ReferenceGrouping implements Optional
                 }
             }
 
-            $previous   =   $names;
+            $previous = $names;
         }
 
         return $bibliography;
@@ -175,23 +183,24 @@ class ReferenceGrouping implements Optional
      */
     private function partialFirst($bibliography)
     {
-        $previous   =   $this->names->renderAsArray('');
-        $length     =   count($bibliography);
+        $previous = $this->names->renderAsArray('');
+        $length = count($bibliography);
 
         for ($i = 1; $i < $length; $i++) {
             Container::getData()->next();
-            $names  =   $this->names->renderAsArray('');
+            $names = $this->names->renderAsArray('');
 
             if (isset($names[0]) == true
-                && in_array($names[0], $previous) == true) {
-                $bibliography[$i]   =   preg_replace(
+                && in_array($names[0], $previous) == true
+            ) {
+                $bibliography[$i] = preg_replace(
                     '/' . preg_quote($names[0], '/') . '/',
                     $this->value,
                     $bibliography[$i]
                 );
             }
 
-            $previous   =   $names;
+            $previous = $names;
         }
 
         return $bibliography;

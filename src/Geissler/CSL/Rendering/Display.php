@@ -11,7 +11,7 @@ use Geissler\CSL\Interfaces\Renderable;
  */
 class Display implements Renderable
 {
-    /** @var string **/
+    /** @var string * */
     private $display;
 
     /**
@@ -21,11 +21,11 @@ class Display implements Renderable
      */
     public function __construct(\SimpleXMLElement $affix)
     {
-        $this->display  =   '';
+        $this->display = '';
 
         foreach ($affix->attributes() as $name => $value) {
             if ($name == 'display') {
-                $this->display   =   (string) $value;
+                $this->display = (string)$value;
             }
         }
     }
@@ -42,16 +42,16 @@ class Display implements Renderable
     {
         switch ($this->display) {
             case 'block':
-                return '<font style="display:block">' . $data . '</font>';
+                return '<div class="csl-block">' . $data . '</div>';
                 break;
             case 'left-margin':
-                return $data;
+                return '<div class="csl-left-margin">' . $data . '</div>';
                 break;
             case 'right-inline':
-                return '<font style="display:inline">' . $data . '</font>';
+                return '<div class="csl-right-inline">' . $data . '</div>';
                 break;
             case 'indent':
-                return '<font style="text-indent: 0px; padding-left: 45px;">' . $data . '</font>';
+                return '<div class="csl-indent">' . $data . '</div>';
                 break;
             default:
                 return $data;

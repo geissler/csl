@@ -32,10 +32,10 @@ class Citation implements Option
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->disambiguation   =   new Disambiguation();
-        $this->renderFromIds    =   new RenderFromIds();
-        $this->citeGrouping     =   new CiteGrouping();
-        $this->citeCollapsing   =   new CiteCollapsing();
+        $this->disambiguation = new Disambiguation();
+        $this->renderFromIds = new RenderFromIds();
+        $this->citeGrouping = new CiteGrouping();
+        $this->citeCollapsing = new CiteCollapsing();
 
         // set standard values for citationItems-specific options
         Container::getContext()->addCitation('disambiguateAddNames', false);
@@ -53,27 +53,27 @@ class Citation implements Option
                     Container::getContext()->addCitation('disambiguateAddGivenname', isBoolean($value));
                     break;
                 case 'givenname-disambiguation-rule':
-                    Container::getContext()->addCitation('givennameDisambiguationRule', (string) $value);
+                    Container::getContext()->addCitation('givennameDisambiguationRule', (string)$value);
                     break;
                 case 'disambiguate-add-year-suffix':
                     Container::getContext()->addCitation('disambiguateAddYearSuffix', isBoolean($value));
                     break;
                 case 'cite-group-delimiter':
-                    $this->citeGrouping->setCiteGroupDelimiter((string) $value);
+                    $this->citeGrouping->setCiteGroupDelimiter((string)$value);
                     $this->citeGrouping->setActive(true);
                     break;
                 case 'collapse':
-                    $this->citeCollapsing->setCollapse((string) $value);
+                    $this->citeCollapsing->setCollapse((string)$value);
                     $this->citeGrouping->setActive(true);
                     break;
                 case 'year-suffix-delimiter':
-                    $this->citeCollapsing->setYearSuffixDelimiter((string) $value);
+                    $this->citeCollapsing->setYearSuffixDelimiter((string)$value);
                     break;
                 case 'after-collapse-delimiter':
-                    $this->citeCollapsing->setAfterCollapseDelimiter((string) $value);
+                    $this->citeCollapsing->setAfterCollapseDelimiter((string)$value);
                     break;
                 case 'near-note-distance':
-                    Container::getContext()->addCitation('nearNoteDistance', (int) $value);
+                    Container::getContext()->addCitation('nearNoteDistance', (int)$value);
                     break;
             }
         }
@@ -88,15 +88,15 @@ class Citation implements Option
     public function apply(array $data)
     {
         // step 1: disambiguation
-        // Container::getRendered()->dump();
-        $data   =   $this->disambiguation->apply($data);
+        //Container::getRendered()->dump();
+        $data = $this->disambiguation->apply($data);
 
         // step 2: create array from rendered by replacing item-ids
-        $data   =   $this->renderFromIds->apply($data);
+        $data = $this->renderFromIds->apply($data);
         // Container::getRendered()->dump();
 
         // step 3: cite grouping
-        $data   =   $this->citeGrouping->apply($data);
+        $data = $this->citeGrouping->apply($data);
 
         // step 4: cite collapsing or implode and replace
         return $this->citeCollapsing->apply($data);

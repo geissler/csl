@@ -16,19 +16,19 @@ use Geissler\CSL\Rendering\StripPeriods;
  */
 class Label implements Groupable
 {
-    /** @var string **/
+    /** @var string * */
     private $variable;
-    /** @var string **/
+    /** @var string * */
     private $form;
-    /** @var string **/
+    /** @var string * */
     private $plural;
-    /** @var Affix **/
+    /** @var Affix * */
     private $affix;
-    /** @var Formatting **/
+    /** @var Formatting * */
     private $formatting;
-    /** @var TextCase **/
+    /** @var TextCase * */
     private $textCase;
-    /** @var StripPeriods **/
+    /** @var StripPeriods * */
     private $stripPeriods;
 
     /**
@@ -38,24 +38,24 @@ class Label implements Groupable
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->form     =   'long';
-        $this->plural   =   'contextual';
+        $this->form = 'long';
+        $this->plural = 'contextual';
 
-        $this->affix        =   new Affix($xml);
-        $this->formatting   =   new Formatting($xml);
-        $this->textCase     =   new TextCase($xml);
-        $this->stripPeriods =   new StripPeriods($xml);
+        $this->affix = new Affix($xml);
+        $this->formatting = new Formatting($xml);
+        $this->textCase = new TextCase($xml);
+        $this->stripPeriods = new StripPeriods($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             switch ($name) {
                 case 'variable':
-                    $this->setVariable((string) $value);
+                    $this->setVariable((string)$value);
                     break;
                 case 'form':
-                    $this->form     =   (string) $value;
+                    $this->form = (string)$value;
                     break;
                 case 'plural':
-                    $this->setPlural((string) $value);
+                    $this->setPlural((string)$value);
                     break;
             }
         }
@@ -98,58 +98,62 @@ class Label implements Groupable
             throw new \ErrorException('variable is not set!');
         }
 
-        $variable   =   $this->variable;
+        $content = Container::getData()->getVariable($this->variable);
+        $variable = $this->variable;
         if ($this->variable == 'locator') {
             // Must be accompanied in the input data by a label indicating the locator type, which determines which
             // term is rendered by cs:label when the "locator" variable is selected
             if (is_object(Container::getCitationItem()) == true
-                && Container::getCitationItem()->get('label') !== null) {
-                $variable   =   Container::getCitationItem()->get('label');
+                && Container::getCitationItem()->get('label') !== null
+            ) {
+                $variable = Container::getCitationItem()->get('label');
+                $content = Container::getCitationItem()->get('locator');
             } else {
                 return '';
             }
         }
 
         // The term is only rendered if the selected variable is non-empty.
-        $content    =   Container::getData()->getVariable($variable);
         if ($content == ''
-            && $variable !== 'editortranslator') {
+            && $variable !== 'editortranslator'
+        ) {
             return '';
         }
 
-        $plural     =   'single';
+        $plural = 'single';
         switch ($this->plural) {
             case 'contextual':
                 if (is_array($content) == true) {
                     if (count($content) > 1) {
-                        $plural =   'multiple';
+                        $plural = 'multiple';
                     }
                 } elseif (($this->variable == 'number-of-pages'
                     || $this->variable == 'number-of-volumes')
-                    && preg_match_all('/([0-9])/', $content) > 1) {
+                    && preg_match_all('/([0-9])/', $content) > 1
+                ) {
 
-                    $plural =   'multiple';
-                } elseif (preg_match('/([2-9][0-9]*)/', $content) == 1) {
-                    $plural =   'multiple';
+                    $plural = 'multiple';
+                } elseif (preg_match('/^[0-9]+$/', $content, $match) == 0) {
+                    $plural = 'multiple';
                 }
                 break;
             case 'always':
             case 'multiple':
-                $plural =   'multiple';
+                $plural = 'multiple';
                 break;
         }
 
-        $form   =   '';
+        $form = '';
         if ($this->form !== 'long') {
-            $form   =   $this->form;
+            $form = $this->form;
         }
 
-        $return =   Container::getLocale()->getTerms($variable, $form, $plural);
+        $return = Container::getLocale()->getTerms($variable, $form, $plural);
         if ($return !== '') {
-            $return =   $this->formatting->render($return);
-            $return =   $this->textCase->render($return);
-            $return =   $this->stripPeriods->render($return);
-            $return =   $this->affix->render($return, true);
+            $return = $this->formatting->render($return);
+            $return = $this->textCase->render($return);
+            $return = $this->stripPeriods->render($return);
+            $return = $this->affix->render($return, true);
         }
 
         return $return;

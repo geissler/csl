@@ -18,15 +18,15 @@ use Geissler\CSL\Interfaces\Option;
  */
 class Layout implements Renderable, Parental
 {
-    /** @var Affix **/
+    /** @var Affix * */
     private $affix;
-    /** @var Formatting **/
+    /** @var Formatting * */
     private $formatting;
-    /** @var string **/
+    /** @var string * */
     private $delimiter;
-    /** @var ExpandFormatting **/
+    /** @var ExpandFormatting * */
     private $expand;
-    /** @var array **/
+    /** @var array * */
     private $children;
     /** @var \Geissler\CSL\Interfaces\Option */
     private $options;
@@ -38,20 +38,20 @@ class Layout implements Renderable, Parental
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->delimiter    =   "";
+        $this->delimiter = "";
 
-        $this->affix        =   new Affix($xml);
-        $this->formatting   =   new Formatting($xml);
-        $this->expand       =   new ExpandFormatting();
+        $this->affix = new Affix($xml);
+        $this->formatting = new Formatting($xml);
+        $this->expand = new ExpandFormatting();
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'delimiter') {
-                $this->delimiter    =   (string) $value;
+                $this->delimiter = (string)$value;
             }
         }
 
-        $children       =   new Children();
-        $this->children =   $children->create($xml);
+        $children = new Children();
+        $this->children = $children->create($xml);
     }
 
     /**
@@ -78,7 +78,7 @@ class Layout implements Renderable, Parental
             if (($child instanceof $class) == true) {
                 return $child;
             } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
-                $subChild   =   $child->getChildElement($class);
+                $subChild = $child->getChildElement($class);
 
                 if ($subChild !== false) {
                     return $subChild;
@@ -100,7 +100,8 @@ class Layout implements Renderable, Parental
     {
         foreach ($this->children as $child) {
             if (($child instanceof $class) == true
-                && ($child instanceof \Geissler\CSL\Interfaces\Modifiable) == true) {
+                && ($child instanceof \Geissler\CSL\Interfaces\Modifiable) == true
+            ) {
                 $child->modify($xml);
                 return true;
             } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true) {
@@ -123,7 +124,8 @@ class Layout implements Renderable, Parental
     {
         foreach ($this->children as $child) {
             if (($child instanceof \Geissler\CSL\Interfaces\Parental) == true
-                && $child->isAccessingVariable($name) == true) {
+                && $child->isAccessingVariable($name) == true
+            ) {
                 return true;
             }
         }
@@ -144,15 +146,15 @@ class Layout implements Renderable, Parental
 
         if (Container::getContext()->getName() == 'citation') {
             if (Container::getCitationItem() !== false) {
-                $return =   $this->citation($data);
+                $return = $this->citation($data);
             } else {
-                $return =   $this->citationFromData($data);
+                $return = $this->citationFromData($data);
             }
         } else {
-            $return =   $this->bibliography($data);
+            $return = $this->bibliography($data);
         }
 
-        $return =   $this->removeUnnecessaryFormatting($return);
+        $return = $this->removeUnnecessaryFormatting($return);
         Container::getContext()->leave();
         return $return;
     }
@@ -166,27 +168,27 @@ class Layout implements Renderable, Parental
     public function renderJustActualEntry($data)
     {
         Container::getData()->moveToId(Container::getActualId());
-        $entry   =   array();
+        $entry = array();
 
         if (Container::getCitationItem() !== false) {
             // prefix for citation item
             if (Container::getCitationItem()->get('prefix') !== null) {
-                $entry[]    =   Container::getCitationItem()->get('prefix');
-                $entry[]    =   ' ';
+                $entry[] = Container::getCitationItem()->get('prefix');
+                $entry[] = ' ';
             }
 
             foreach ($this->children as $child) {
-                $entry[]   =   $child->render($data);
+                $entry[] = $child->render($data);
             }
 
             // suffix for citation item
             if (Container::getCitationItem()->get('suffix') !== null) {
-                $entry[]    =   ' ';
-                $entry[]    =   Container::getCitationItem()->get('suffix');
+                $entry[] = ' ';
+                $entry[] = Container::getCitationItem()->get('suffix');
             }
         } else {
             foreach ($this->children as $child) {
-                $entry[]   =   $child->render($data);
+                $entry[] = $child->render($data);
             }
         }
 
@@ -202,11 +204,11 @@ class Layout implements Renderable, Parental
      */
     public function renderById($id, $data)
     {
-        $actualId   =   Container::getActualId();
-        $return     =   false;
+        $actualId = Container::getActualId();
+        $return = false;
 
         if (Container::getData()->moveToId($id) == true) {
-            $return =   $this->renderJustActualEntry($data);
+            $return = $this->renderJustActualEntry($data);
 
             if ($actualId !== '') {
                 Container::getData()->moveToId($actualId);
@@ -214,25 +216,6 @@ class Layout implements Renderable, Parental
         }
 
         return $return;
-    }
-
-    public function renderFirstId($id)
-    {
-        if (Container::getCitationItem() !== false) {
-            Container::getCitationItem()->moveToFirst();
-
-            $found =    false;
-            do {
-                do {
-                    if (Container::getCitationItem()->get('id') == $id) {
-                        $found  =   true;
-                        break;
-                    }
-                } while (Container::getCitationItem()->nextInGroup() == true);
-            } while (Container::getCitationItem()->next() == true && $found == false);
-        }
-
-        return $this->renderById($id, '');
     }
 
     /**
@@ -245,16 +228,17 @@ class Layout implements Renderable, Parental
     {
         Container::getContext()->addOption('layout', 'delimiter', $this->delimiter);
         Container::getCitationItem()->moveToFirst();
-        $result =   array();
+        $result = array();
 
         do {
             $group = array();
             do {
-                $id         =   Container::getActualId();
-                $citationId =   Container::getActualCitationId();
+                $id = Container::getActualId();
+                $citationId = Container::getActualCitationId();
 
                 if ($id !== null
-                    && $citationId !== null) {
+                    && $citationId !== null
+                ) {
                     Container::getData()->moveToId($id);
 
                     // store rendered citation
@@ -263,7 +247,7 @@ class Layout implements Renderable, Parental
                 }
             } while (Container::getCitationItem()->nextInGroup() == true);
 
-            $result[]   =   $group;
+            $result[] = $group;
         } while (Container::getCitationItem()->next() == true);
 
 
@@ -280,13 +264,13 @@ class Layout implements Renderable, Parental
     {
         Container::getContext()->addOption('layout', 'delimiter', $this->delimiter);
         Container::getData()->moveToFirst();
-        $result =   array();
+        $result = array();
 
         do {
             // store rendered citation
-            $id =   Container::getData()->getVariable('id');
+            $id = Container::getData()->getVariable('id');
             Container::getRendered()->set($id, 0, $this->renderJustActualEntry($data));
-            $result[]   =   $id . '#0';
+            $result[] = $id . '#0';
         } while (Container::getData()->next() == true);
 
         return explode("\n", $this->applyCitationOptions($result, $this->delimiter));
@@ -301,44 +285,45 @@ class Layout implements Renderable, Parental
      */
     private function applyCitationOptions($data, $delimiter)
     {
-        $data   =   $this->applyOptions($data);
+        $data = $this->applyOptions($data);
 
         if (is_array($data) == true) {
-            $length     =   count($data);
-            $delimiters =   array();
+            $length = count($data);
+            $delimiters = array();
             for ($i = 0; $i < $length; $i++) {
                 if (isset($data[$i][0]) == true) {
-                    $innerLength    =   count($data[$i]);
-                    $innerData      =   array();
+                    $innerLength = count($data[$i]);
+                    $innerData = array();
 
                     for ($j = 0; $j < $innerLength; $j++) {
                         if ($data[$i][$j]['delimiter'] != '') {
-                            $delimiters[]   =   $data[$i][$j]['delimiter'];
+                            $delimiters[] = $data[$i][$j]['delimiter'];
                         }
 
                         if (preg_match('/[,|;|\.]$/', $data[$i][$j]['value']) == 0) {
-                            $innerData[]    =   $data[$i][$j]['value'] . $data[$i][$j]['delimiter'];
+                            $innerData[] = $data[$i][$j]['value'] . $data[$i][$j]['delimiter'];
                         } else {
-                            $innerData[]    =   $data[$i][$j]['value'];
+                            $innerData[] = $data[$i][$j]['value'];
                             if (preg_match('/[ ]$/', $data[$i][$j]['delimiter']) == 1) {
-                                $innerData[]    =   ' ';
+                                $innerData[] = ' ';
                             }
                         }
                     }
 
-                    $data[$i]   =   $this->format(implode('', $innerData));
+                    $data[$i] = $this->format(implode('', $innerData));
                 } else {
                     if ($data[$i]['delimiter'] != '') {
-                        $delimiters[]   =   $data[$i]['delimiter'];
+                        $delimiters[] = $data[$i]['delimiter'];
                     }
 
                     if (preg_match('/[,|;|\.]$/', $data[$i]['value']) == 0) {
-                        $data[$i]    =   $data[$i]['value'] . $data[$i]['delimiter'];
+                        $data[$i] = $data[$i]['value'] . $data[$i]['delimiter'];
                     } else {
-                        $data[$i]    =   $data[$i]['value'];
+                        $data[$i] = $data[$i]['value'];
                         if (isset($data[$i]['delimiter']) == true
-                            && preg_match('/[ ]$/', $data[$i]['delimiter']) == 1) {
-                            $data[$i]    =   ' ';
+                            && preg_match('/[ ]$/', $data[$i]['delimiter']) == 1
+                        ) {
+                            $data[$i] = ' ';
                         }
                     }
                 }
@@ -346,20 +331,20 @@ class Layout implements Renderable, Parental
 
             // Add delimiter where no other exists
             if (count($delimiters) > 0) {
-                $regExp =   '/(' . implode('|', array_unique($delimiters)) . ')$/';
+                $regExp = '/(' . implode('|', array_unique($delimiters)) . ')$/';
                 for ($i = 0; $i < $length - 1; $i++) {
                     if (preg_match($regExp, $data[$i]) == 0) {
-                        $data[$i]   .=  $delimiter;
+                        $data[$i] .= $delimiter;
                     }
                 }
 
-                $return =   implode('', $data);
+                $return = implode('', $data);
             } else {
-                $return =   implode($delimiter, $data);
+                $return = implode($delimiter, $data);
             }
 
-            $return =   str_replace('. ' . $this->delimiter, '. ', $return);
-            $return =   str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
+            $return = str_replace('. ' . $this->delimiter, '. ', $return);
+            $return = str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
             return $this->format($return);
         }
 
@@ -375,11 +360,12 @@ class Layout implements Renderable, Parental
     private function bibliography($data)
     {
         Container::getData()->moveToFirst();
-        $result =   array();
+        $result = array();
 
         // add year-suffix to the first year rendered through cs:date in the bibliographic entry
         if (Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') == true
-            && $this->isAccessingVariable('year-suffix') == false) {
+            && $this->isAccessingVariable('year-suffix') == false
+        ) {
             $this->modifyChildElement(
                 'Geissler\CSL\Date\Date',
                 new \SimpleXMLElement('<date add-year-suffix="true" />')
@@ -387,12 +373,12 @@ class Layout implements Renderable, Parental
         }
 
         do {
-            $entry   =   array();
+            $entry = array();
             foreach ($this->children as $child) {
-                $entry[]   =   $child->render($data);
+                $entry[] = $child->render($data);
             }
 
-            $result[]   =   $this->format($this->applyOptions($entry, true));
+            $result[] = $this->format($this->applyOptions($entry, true));
         } while (Container::getData()->next() == true);
 
         return $this->applyOptions($result);
@@ -406,13 +392,13 @@ class Layout implements Renderable, Parental
      */
     private function format($data)
     {
-        $data   =   preg_replace('/[ ][ ]+/', ' ', $data);
-        $data   =   preg_replace('/[\.][\.]+/', '.', $data);
-        $data   =   preg_replace('/( ,)/', ',', $data);
-        $data   =   preg_replace('/[;|,]([;|,])/', '$1', $data);
-        $data   =   preg_replace('/\.(<\/[a-z]+>)\./', '.$1', $data);
-        $data   =   $this->expand->render($data);
-        $data   =   $this->affix->render($data, true);
+        $data = preg_replace('/[ ][ ]+/', ' ', $data);
+        $data = preg_replace('/[\.][\.]+/', '.', $data);
+        $data = preg_replace('/( ,)/', ',', $data);
+        $data = preg_replace('/[;|,]([;|,])/', '$1', $data);
+        $data = preg_replace('/\.(<\/[a-z]+>)\./', '.$1', $data);
+        $data = $this->expand->render($data);
+        $data = $this->affix->render($data, true);
         return $this->formatting->render($data);
     }
 
@@ -424,12 +410,12 @@ class Layout implements Renderable, Parental
      */
     private function removeUnnecessaryFormatting($data)
     {
-        $length =   count($data);
+        $length = count($data);
 
         for ($i = 0; $i < $length; $i++) {
             if (preg_match('/^\<span style="font\-style:normal;">(.*)<\/span>$/', $data[$i]) == 1) {
-                $data[$i]   =   preg_replace('/^\<span style="font\-style:normal;"\>/', '', $data[$i]);
-                $data[$i]   =   preg_replace('/<\/span>$/', '', $data[$i]);
+                $data[$i] = preg_replace('/^\<span style="font\-style:normal;"\>/', '', $data[$i]);
+                $data[$i] = preg_replace('/<\/span>$/', '', $data[$i]);
             }
         }
 

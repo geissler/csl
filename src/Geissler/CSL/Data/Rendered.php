@@ -19,8 +19,8 @@ class Rendered
      */
     public function __construct()
     {
-        $this->rendered             =   array();
-        $this->differentCitations   =   false;
+        $this->rendered = array();
+        $this->differentCitations = false;
     }
 
     /**
@@ -31,7 +31,7 @@ class Rendered
      */
     public function setUseDifferentCitations($value)
     {
-        $this->differentCitations   =   $value;
+        $this->differentCitations = $value;
         return $this;
     }
 
@@ -46,6 +46,16 @@ class Rendered
     }
 
     /**
+     * Retrieve the number of actual rendered cites.
+     *
+     * @return int
+     */
+    public function getLength()
+    {
+        return count($this->rendered);
+    }
+
+    /**
      * Store a rendered value under its item-id and citationID.
      *
      * @param string|int $id
@@ -55,14 +65,14 @@ class Rendered
      */
     public function set($id, $citationId, $value)
     {
-        $key    =   $this->find($id, $citationId);
+        $key = $this->find($id, $citationId);
         if ($key !== false) {
-            $this->rendered[$key]['value']  =   $value;
+            $this->rendered[$key]['value'] = $value;
         } else {
-            $this->rendered[]   =   array(
-                'id'            =>  $id,
-                'citationId'    =>  $citationId,
-                'value'         =>  $value
+            $this->rendered[] = array(
+                'id' => $id,
+                'citationId' => $citationId,
+                'value' => $value
             );
         }
 
@@ -82,12 +92,12 @@ class Rendered
                 return false;
             }
 
-            $ids        =   explode('#', $id);
-            $id         =   $ids[0];
-            $citationId =   $ids[1];
+            $ids = explode('#', $id);
+            $id = $ids[0];
+            $citationId = $ids[1];
         }
 
-        $key    =   $this->find($id, $citationId);
+        $key = $this->find($id, $citationId);
         if ($key !== false) {
             return $this->rendered[$key]['value'];
         }
@@ -105,8 +115,8 @@ class Rendered
      */
     public function update($id, $oldValue, $newValue)
     {
-        $length     =   count($this->rendered);
-        $updated    =   array();
+        $length = count($this->rendered);
+        $updated = array();
 
         for ($i = 0; $i < $length; $i++) {
             if (isset($this->rendered[$i]) == true
@@ -114,10 +124,11 @@ class Rendered
                 && ($this->rendered[$i]['value'] == $oldValue
                     || preg_match('/^' . $oldValue . '/', $this->rendered[$i]['value']) == 1)
                 && ($this->differentCitations == false
-                    || in_array($id, $updated) == false)) {
+                    || in_array($id, $updated) == false)
+            ) {
 
-                $this->rendered[$i]['value']    =   $newValue;
-                $updated[]                      =   $id;
+                $this->rendered[$i]['value'] = $newValue;
+                $updated[] = $id;
             }
         }
 
@@ -131,10 +142,10 @@ class Rendered
      */
     public function getAllById()
     {
-        $return =   array();
+        $return = array();
         foreach ($this->rendered as $values) {
             if (array_key_exists($values['id'], $return) == false) {
-                $return[$values['id']]  =   $values['value'];
+                $return[$values['id']] = $values['value'];
             }
         }
 
@@ -149,16 +160,17 @@ class Rendered
      */
     public function getFirstById($id)
     {
-        $length =   count($this->rendered);
+        $length = count($this->rendered);
 
         for ($i = 0; $i < $length; $i++) {
             if (isset($this->rendered[$i]) == true
-                && $this->rendered[$i]['id'] == $id) {
+                && $this->rendered[$i]['id'] == $id
+            ) {
                 return $this->rendered[$i]['value'];
             }
         }
 
-        return '';
+        return null;
     }
 
     /**
@@ -169,7 +181,7 @@ class Rendered
      */
     public function getPositionOfFirstId($id)
     {
-        $length =   count($this->rendered);
+        $length = count($this->rendered);
 
         for ($i = 0; $i < $length; $i++) {
             if ($this->rendered[$i]['id'] == $id) {
@@ -177,7 +189,7 @@ class Rendered
             }
         }
 
-        return 0;
+        return null;
     }
 
     public function dump()
@@ -192,7 +204,7 @@ class Rendered
      */
     public function clear()
     {
-        $this->rendered =   array();
+        $this->rendered = array();
         return $this;
     }
 
@@ -204,11 +216,12 @@ class Rendered
      */
     public function clearById($id)
     {
-        $length =   count($this->rendered);
+        $length = count($this->rendered);
 
         for ($i = 0; $i < $length; $i++) {
             if (isset($this->rendered[$i]) == true
-                && $this->rendered[$i]['id'] == $id) {
+                && $this->rendered[$i]['id'] == $id
+            ) {
                 unset($this->rendered[$i]);
             }
         }
@@ -227,7 +240,8 @@ class Rendered
     {
         foreach ($this->rendered as $key => $values) {
             if ($values['id'] == $id
-                && $values['citationId'] == $citationId) {
+                && $values['citationId'] == $citationId
+            ) {
                 return $key;
             }
         }

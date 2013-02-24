@@ -16,9 +16,9 @@ use Geissler\CSL\Options\Citation as CitationOptions;
  */
 class Citation implements Renderable
 {
-    /** @var Layout **/
+    /** @var Layout * */
     private $layout;
-    /** @var Sort **/
+    /** @var Sort * */
     private $sort;
 
     /**
@@ -33,10 +33,10 @@ class Citation implements Renderable
         foreach ($xml->children() as $child) {
             switch ($child->getName()) {
                 case 'layout':
-                    $this->layout   =   new Layout($child);
+                    $this->layout = new Layout($child);
                     break;
                 case 'sort':
-                    $this->sort =   new Sort($child);
+                    $this->sort = new Sort($child);
                     break;
             }
         }
@@ -49,7 +49,7 @@ class Citation implements Renderable
         $this->layout->setOptions(new CitationOptions($xml));
 
         // set global options and inheritable name options
-        $options    =   new Options();
+        $options = new Options();
         $options->set('citation', $xml);
     }
 
@@ -79,7 +79,7 @@ class Citation implements Renderable
         }
 
         // render citation
-        $result =   $this->layout->render($data);
+        $result = $this->layout->render($data);
 
         // The assignment of the year-suffixes follows the order of the bibliographies entries,
         // so sort if disambiguation by year-suffixes is needed, sort the data by the bibliography
@@ -87,39 +87,64 @@ class Citation implements Renderable
         if (Container::hasBibliography() == true
             && Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
             && Container::getContext()->getLastDisambiguation() == 'Geissler\CSL\Options\Disambiguation\AddYearSuffix'
-            && Container::getBibliography()->sort() == true) {
+            && Container::getBibliography()->sort() == true
+        ) {
             Container::getRendered()->clear();
 
             // re-render citation
-            $result =   $this->layout->render($data);
+            $result = $this->layout->render($data);
         }
 
         if (Container::getCitationItem() !== false) {
             // apply additional citation formatting options
             Container::getCitationItem()->moveToFirst();
             if (Container::getCitationItem()->get('noteIndex') !== null
-                || Container::getCitationItem()->get('index') !== null) {
-                $citation   =   array();
-                $length     =   count($result);
-                $prefix     =   '..';
+                || Container::getCitationItem()->get('index') !== null
+            ) {
+                $citation = array();
+                $length = count($result);
+                $prefix = '..';
 
                 for ($i = 0; $i < $length; $i++) {
                     if ($i + 1 == $length) {
-                        $prefix =   '>>';
+                        $prefix = '>>';
                     }
 
-                    $citation[] =   $prefix . '[' . $i . '] ' . $result[$i];
+                    // Therefore, the first character of a citation should preferably be uppercased
+                    $citation[] = $prefix . '[' . $i . '] ' . $this->upperCase($result[$i]);
                 }
 
-                $return =   implode("\n", $citation);
+                $return = implode("\n", $citation);
             } else {
-                $return =   implode("\n", $result);
+                array_walk($result, array($this, 'upperCase'));
+                $return = implode("\n", $result);
             }
         } else {
-            $return =   implode("\n", $result);
+            array_walk($result, array($this, 'upperCase'));
+            $return = implode("\n", $result);
         }
 
         Container::getContext()->leave();
         return $return;
+    }
+
+    /**
+     * In note styles, a citation is often a sentence by itself. Therefore, the first character of a citation should
+     * preferably be uppercased when there is no preceding text in the note.
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function upperCase(&$value)
+    {
+        if (Container::getContext()->getValue('class', 'style') == 'note') {
+            if (preg_match_all('/([A-z|Ä|ä|Ö|ö|Ü|ü|ß]){2,}/', $value, $match) !== false
+                && count($match[0]) == 1
+            ) {
+                $value = ucfirst($value);
+            }
+        }
+
+        return $value;
     }
 }

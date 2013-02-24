@@ -32,7 +32,8 @@ class Disambiguation implements Optional
         if (Container::getContext()->getValue('disambiguateAddNames', 'citation') === true
             || Container::getContext()->getValue('disambiguateAddGivenname', 'citation') === true
             || Container::getContext()->getValue('disambiguateAddYearSuffix', 'citation') === true
-            || Container::getContext()->isChooseDisambiguationActive() == true) {
+            || Container::getContext()->isChooseDisambiguationActive() == true
+        ) {
             $this->solve();
         }
 
@@ -45,15 +46,15 @@ class Disambiguation implements Optional
     private function solve()
     {
         Container::getContext()->enter('disambiguation');
-        $this->layout   =   Container::getContext()->get('layout', 'layout');
-        $this->names    =   $this->layout->getChildElement('\Geissler\CSL\Names\Names');
+        $this->layout = Container::getContext()->get('layout', 'layout');
+        $this->names = $this->layout->getChildElement('\Geissler\CSL\Names\Names');
 
         // if "et-al-subsequent-min" or "et-al-subsequent-use-first" are used, use the first citation
         // to disambiguate the values (see disambiguate_BasedOnEtAlSubsequent.txt)
-        $citations  =   Container::getRendered()->getAllById();
+        $citations = Container::getRendered()->getAllById();
 
         if (is_object($this->names) == true) {
-            $this->sorted   =   array_keys($citations);
+            $this->sorted = array_keys($citations);
             asort($citations);
             $this->disambiguateByName($citations);
 
@@ -69,7 +70,7 @@ class Disambiguation implements Optional
      */
     private function disambiguateByCitationLabel($citations)
     {
-        $ambiguous   =   ArrayData::ambiguous($citations);
+        $ambiguous = ArrayData::ambiguous($citations);
         new Chain($ambiguous);
     }
 
@@ -80,46 +81,47 @@ class Disambiguation implements Optional
      */
     private function disambiguateByName($citations)
     {
-        $identical  =   array();
-        $last       =   false;
-        $lastNames  =   false;
+        $identical = array();
+        $last = false;
+        $lastNames = false;
         foreach ($citations as $id => $citation) {
             Container::getData()->moveToId($id);
-            $actualNames    =   $this->names->render('');
+            $actualNames = $this->names->render('');
 
             if ($last === false) {
-                $identical      =   array();
-                $lastNames      =   $actualNames;
-                $last           =   $citation;
+                $identical = array();
+                $lastNames = $actualNames;
+                $last = $citation;
 
-                $identical[]    =   array(
-                    'id'        =>  $id,
-                    'citation'  =>  $citation,
-                    'position'  =>  $this->getSortedPosition($id),
-                    'names'     =>  $actualNames
+                $identical[] = array(
+                    'id' => $id,
+                    'citation' => $citation,
+                    'position' => $this->getSortedPosition($id),
+                    'names' => $actualNames
                 );
 
             } elseif ($last == $citation
-                || $lastNames == $actualNames) {
-                $identical[]    =   array(
-                    'id'        =>  $id,
-                    'citation'  =>  $citation,
-                    'position'  =>  $this->getSortedPosition($id),
-                    'names'     =>  $actualNames
+                || $lastNames == $actualNames
+            ) {
+                $identical[] = array(
+                    'id' => $id,
+                    'citation' => $citation,
+                    'position' => $this->getSortedPosition($id),
+                    'names' => $actualNames
                 );
             } else {
                 if (count($identical) > 1) {
                     $this->disambiguateIdentical($identical);
                 }
 
-                $last           =   $citation;
-                $lastNames      =   $actualNames;
-                $identical      =   array();
-                $identical[]    =   array(
-                    'id'        =>  $id,
-                    'citation'  =>  $citation,
-                    'position'  =>  $this->getSortedPosition($id),
-                    'names'     =>  $actualNames
+                $last = $citation;
+                $lastNames = $actualNames;
+                $identical = array();
+                $identical[] = array(
+                    'id' => $id,
+                    'citation' => $citation,
+                    'position' => $this->getSortedPosition($id),
+                    'names' => $actualNames
                 );
 
             }
@@ -150,58 +152,15 @@ class Disambiguation implements Optional
      */
     private function disambiguateIdentical($identical)
     {
-        $reRender       =   false;
-        $rePositioned   =   $this->rePositioningCitations($identical);
-        $values         =   array_values($rePositioned);
+        $rePositioned = $this->rePositioningCitations($identical);
+        $values = array_values($rePositioned);
 
         if ($values[0] !== $values[1]) {
-            $reRender       =   true;
-            $rePositioned   =   $this->rePositioningCitations($identical, 'names');
+            $rePositioned = $this->rePositioningCitations($identical, 'names');
         }
 
         // run through disambiguation chain
         new Chain($rePositioned);
-
-        /*
-        if (Container::getContext()->isChooseDisambiguationActive() == true) {
-            // re-render citation with choose disambiguate validates to true
-
-            foreach (array_keys($rePositioned) as $id) {
-                $rendered    =   Container::getRendered()->getById($id);
-                //Container::getRendered()->updateCitation($id, false, $rendered['citation']);
-            }
-
-        } elseif ($reRender == true) {
-            // if entries are disambiguated by the names, the full first cite must be re-rendered
-            Container::getContext()->setIgnoreEtAlSubsequent(true);
-
-            foreach (array_keys($rePositioned) as $id) {
-                //$rendered    =   Container::getRendered()->getById($id);
-                Container::getRendered()->updateFirst($id, $this->layout->renderFirstId($id));
-                Container::getRendered()->updateCitation(
-                    $id,
-                    $this->layout->renderById($id, ''),
-                    $rendered['firstCitation']
-                );
-
-            }
-
-            Container::getContext()->setIgnoreEtAlSubsequent(false);
-        } else {
-            // if firstCitation and citation in ambiguous mode are identical, copy first citation to citation
-
-            foreach (array_keys($rePositioned) as $id) {
-                $rendered    =   Container::getRendered()->getById($id);
-                if (isset($rendered['citation']) == true) {
-                    Container::getRendered()->updateCitation(
-                        $id,
-                        $rendered['firstCitation'],
-                        $rendered['citation']
-                    );
-                }
-            }
-        }
-        */
     }
 
     /**
@@ -213,15 +172,15 @@ class Disambiguation implements Optional
      */
     private function rePositioningCitations($data, $field = 'citation')
     {
-        $positions  =   array();
+        $positions = array();
         foreach ($data as $key => $entry) {
-            $positions[$key]    =   $entry['position'];
+            $positions[$key] = $entry['position'];
         }
 
         array_multisort($positions, SORT_ASC, $data);
-        $solve  =   array();
+        $solve = array();
         foreach ($data as $entry) {
-            $solve[$entry['id']]    =   $entry[$field];
+            $solve[$entry['id']] = $entry[$field];
         }
 
         return $solve;

@@ -26,7 +26,7 @@ class DisplayTest extends \PHPUnit_Framework_TestCase
     public function testRender()
     {
         $this->initElement('<text variable="note" display="block"/>');
-        $this->assertEquals('<font style="display:block">Hello Word</font>', $this->object->render('Hello Word'));
+        $this->assertEquals('<div class="csl-block">Hello Word</div>', $this->object->render('Hello Word'));
     }
 
     /**
@@ -35,7 +35,7 @@ class DisplayTest extends \PHPUnit_Framework_TestCase
     public function testRender1()
     {
         $this->initElement('<text variable="note" display="left-margin"/>');
-        $this->assertEquals('Hello Word', $this->object->render('Hello Word'));
+        $this->assertEquals('<div class="csl-left-margin">Hello Word</div>', $this->object->render('Hello Word'));
     }
 
     /**
@@ -44,7 +44,7 @@ class DisplayTest extends \PHPUnit_Framework_TestCase
     public function testRender2()
     {
         $this->initElement('<text variable="note" display="right-inline"/>');
-        $this->assertEquals('<font style="display:inline">Hello Word</font>', $this->object->render('Hello Word'));
+        $this->assertEquals('<div class="csl-right-inline">Hello Word</div>', $this->object->render('Hello Word'));
     }
 
     /**
@@ -53,7 +53,7 @@ class DisplayTest extends \PHPUnit_Framework_TestCase
     public function testRender3()
     {
         $this->initElement('<text variable="note" display="indent"/>');
-        $this->assertEquals('<font style="text-indent: 0px; padding-left: 45px;">Hello Word</font>', $this->object->render('Hello Word'));
+        $this->assertEquals('<div class="csl-indent">Hello Word</div>', $this->object->render('Hello Word'));
     }
 
     /**
@@ -65,9 +65,13 @@ class DisplayTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Hello Word', $this->object->render('Hello Word'));
     }
 
+    /**
+     * Init test.
+     * @param $layout
+     */
     protected function initElement($layout)
     {
         $xml = new \SimpleXMLElement($layout);
-        $this->object   =   new Display($xml);
+        $this->object = new Display($xml);
     }
 }
