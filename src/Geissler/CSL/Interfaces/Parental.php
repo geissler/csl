@@ -1,13 +1,15 @@
 <?php
 namespace Geissler\CSL\Interfaces;
 
+use Geissler\CSL\Interfaces\Variable;
+
 /**
  * Retrieve a child element.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-interface Parental
+interface Parental extends Variable
 {
     /**
      * Retrieve the first child element matching the given class name.
@@ -25,12 +27,4 @@ interface Parental
      * @return object
      */
     public function modifyChildElement($class, \SimpleXMLElement $xml);
-
-    /**
-     * Tests if the element or an child element is accessing the variable with the given name.
-     *
-     * @param string $name
-     * @return boolean
-     */
-    public function isAccessingVariable($name);
 }

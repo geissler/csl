@@ -66,7 +66,9 @@ class Style
                     Container::getContext()->addStyle('class', (string) $value);
                     break;
                 case 'default-locale':
-                    Container::getContext()->addStyle('defaultLocale', (string) $value);
+                    $locale =   Factory::locale();
+                    $locale->readFile((string) $value);
+                    Container::setLocale($locale);
                     break;
             }
         }
@@ -97,23 +99,7 @@ class Style
                     }
                     break;
                 case 'locale':
-                    // select language
-                    $language   =   Container::getContext()->getValue('defaultLocale');
-                    if ($language == ''
-                        || $language == 'en-US') {
-
-                        foreach ($child->attributes() as $name => $value) {
-                            if ($name == 'lang') {
-                                $language   =   (string) $value;
-                                break;
-                            }
-                        }
-                    }
-
-                    $locale =   Factory::locale();
-                    $locale->readFile($language)
-                           ->addXml($child);
-                    Container::setLocale($locale);
+                    Container::getLocale()->addXml($child);
                     break;
             }
         }

@@ -366,9 +366,15 @@ class Name implements Renderable, Modifiable, Contextualize
             $return =   str_replace(Container::getLocale()->getTerms('et-al'), ' … ' . end($names), $return);
         }
 
-        // no formatting in while sorting
+        // no formatting while sorting
         if (Container::getContext()->in('sort') == true) {
             return $return;
+        }
+
+        // no formatting while author-only is set for actual cite
+        if (Container::getCitationItem() !== false
+            && Container::getCitationItem()->get('author-only') == 1) {
+            return $this->affix->render($return, true);
         }
 
         $return =   $this->formatting->render($return);

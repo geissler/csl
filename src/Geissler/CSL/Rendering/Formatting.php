@@ -78,6 +78,10 @@ class Formatting implements Renderable, Modifiable
      */
     public function render($data)
     {
+        if ($data == '') {
+            return '';
+        }
+
         $style  =   array();
 
         if ($this->style !== '') {

@@ -41,7 +41,6 @@ function multiCompare($first, $second)
                 } else {
                     $return =   0;
                 }
-
             } elseif (strtotime($first[$position][0]) !== false
                 || strtotime($second[$position][0]) !== false) {
                 // compare as dates

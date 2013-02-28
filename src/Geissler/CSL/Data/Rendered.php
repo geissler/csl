@@ -192,6 +192,29 @@ class Rendered
         return null;
     }
 
+    /**
+     * Retrieve the item-id and citationID for a rendered value.
+     *
+     * @param string $value
+     * @return array|null
+     */
+    public function getIdByValue($value)
+    {
+        $length = count($this->rendered);
+
+        for ($i = 0; $i < $length; $i++) {
+            if (isset($this->rendered[$i]) == true
+                && $this->rendered[$i]['value'] == $value) {
+                return array(
+                    'id'            =>  $this->rendered[$i]['id'],
+                    'citationId'    =>  $this->rendered[$i]['citationId']
+                );
+            }
+        }
+
+        return null;
+    }
+
     public function dump()
     {
         var_dump($this->rendered);

@@ -3,6 +3,7 @@ namespace Geissler\CSL\Names;
 
 use Geissler\CSL\Interfaces\Groupable;
 use Geissler\CSL\Interfaces\Modifiable;
+use Geissler\CSL\Interfaces\Variable;
 use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Affix;
 use Geissler\CSL\Rendering\Display;
@@ -18,7 +19,7 @@ use Geissler\CSL\Rendering\Label;
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
  */
-class Names implements Groupable, Modifiable
+class Names implements Groupable, Modifiable, Variable
 {
     /** @var array **/
     private $variables;
@@ -128,6 +129,18 @@ class Names implements Groupable, Modifiable
 
         return $this;
     }
+
+    /**
+     * Tests if the element or an child element is accessing the variable with the given name.
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function isAccessingVariable($name)
+    {
+        return in_array($name, $this->variables);
+    }
+
 
     /**
      * Retrieve the name object.
@@ -249,7 +262,14 @@ class Names implements Groupable, Modifiable
         }
 
         $return =   implode($this->delimiter, $returns);
-        $return =   $this->formatting->render($return);
+
+        // no formatting while author-only is set for actual cite
+        if (Container::getCitationItem() == false
+            || Container::getCitationItem()->get('author-only') == 0
+            || Container::getCitationItem()->get('author-only') === null) {
+            $return =   $this->formatting->render($return);
+        }
+
         $return =   $this->display->render($return);
         return $this->affix->render($return);
     }

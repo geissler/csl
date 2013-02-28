@@ -1,4 +1,4 @@
-This project is still in an early alpha state, nearly the half of the tests is failing. The goal is to implement a
+This project is still in an early alpha state, nearly the half of the tests are failing. The goal is to implement a
 parser which is 100% compatible with the [CSL 1.0.1](http://citationstyles.org/downloads/specification.html "CSL")
 standard, 100% clean OOP and follows the
 [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md "PSR-2") coding

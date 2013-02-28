@@ -201,7 +201,10 @@ class CiteCollapsing implements Optional
             foreach ($missingYear as $position) {
                 if (isset($data[$position + 1]) == true
                     && isset($data[$position + 1]['value']) == true) {
-                    if (preg_match('/^' . $data[$position]['value'] . '/', $data[$position + 1]['value']) == 1) {
+                    if (preg_match(
+                        '/^' . preg_quote($data[$position]['value'], '/') . '/',
+                        $data[$position + 1]['value']
+                    ) == 1) {
                         $data[$position + 1]['value']   =   str_replace(
                             $data[$position]['value'],
                             $data[$position]['value'] . $delimiter,

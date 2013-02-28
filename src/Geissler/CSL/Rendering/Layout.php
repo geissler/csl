@@ -9,6 +9,7 @@ use Geissler\CSL\Rendering\Children;
 use Geissler\CSL\Rendering\ExpandFormatting;
 use Geissler\CSL\Container;
 use Geissler\CSL\Interfaces\Option;
+use Geissler\CSL\Options\Discretionary;
 
 /**
  * Layout.
@@ -30,6 +31,8 @@ class Layout implements Renderable, Parental
     private $children;
     /** @var \Geissler\CSL\Interfaces\Option */
     private $options;
+    /** @var \Geissler\CSL\Options\Discretionary */
+    private $discretionary;
 
     /**
      * Parses the layout configuration.
@@ -38,11 +41,11 @@ class Layout implements Renderable, Parental
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->delimiter = "";
-
-        $this->affix = new Affix($xml);
-        $this->formatting = new Formatting($xml);
-        $this->expand = new ExpandFormatting();
+        $this->delimiter        =   "";
+        $this->affix            =   new Affix($xml);
+        $this->formatting       =   new Formatting($xml);
+        $this->expand           =   new ExpandFormatting();
+        $this->discretionary    =   new Discretionary();
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'delimiter') {
@@ -50,8 +53,8 @@ class Layout implements Renderable, Parental
             }
         }
 
-        $children = new Children();
-        $this->children = $children->create($xml);
+        $children       =   new Children();
+        $this->children =   $children->create($xml);
     }
 
     /**
@@ -177,7 +180,8 @@ class Layout implements Renderable, Parental
                 $entry[] = ' ';
             }
 
-            foreach ($this->children as $child) {
+            $render =   $this->discretionary->getRenderClasses($this->children);
+            foreach ($render as $child) {
                 $entry[] = $child->render($data);
             }
 
@@ -237,8 +241,7 @@ class Layout implements Renderable, Parental
                 $citationId = Container::getActualCitationId();
 
                 if ($id !== null
-                    && $citationId !== null
-                ) {
+                    && $citationId !== null) {
                     Container::getData()->moveToId($id);
 
                     // store rendered citation
@@ -249,7 +252,6 @@ class Layout implements Renderable, Parental
 
             $result[] = $group;
         } while (Container::getCitationItem()->next() == true);
-
 
         return explode("\n", $this->applyCitationOptions($result, "\n"));
     }
@@ -288,8 +290,9 @@ class Layout implements Renderable, Parental
         $data = $this->applyOptions($data);
 
         if (is_array($data) == true) {
-            $length = count($data);
-            $delimiters = array();
+            $length     =   count($data);
+            $delimiters =   array();
+
             for ($i = 0; $i < $length; $i++) {
                 if (isset($data[$i][0]) == true) {
                     $innerLength = count($data[$i]);
@@ -309,23 +312,24 @@ class Layout implements Renderable, Parental
                             }
                         }
                     }
-
-                    $data[$i] = $this->format(implode('', $innerData));
                 } else {
+                    $innerData  =   array($data[$i]['value']);
                     if ($data[$i]['delimiter'] != '') {
                         $delimiters[] = $data[$i]['delimiter'];
                     }
 
                     if (preg_match('/[,|;|\.]$/', $data[$i]['value']) == 0) {
-                        $data[$i] = $data[$i]['value'] . $data[$i]['delimiter'];
-                    } else {
-                        $data[$i] = $data[$i]['value'];
-                        if (isset($data[$i]['delimiter']) == true
-                            && preg_match('/[ ]$/', $data[$i]['delimiter']) == 1
-                        ) {
-                            $data[$i] = ' ';
-                        }
+                        $innerData[]    =   $data[$i]['delimiter'];
+                    } elseif (isset($data[$i]['delimiter']) == true
+                        && preg_match('/[ ]$/', $data[$i]['delimiter']) == 1) {
+                        $innerData[] = ' ';
                     }
+                }
+
+                if (Container::getCitationItem() !== false) {
+                    $data[$i] = $this->format(implode('', $innerData));
+                } else {
+                    $data[$i] = implode('', $innerData);
                 }
             }
 
@@ -345,6 +349,12 @@ class Layout implements Renderable, Parental
 
             $return = str_replace('. ' . $this->delimiter, '. ', $return);
             $return = str_replace($this->delimiter . $this->delimiter, $this->delimiter, $return);
+
+            if (Container::getCitationItem() !== false) {
+                return $return;
+            }
+
+            // apply additional formatting if citations are rendered from Input data
             return $this->format($return);
         }
 
@@ -398,6 +408,17 @@ class Layout implements Renderable, Parental
         $data = preg_replace('/[;|,]([;|,])/', '$1', $data);
         $data = preg_replace('/\.(<\/[a-z]+>)\./', '.$1', $data);
         $data = $this->expand->render($data);
+
+        if (Container::getCitationItem() !== false) {
+            // suppress affixes if author-only is set and there is only one cite in the actual citation
+            $ids    =   Container::getRendered()->getIdByValue($data);
+
+            Container::getCitationItem()->moveTo($ids['id'], $ids['citationId']);
+            if (Container::getCitationItem()->get('author-only') == 1) {
+                return $data;
+            }
+        }
+
         $data = $this->affix->render($data, true);
         return $this->formatting->render($data);
     }

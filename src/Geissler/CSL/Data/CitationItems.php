@@ -96,8 +96,12 @@ class CitationItems extends CitationAbstract
      * Retrieve the actual group length.
      * @return int
      */
-    protected function getGroupLength()
+    public function getGroupLength()
     {
-        return count($this->data[$this->position]);
+        if (isset($this->data[$this->position]) == true) {
+            return count($this->data[$this->position]);
+        }
+
+        return 0;
     }
 }

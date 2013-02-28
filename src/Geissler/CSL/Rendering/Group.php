@@ -84,6 +84,16 @@ class Group implements Groupable, Parental
     }
 
     /**
+     * Retrieve all child elements.
+     *
+     * @return array
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
      * Retrieve the first child element matching the given class name.
      *
      * @param string $class full, namespace aware class name
@@ -142,7 +152,7 @@ class Group implements Groupable, Parental
             if (($child instanceof \Geissler\CSL\Rendering\Variable) == true
                 && $child->getName() == $name) {
                 return true;
-            } elseif (($child instanceof \Geissler\CSL\Interfaces\Parental) == true
+            } elseif (in_array('Geissler\CSL\Interfaces\Variable', class_implements($child)) == true
                 && $child->isAccessingVariable($name) == true) {
                 return true;
             }
@@ -212,6 +222,29 @@ class Group implements Groupable, Parental
             && Container::getContext()->get('renderJust', 'sort') !== null) {
             $renderJustClass            =   Container::getContext()->get('renderJust', 'sort');
             $renderJustSelectedClass    =   true;
+        } elseif (Container::getCitationItem() !== false) {
+            if (Container::getCitationItem()->get('author-only') == 1) {
+                $renderJustSelectedClass    =   true;
+
+                foreach ($this->children as $child) {
+                    if (($child instanceof \Geissler\CSL\Interfaces\Variable) == true
+                        && $child->isAccessingVariable('author') == true) {
+                        $renderJustClass[]  =   get_class($child);
+                    }
+                }
+            } elseif (Container::getCitationItem()->get('suppress-author') == 1) {
+                $renderJustSelectedClass    =   true;
+
+                foreach ($this->children as $child) {
+                    if ((($child instanceof \Geissler\CSL\Interfaces\Variable) == true
+                            && $child->isAccessingVariable('author') == false
+                            && $child->isAccessingVariable('editor') == false
+                            && $child->isAccessingVariable('citation-number') == false)
+                        || ($child instanceof \Geissler\CSL\Interfaces\Variable) == false) {
+                        $renderJustClass[]  =   get_class($child);
+                    }
+                }
+            }
         }
 
         $result =   array();

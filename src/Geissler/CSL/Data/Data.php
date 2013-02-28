@@ -36,7 +36,7 @@ class Data
             return $this->moveToFirst();
         }
 
-        throw new \ErrorException('No data set!');
+        throw new \ErrorException('No data set! Is the JSON valid?');
     }
 
     /**

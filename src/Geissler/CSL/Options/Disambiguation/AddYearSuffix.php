@@ -47,7 +47,7 @@ class AddYearSuffix extends DisambiguateAbstract implements Disambiguate
                 $citation   =   Container::getRendered()->getFirstById($id);
 
                 if (preg_match($this->regExp, $citation) == 1
-                    && preg_match('/^' . $this->tmpAmbiguous[$id] . '/', $citation) == 1) {
+                    && preg_match('/^' . preg_quote($this->tmpAmbiguous[$id], '/') . '/', $citation) == 1) {
                     $this->tmpAmbiguous[$id] =  $citation;
                 }
             }

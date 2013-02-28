@@ -39,8 +39,11 @@ abstract class CitationAbstract
             $this->position         =   0;
             $this->groupPosition    =   0;
             $this->groupLength      =   $this->getGroupLength();
-            $this->createCitationIds();
-            return $this;
+
+            return $this
+                ->createCitationIds()
+                ->copySuppressAuthor()
+                ->moveToFirst();
         }
 
         throw new \ErrorException('No citation data set! Correct json object?');
@@ -56,20 +59,7 @@ abstract class CitationAbstract
      */
     abstract public function setVariable($name, $value, $position);
 
-    /**
-     * Create citationIDs if missing to separate identical items in different citations.
-     *
-     * @return void
-     */
-    public function createCitationIds()
-    {
-        if ($this->getAtPosition('citationID', 0, 0) === null) {
-            $length =   $this->getLength();
-            for ($i = 0; $i < $length; $i++) {
-                $this->setVariable('citationID', $i, $i, 0);
-            }
-        }
-    }
+
 
     /**
      * Retrieve the variable from the actual citation item.
@@ -107,7 +97,6 @@ abstract class CitationAbstract
             do {
                 $id =   $this->get('id');
                 if (in_array($id, $ids) == true) {
-
                         $result[]   =   array(
                             'id'            =>  $id,
                             'citationID'    =>  $this->get('citationID')
@@ -283,5 +272,41 @@ abstract class CitationAbstract
      * Calculate the length of the actual citations items.
      * @return integer
      */
-    abstract protected function getGroupLength();
+    abstract public function getGroupLength();
+
+    /**
+     * Create citationIDs if missing to separate identical items in different citations.
+     *
+     * @return \Geissler\CSL\Data\CitationAbstract
+     */
+    private function createCitationIds()
+    {
+        if ($this->getAtPosition('citationID', 0, 0) === null) {
+            $length =   $this->getLength();
+            for ($i = 0; $i < $length; $i++) {
+                $this->setVariable('citationID', $i, $i, 0);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * If first cite in citation uses 'suppress-author' all other cites use also 'suppress-author'.
+     *
+     * @return CitationAbstract
+     */
+    private function copySuppressAuthor()
+    {
+        do {
+            if ($this->get('suppress-author') == 1) {
+                while ($this->nextInGroup() == true) {
+                    $this->setVariable('suppress-author', 1, $this->getPosition());
+                }
+            }
+
+        } while ($this->next() == true);
+
+        return $this;
+    }
 }

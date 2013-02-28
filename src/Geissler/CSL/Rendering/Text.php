@@ -146,7 +146,6 @@ class Text implements Renderable, Groupable, Parental
             return '';
         }
 
-
         $data   =   $this->render->render($data);
 
         // no formatting while sorting

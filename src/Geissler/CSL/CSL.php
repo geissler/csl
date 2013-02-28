@@ -129,12 +129,16 @@ class CSL
      */
     public function citation($style = '', $input = '', $language = '')
     {
-        $this->registerContext('citation')
-             ->setStyle($style)
-             ->changeLocale($language)
-             ->setInput($input);
+        try {
+            $this->registerContext('citation')
+                 ->setStyle($style)
+                 ->changeLocale($language)
+                 ->setInput($input);
 
-        return Container::getCitation()->render('');
+            return Container::getCitation()->render('');
+        } catch (\ErrorException $error) {
+            return 'An error occurred! ' . $error->getMessage();
+        }
     }
 
     /**
@@ -142,17 +146,21 @@ class CSL
      *
      * @param string $style
      * @param string $input
-     * @param bool $language
+     * @param string $language
      * @return string
      */
-    public function bibliography($style = '', $input = '', $language = false)
+    public function bibliography($style = '', $input = '', $language = '')
     {
-        $this->registerContext('bibliography')
-             ->setStyle($style)
-             ->changeLocale($language)
-             ->setInput($input);
+        try {
+            $this->registerContext('bibliography')
+                ->setStyle($style)
+                ->changeLocale($language)
+                ->setInput($input);
 
-        return Container::getBibliography()->render('');
+            return Container::getBibliography()->render('');
+        } catch (\ErrorException $error) {
+            return 'An error occurred! ' . $error->getMessage();
+        }
     }
 
     /**
@@ -163,6 +171,7 @@ class CSL
      */
     private function registerContext($context)
     {
+        Container::clear();
         Container::getContext()->setName($context);
 
         return $this;

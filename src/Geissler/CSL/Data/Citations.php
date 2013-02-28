@@ -121,7 +121,7 @@ class Citations extends CitationAbstract
      *
      * @return int
      */
-    protected function getGroupLength()
+    public function getGroupLength()
     {
         if (isset($this->data[$this->position]) == true) {
             return count($this->data[$this->position][0]['citationItems']);
