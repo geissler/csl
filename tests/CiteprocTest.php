@@ -18,12 +18,12 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
     protected $testJustSelected =   false;
     protected $selectedTests    =   array(
 
-        // 'etal_'
-        // 'variables_'
 
+        'variables_ShortForm'
 
         // working, excluding errors
         /*
+        'etal_',
         'discretionary_',
         'group_',
         'display_',
@@ -46,6 +46,9 @@ class CiteprocTest extends \PHPUnit_Framework_TestCase
         'sort_SubstituteTitle.txt',
         'display_SecondFieldAlignClone.txt',
         'display_SecondFieldAlignMigratePunctuation.txt',
+
+        // not sure what to suppress
+        'etal_UseZeroFirst.txt',
 
         // Don't know why the "citation-number" is suppressed
         'discretionary_CitationNumberAuthorOnlyThenSuppressAuthor.txt',

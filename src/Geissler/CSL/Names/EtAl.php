@@ -44,8 +44,8 @@ class EtAl implements Renderable
     public function render($data)
     {
         $data   =   str_replace(' ' . Container::getLocale()->getTerms('et-al'), '', $data);
-        $data   .=  ' ' . Container::getLocale()->getTerms($this->term);
+        $data   .=  ' ' . $this->formatting->render(Container::getLocale()->getTerms($this->term));
 
-        return $this->formatting->render($data);
+        return $data;
     }
 }

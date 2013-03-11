@@ -131,9 +131,9 @@ class CSL
     {
         try {
             $this->registerContext('citation')
-                 ->setStyle($style)
-                 ->changeLocale($language)
-                 ->setInput($input);
+                ->setStyle($style)
+                ->changeLocale($language)
+                ->setInput($input);
 
             return Container::getCitation()->render('');
         } catch (\ErrorException $error) {

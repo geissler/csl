@@ -583,9 +583,16 @@ class Name implements Renderable, Modifiable, Contextualize
         return '';
     }
 
+    /**
+     * Backup the actual rendering configuration.
+     *
+     * @return Name
+     */
     private function backup()
     {
         $backup         =   get_object_vars($this);
         $this->backup   =   $backup;
+
+        return $this;
     }
 }

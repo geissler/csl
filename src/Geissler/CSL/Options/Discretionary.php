@@ -5,7 +5,7 @@ use Geissler\CSL\Container;
 use Geissler\CSL\Rendering\Value;
 
 /**
- * Discretionary.
+ * Remove rendering elements which should at the moment not be rendered.
  *
  * @author Benjamin Geißler <benjamin.geissler@gmail.com>
  * @license MIT
@@ -20,7 +20,20 @@ class Discretionary
      */
     public function getRenderClasses(array $children)
     {
-        if (Container::getCitationItem() !== false) {
+        // render just child elements of a given class (@see Macro)
+        if (Container::getContext()->in('sort') == true
+            && Container::getContext()->get('renderJust', 'sort') !== null) {
+            $toRender   =   Container::getContext()->get('renderJust', 'sort');
+            $render     =   array();
+            foreach ($children as $child) {
+                if (in_array(get_class($child), $toRender) == true
+                    || ($child instanceof \Geissler\CSL\Interfaces\Parental)) {
+                    $render[]   =   $child;
+                }
+            }
+
+            return $render;
+        } elseif (Container::getCitationItem() !== false) {
             if (Container::getCitationItem()->get('author-only') == 1) {
                 $render =   array();
 
@@ -72,5 +85,19 @@ class Discretionary
         }
 
         return $render;
+    }
+
+    /**
+     * Render authors only once.
+     *
+     * @param array $children
+     */
+    private function renderAuthorsOnlyOnce(array $children)
+    {
+        foreach ($children as &$child) {
+            if ($child instanceof \Geissler\CSL\Interfaces\Parental) {
+                $child  =   $this->renderAuthorsOnlyOnce($child);
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ use Geissler\CSL\Rendering\Number;
 use Geissler\CSL\Names\Names;
 use Geissler\CSL\Rendering\Label;
 use Geissler\CSL\Choose\Choose;
+use Geissler\CSL\Options\Discretionary;
 
 /**
  * Group Element.
@@ -34,6 +35,8 @@ class Group implements Groupable, Parental
     private $children;
     /** @var array */
     private $renderedGroup;
+    /** @var \Geissler\CSL\Options\Discretionary */
+    private $discretionary;
 
     /**
      * Parses the Group configuration.
@@ -42,12 +45,12 @@ class Group implements Groupable, Parental
      */
     public function __construct(\SimpleXMLElement $xml)
     {
-        $this->delimiter    =   '';
-        $this->children     =   array();
-
-        $this->affix        =   new Affix($xml);
-        $this->display      =   new Display($xml);
-        $this->formatting   =   new Formatting($xml);
+        $this->delimiter        =   '';
+        $this->children         =   array();
+        $this->discretionary    =   new Discretionary();
+        $this->affix            =   new Affix($xml);
+        $this->display          =   new Display($xml);
+        $this->formatting       =   new Formatting($xml);
 
         foreach ($xml->attributes() as $name => $value) {
             if ($name == 'delimiter') {
@@ -215,47 +218,13 @@ class Group implements Groupable, Parental
      */
     private function renderGroup()
     {
-        // render just child elements of a given class (@see Macro)
-        $renderJustSelectedClass    =   false;
-        $renderJustClass            =   array();
-        if (Container::getContext()->in('sort') == true
-            && Container::getContext()->get('renderJust', 'sort') !== null) {
-            $renderJustClass            =   Container::getContext()->get('renderJust', 'sort');
-            $renderJustSelectedClass    =   true;
-        } elseif (Container::getCitationItem() !== false) {
-            if (Container::getCitationItem()->get('author-only') == 1) {
-                $renderJustSelectedClass    =   true;
+        $toRender   =   $this->discretionary->getRenderClasses($this->children);
+        $result     =   array();
 
-                foreach ($this->children as $child) {
-                    if (($child instanceof \Geissler\CSL\Interfaces\Variable) == true
-                        && $child->isAccessingVariable('author') == true) {
-                        $renderJustClass[]  =   get_class($child);
-                    }
-                }
-            } elseif (Container::getCitationItem()->get('suppress-author') == 1) {
-                $renderJustSelectedClass    =   true;
-
-                foreach ($this->children as $child) {
-                    if ((($child instanceof \Geissler\CSL\Interfaces\Variable) == true
-                            && $child->isAccessingVariable('author') == false
-                            && $child->isAccessingVariable('editor') == false
-                            && $child->isAccessingVariable('citation-number') == false)
-                        || ($child instanceof \Geissler\CSL\Interfaces\Variable) == false) {
-                        $renderJustClass[]  =   get_class($child);
-                    }
-                }
-            }
-        }
-
-        $result =   array();
-        foreach ($this->children as $element) {
+        foreach ($toRender as $element) {
             $rendered   =   $element->render('');
 
-            if ($rendered !== ''
-                && ($renderJustSelectedClass == false
-                    || in_array(get_class($element), $renderJustClass) == true
-                    || ($element instanceof Parental) == true)
-            ) {
+            if ($rendered !== '') {
                 $result[] =   $rendered;
             }
         }

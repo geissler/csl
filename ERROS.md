@@ -52,4 +52,5 @@ The following tests are excluded of various reasons:
     > In **discretionary_CitationNumberSuppressAuthor.txt** the citation-number is rendered if **suppress-author** is
      used, but in **discretionary_CitationNumberAuthorOnlyThenSuppressAuthor.txt** with the same style and data it is
      rendered.
-
+* etal_UseZeroFirst.txt
+    > I'm not shure if the first or second **<names>** element should be suppressed.
